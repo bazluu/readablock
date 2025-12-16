@@ -1,6 +1,6 @@
 import os
 
-from ebooklib import epub
+from ebooklib import epub, ITEM_DOCUMENT
 from ninja import NinjaAPI
 from ninja.responses import Response
 
@@ -14,7 +14,7 @@ def hello(request):
 @api.get("/read/")
 def read(request):
     # Path to your local EPUB file (adjust as needed)
-    epub_path = os.path.join(os.path.dirname(__file__), "../app/Gatto e topo in società.epub")
+    epub_path = os.path.join(os.path.dirname(__file__), "../Gatto e topo in società.epub")
 
     # Read the EPUB file
     book = epub.read_epub(epub_path)
@@ -22,10 +22,10 @@ def read(request):
 
     # Extract text from each document in the EPUB
     for item in book.get_items():
-        if item.get_type() == epub.ITEM_DOCUMENT:
+        if item.get_type() == ITEM_DOCUMENT:
             text.append(item.get_content().decode("utf-8"))
 
     # Combine all text
     full_text = "\n".join(text)
 
-    return {"text": full_text}
+    return Response({"text": full_text}, status=200)
