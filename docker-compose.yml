@@ -1,0 +1,14 @@
+services:
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server
+    command: python manage.py runserver 0.0.0.0:8000
+    working_dir: /app
+    volumes:
+      - ./server:/app
+    ports:
+      - "8000:8000"
+
