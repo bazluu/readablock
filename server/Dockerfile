@@ -6,6 +6,7 @@ COPY requirements.txt .
 
 RUN apk add --no-cache build-base \
   && pip install --no-cache-dir -r requirements.txt \
+  && python -m textblob.download_corpora \
   && apk del build-base
 
 COPY . .
