@@ -6,18 +6,14 @@ from app import schema, services
 
 api = NinjaAPI()
 
-
 @api.post("/read/")
 def read(request, data: schema.BookSchema):
-    """Return the next `n` sentences starting from `sentence_current`."""
-    start = data.sentence_current
-    end = start + data.sentences_amount
+    sentence_first = data.sentence_first
+    sentence_last = data.sentence_last
 
-    sentences = services.get_epub_as_list()
+    epub = services.convert_epub_to_str()
+    epub_cleaned = services.remove_html(epub)
+ 
+    sentences = services.convert_text_to_sentences(epub_cleaned, sentence_first, sentence_last)
 
-    if start >= len(sentences):
-        return Response({"error": "Current sentence out of range"}, status=400)
-    if end > len(sentences):
-        end = len(sentences)
-
-    return Response({"sentences": sentences[start:end]}, status=200)
+    return Response({"sentences": sentences}, status=200)

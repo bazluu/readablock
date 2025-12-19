@@ -1,10 +1,26 @@
 import os
-import re
 
 from ebooklib import epub, ITEM_DOCUMENT
+from bs4 import BeautifulSoup
+from textblob import TextBlob
 
 
-def get_epub_as_list():
+def convert_text_to_sentences(text: str, start: int, end: int):
+    blob = TextBlob(text)
+
+    sentences = []
+    for sentence in blob.sentences[start:end]:
+        sentences.append(str(sentence))
+
+    return sentences
+
+def remove_html(text: str):
+    soup = BeautifulSoup(text, "html.parser")
+    clean_text = soup.get_text(separator=" ", strip=True)
+
+    return clean_text
+
+def convert_epub_to_str():
     """Load the EPUB file and split its text into sentences."""
     epub_path = os.path.join(os.path.dirname(__file__), "../Gatto e topo in società.epub")
     book = epub.read_epub(epub_path)
@@ -12,13 +28,9 @@ def get_epub_as_list():
     text = []
     for item in book.get_items():
         if item.get_type() == ITEM_DOCUMENT:
-            text.append(item.get_content().decode("utf-8"))
+            content = item.get_content().decode("utf-8")
+            text.append(content)
 
     full_text = "\n".join(text)
 
-    sentences = re.split(r'(?<=[.!?])\s+', full_text.strip())
-
-    # Filter out empty sentences
-    sentences = [s for s in sentences if s]
-
-    return sentences
+    return full_text
