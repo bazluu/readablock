@@ -21,8 +21,11 @@ def remove_html(text: str):
     return clean_text
 
 def convert_epub_to_str():
-    """Load the EPUB file and split its text into sentences."""
-    epub_path = os.path.join(os.path.dirname(__file__), "../Gatto e topo in società.epub")
+    epub_path = os.path.join(
+        os.path.dirname(__file__),
+        "../Gatto e topo in società.epub"
+    )
+
     book = epub.read_epub(epub_path)
 
     text = []
