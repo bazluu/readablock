@@ -11,5 +11,5 @@ class BookSchema(Schema):
 
 class TranslationSchema(Schema):
     text: str
-    source: Optional[str] = None
+    source: str = "IT"
     target: str = "EN-GB"

@@ -47,7 +47,7 @@ def translate(request, data: schema.TranslationSchema):
         translated = services.translate(data.text, data.source, data.target)
  
         return Response(
-            {"translated": str(translated)},
+            {"translated": translated.text},
             status=200
         )
 

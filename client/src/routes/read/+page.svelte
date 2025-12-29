@@ -14,7 +14,7 @@
 	let translations = {}; // Store translations by sentence index
 	let translatingIndex = null;
 	let targetLang = 'EN-GB';
-	let sourceLang = null;
+	let sourceLang = 'IT';
 
 	// Word translation dropdown state
 	let wordDropdown = {
@@ -72,6 +72,10 @@
 			}
 
 			const data = await response.json();
+			console.log('API Response:', data); // Debug log
+
+			// The API returns: { "translated": "done" }
+			// where "translated" is a string, not an object
 			return data.translated;
 		} catch (err) {
 			console.error('Translation error:', err);
@@ -85,8 +89,7 @@
 			const translated = await translateText(sentence);
 			translations[index] = {
 				original: sentence,
-				translated: translated.text,
-				detected_lang: translated.detected_source_lang
+				translated: translated
 			};
 			translations = { ...translations }; // Trigger reactivity
 		} catch (err) {
@@ -118,9 +121,10 @@
 
 		try {
 			const translated = await translateText(cleanWord);
+			console.log('Translated word:', translated); // Debug log
 			wordDropdown = {
 				...wordDropdown,
-				translation: translated.text,
+				translation: translated,
 				loading: false
 			};
 		} catch (err) {
@@ -251,11 +255,6 @@
 												<div class="flex-1">
 													<p class="text-sm font-semibold text-primary">Translation:</p>
 													<p class="text-sm">{translations[index].translated}</p>
-													{#if translations[index].detected_lang}
-														<p class="text-xs text-base-content/60 mt-1">
-															Detected: {translations[index].detected_lang}
-														</p>
-													{/if}
 												</div>
 												<button
 													class="btn btn-ghost btn-xs"
