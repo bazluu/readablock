@@ -4,6 +4,11 @@ from ebooklib import epub, ITEM_DOCUMENT
 from bs4 import BeautifulSoup
 from textblob import TextBlob
 
+def get_total_sentence_count(text: str) -> int:
+    blob = TextBlob(text)
+    total = len(blob.sentences)
+
+    return total
 
 def convert_text_to_sentences(text: str, start: int, end: int):
     blob = TextBlob(text)

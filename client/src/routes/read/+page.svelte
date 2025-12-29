@@ -3,6 +3,7 @@
 	const baseURL = 'http://127.0.0.1:8000';
 	let sentences = [];
 	let sentenceLastRead = 0;
+	let sentenceCount = 0;
 	let sentenceFirst = 0;
 	let hasPrevious = false;
 	let isLoading = true;
@@ -26,6 +27,7 @@
 			const data = await response.json();
 			sentences = data.sentences;
 			sentenceLastRead = data.sentence_last_read;
+			sentenceCount = data.sentence_count;
 			sentenceFirst = data.sentence_first;
 			hasPrevious = data.has_previous;
 		} catch (err) {
@@ -72,6 +74,12 @@
 		<p class="text-center">No sentences found.</p>
 	{:else}
 		<div class="max-w-4xl mx-auto">
+			<progress
+				class="progress progress-primary w-full"
+				value={sentenceLastRead}
+				max={sentenceCount}
+			></progress>
+
 			<!-- Sentences Table -->
 			<div class="overflow-x-auto">
 				<table class="table w-full border-collapse">

@@ -32,6 +32,7 @@ def read(request, data: schema.BookSchema):
     return Response(
         {
             "sentences": sentences,
+            "sentence_count": services.get_total_sentence_count(epub_cleaned),
             "sentence_last_read": sentence_last,
             "sentence_first": sentence_first,
             "has_previous": sentence_first > 0
