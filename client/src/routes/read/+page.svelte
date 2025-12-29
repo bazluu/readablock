@@ -200,27 +200,6 @@
 		<p class="text-center">No sentences found.</p>
 	{:else}
 		<div class="max-w-4xl mx-auto">
-			<!-- Language Selector -->
-			<div class="mb-4 flex gap-4 items-center">
-				<label class="form-control w-full max-w-xs">
-					<div class="label">
-						<span class="label-text">Target Language</span>
-					</div>
-					<select class="select select-bordered" bind:value={targetLang}>
-						<option value="EN-GB">English (UK)</option>
-						<option value="EN-US">English (US)</option>
-						<option value="ES">Spanish</option>
-						<option value="FR">French</option>
-						<option value="DE">German</option>
-						<option value="IT">Italian</option>
-						<option value="PT-PT">Portuguese</option>
-						<option value="RU">Russian</option>
-						<option value="JA">Japanese</option>
-						<option value="ZH">Chinese</option>
-					</select>
-				</label>
-			</div>
-
 			<progress
 				class="progress progress-primary w-full mb-4"
 				value={sentenceLastRead}
