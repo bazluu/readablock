@@ -1,0 +1,18 @@
+FROM python:3.14-alpine
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN apk add --no-cache build-base \
+  && pip install --no-cache-dir -r requirements.txt gunicorn \
+  && python -m textblob.download_corpora \
+  && apk del build-base
+
+COPY . .
+
+RUN python manage.py collectstatic --noinput || true
+
+EXPOSE 8000
+
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]

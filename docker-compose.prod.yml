@@ -1,0 +1,44 @@
+services:
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    container_name: server
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4
+    working_dir: /app
+    volumes:
+      - ./server:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    expose:
+      - "8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - DEBUG=False
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+    container_name: client
+    expose:
+      - "3000"
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  static_volume:
+  media_volume:

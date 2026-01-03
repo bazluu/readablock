@@ -9,6 +9,8 @@ services:
     working_dir: /app
     volumes:
       - ./server:/app
+    environment:
+      - DEBUG=True
     ports:
       - "8000:8000"
     depends_on:
