@@ -148,48 +148,71 @@
 	/>
 </svelte:head>
 
-<div class="app-container">
+<div class="w-full min-h-screen bg-neutral-950 text-neutral-200 font-serif overflow-x-hidden">
 	<!-- Hero Section -->
-	<section class="hero-section">
-		<div class="hero-content">
-			<div class="hero-text">
-				<h1 class="hero-title">
+	<section
+		class="min-h-screen flex flex-col justify-center items-center px-8 py-16 relative border-b-4 border-neutral-800"
+	>
+		<div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+			<div class="space-y-8">
+				<h1
+					class="font-display text-6xl md:text-7xl lg:text-8xl font-bold leading-none tracking-tight"
+				>
 					Read.<br />
 					Click.<br />
-					<span class="gradient-text">Learn.</span>
+					<span class="bg-gradient-to-br from-amber-600 to-amber-500 bg-clip-text text-transparent"
+						>Learn.</span
+					>
 				</h1>
-				<p class="hero-subtitle">
+				<p class="text-xl md:text-2xl text-neutral-400 max-w-lg leading-relaxed">
 					Master languages through immersive reading. Every word tells a story. Every sentence
 					builds fluency.
 				</p>
-				<div class="hero-cta">
-					<a href="/read" class="btn btn-primary">Start Reading</a>
+				<div class="flex gap-4 flex-wrap">
+					<a
+						href="/read"
+						class="px-10 py-4 bg-amber-600 hover:bg-amber-500 text-neutral-950 font-semibold text-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-600/30 border-2 border-amber-600 tracking-wide"
+					>
+						Start Reading
+					</a>
 				</div>
 			</div>
 
-			<div class="hero-demo">
-				<div class="book-preview">
-					<div class="book-header">
-						<span class="book-title">Le Avventure di Pinocchio</span>
-						<span class="book-progress">Chapter 1</span>
+			<div class="relative">
+				<div
+					class="bg-neutral-900 border-4 border-neutral-800 rounded-lg p-8 shadow-2xl transition-transform duration-300 hover:scale-[1.02]"
+					style="transform: perspective(1000px) rotateY(-5deg);"
+				>
+					<div class="flex justify-between items-center pb-6 border-b-2 border-neutral-800 mb-8">
+						<span class="font-display text-xl md:text-2xl font-bold italic"
+							>Le Avventure di Pinocchio</span
+						>
+						<span class="text-neutral-500 text-sm">Chapter 1</span>
 					</div>
-					<div class="book-content">
-						<p class="italian-text">
+					<div class="relative min-h-[300px]">
+						<p class="text-xl md:text-2xl leading-loose">
 							{#each italianExcerpt as word, i}
 								<button
-									class="word"
-									class:selected={selectedWord === word.text}
-									on:click={() => handleWordClick(word.text, word.translation)}
+									class="bg-transparent border-0 text-neutral-200 cursor-pointer px-0.5 py-0.5 transition-all duration-200 relative hover:text-amber-500 inline-block animate-fadeInWord {selectedWord ===
+									word.text
+										? 'text-amber-600 font-semibold'
+										: ''}"
 									style="animation-delay: {i * 0.05}s"
+									on:click={() => handleWordClick(word.text, word.translation)}
 								>
 									{word.text}
+									<span
+										class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600 scale-x-0 transition-transform duration-200 origin-left group-hover:scale-x-100"
+									></span>
 								</button>
 							{/each}
 						</p>
 						{#if translation}
-							<div class="translation-tooltip">
-								<span class="tooltip-word">{selectedWord}</span>
-								<span class="tooltip-translation">{translation}</span>
+							<div
+								class="absolute bottom-full left-1/2 -translate-x-1/2 bg-neutral-800 border-2 border-amber-600 px-6 py-4 rounded-lg flex flex-col gap-2 animate-tooltipAppear shadow-2xl"
+							>
+								<span class="text-xl font-bold text-amber-500">{selectedWord}</span>
+								<span class="text-base text-neutral-400">{translation}</span>
 							</div>
 						{/if}
 					</div>
@@ -197,91 +220,111 @@
 			</div>
 		</div>
 
-		<div class="scroll-indicator">
-			<div class="scroll-line"></div>
+		<div
+			class="absolute bottom-12 flex flex-col items-center gap-4 text-neutral-500 text-sm tracking-widest uppercase"
+		>
+			<div
+				class="w-0.5 h-16 bg-gradient-to-b from-transparent via-neutral-800 to-transparent animate-scrollPulse"
+			></div>
 			<span>Scroll to explore</span>
 		</div>
 	</section>
 
 	<!-- Features Section -->
-	<section class="features-section">
-		<div class="section-header">
-			<h2 class="section-title">The Science of Language Immersion</h2>
-			<p class="section-subtitle">Three principles. Infinite possibilities.</p>
+	<section class="py-40 px-8 border-b-4 border-neutral-800">
+		<div class="text-center max-w-4xl mx-auto mb-24">
+			<h2 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+				The Science of Language Immersion
+			</h2>
+			<p class="text-2xl text-neutral-400">Three principles. Infinite possibilities.</p>
 		</div>
 
-		<div class="features-grid">
+		<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
 			{#each features as feature, i}
 				<div
-					class="feature-card"
-					class:hovered={hoveredFeature === i}
+					class="bg-neutral-900 border-4 border-neutral-800 p-12 relative transition-all duration-300 hover:-translate-y-3 hover:border-amber-600 animate-fadeInUp"
+					style="animation-delay: {i * 0.2}s"
 					on:mouseenter={() => (hoveredFeature = i)}
 					on:mouseleave={() => (hoveredFeature = null)}
-					style="animation-delay: {i * 0.2}s"
 				>
-					<div class="feature-icon">{feature.icon}</div>
-					<h3 class="feature-title">{feature.title}</h3>
-					<p class="feature-description">{feature.description}</p>
-					<div class="feature-border"></div>
+					<div class="text-6xl mb-8">{feature.icon}</div>
+					<h3 class="font-display text-3xl font-bold mb-4">{feature.title}</h3>
+					<p class="text-neutral-400 text-lg leading-relaxed">{feature.description}</p>
+					<div
+						class="absolute bottom-0 left-0 right-0 h-1 bg-amber-600 scale-x-0 transition-transform duration-300 origin-left {hoveredFeature ===
+						i
+							? 'scale-x-100'
+							: ''}"
+					></div>
 				</div>
 			{/each}
 		</div>
 	</section>
 
 	<!-- How It Works -->
-	<section class="how-section">
-		<div class="how-content">
-			<div class="how-left">
-				<h2 class="how-title">From Pages<br />to Fluency</h2>
-				<p class="how-description">
+	<section class="py-40 px-8 bg-neutral-900 border-b-4 border-neutral-800">
+		<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+			<div>
+				<h2 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-none mb-8">
+					From Pages<br />to Fluency
+				</h2>
+				<p class="text-2xl text-neutral-400 mb-16 leading-relaxed">
 					readablock transforms classic literature into your personal language laboratory. Read
 					authentic texts, build vocabulary in context, and reinforce learning through play.
 				</p>
-				<div class="how-stats">
-					<div class="stat">
-						<div class="stat-number">10,000+</div>
-						<div class="stat-label">Words Learned</div>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<div class="border-l-4 border-amber-600 pl-6">
+						<div class="font-display text-5xl font-bold leading-none mb-2 text-amber-500">
+							10,000+
+						</div>
+						<div class="text-sm text-neutral-500 uppercase tracking-wider">Words Learned</div>
 					</div>
-					<div class="stat">
-						<div class="stat-number">500+</div>
-						<div class="stat-label">Books Available</div>
+					<div class="border-l-4 border-amber-600 pl-6">
+						<div class="font-display text-5xl font-bold leading-none mb-2 text-amber-500">500+</div>
+						<div class="text-sm text-neutral-500 uppercase tracking-wider">Books Available</div>
 					</div>
-					<div class="stat">
-						<div class="stat-number">12</div>
-						<div class="stat-label">Languages</div>
+					<div class="border-l-4 border-amber-600 pl-6">
+						<div class="font-display text-5xl font-bold leading-none mb-2 text-amber-500">12</div>
+						<div class="text-sm text-neutral-500 uppercase tracking-wider">Languages</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="how-right">
-				<div class="process-steps">
-					<div class="process-step">
-						<div class="step-number">01</div>
-						<div class="step-content">
-							<h4>Choose Your Book</h4>
-							<p>Select from classics like Pinocchio, Don Quixote, or contemporary novels.</p>
-						</div>
+			<div class="flex flex-col gap-12">
+				<div class="grid grid-cols-[auto_1fr] gap-8 items-start">
+					<div class="font-display text-6xl font-bold leading-none text-neutral-600">01</div>
+					<div>
+						<h4 class="font-display text-3xl font-bold mb-3">Choose Your Book</h4>
+						<p class="text-neutral-400 text-lg">
+							Select from classics like Pinocchio, Don Quixote, or contemporary novels.
+						</p>
 					</div>
-					<div class="process-step">
-						<div class="step-number">02</div>
-						<div class="step-content">
-							<h4>Read & Discover</h4>
-							<p>Click any word or sentence for instant translation and context.</p>
-						</div>
+				</div>
+				<div class="grid grid-cols-[auto_1fr] gap-8 items-start">
+					<div class="font-display text-6xl font-bold leading-none text-neutral-600">02</div>
+					<div>
+						<h4 class="font-display text-3xl font-bold mb-3">Read & Discover</h4>
+						<p class="text-neutral-400 text-lg">
+							Click any word or sentence for instant translation and context.
+						</p>
 					</div>
-					<div class="process-step">
-						<div class="step-number">03</div>
-						<div class="step-content">
-							<h4>Practice Chunking</h4>
-							<p>Reorganize sentences from your reading to master sentence patterns.</p>
-						</div>
+				</div>
+				<div class="grid grid-cols-[auto_1fr] gap-8 items-start">
+					<div class="font-display text-6xl font-bold leading-none text-neutral-600">03</div>
+					<div>
+						<h4 class="font-display text-3xl font-bold mb-3">Practice Chunking</h4>
+						<p class="text-neutral-400 text-lg">
+							Reorganize sentences from your reading to master sentence patterns.
+						</p>
 					</div>
-					<div class="process-step">
-						<div class="step-number">04</div>
-						<div class="step-content">
-							<h4>Track Progress</h4>
-							<p>Watch your vocabulary grow and fluency improve over time.</p>
-						</div>
+				</div>
+				<div class="grid grid-cols-[auto_1fr] gap-8 items-start">
+					<div class="font-display text-6xl font-bold leading-none text-neutral-600">04</div>
+					<div>
+						<h4 class="font-display text-3xl font-bold mb-3">Track Progress</h4>
+						<p class="text-neutral-400 text-lg">
+							Watch your vocabulary grow and fluency improve over time.
+						</p>
 					</div>
 				</div>
 			</div>
@@ -289,32 +332,39 @@
 	</section>
 
 	<!-- Pricing Section -->
-	<section class="pricing-section">
-		<div class="section-header">
-			<h2 class="section-title">Choose Your Path</h2>
-			<p class="section-subtitle">Start free. Upgrade when you're ready to master more.</p>
+	<section class="py-40 px-8 border-b-4 border-neutral-800">
+		<div class="text-center max-w-4xl mx-auto mb-24">
+			<h2 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+				Choose Your Path
+			</h2>
+			<p class="text-2xl text-neutral-400">Start free. Upgrade when you're ready to master more.</p>
 		</div>
 
-		<div class="pricing-grid">
+		<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 			{#each pricingPlans as plan, i}
 				<div
-					class="pricing-card"
-					class:highlighted={plan.highlighted}
+					class="bg-neutral-900 border-4 p-12 relative transition-all duration-300 hover:-translate-y-3 animate-fadeInUp {plan.highlighted
+						? 'border-amber-600 bg-neutral-800 scale-105'
+						: 'border-neutral-800'}"
 					style="animation-delay: {i * 0.15}s"
 				>
 					{#if plan.highlighted}
-						<div class="popular-badge">Most Popular</div>
+						<div
+							class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-600 text-neutral-950 px-6 py-2 text-sm font-bold uppercase tracking-wider"
+						>
+							Most Popular
+						</div>
 					{/if}
-					<h3 class="plan-name">{plan.name}</h3>
-					<div class="plan-price">
-						<span class="price">{plan.price}</span>
-						<span class="period">{plan.period}</span>
+					<h3 class="font-display text-3xl font-bold mb-6">{plan.name}</h3>
+					<div class="flex items-baseline gap-2 mb-8 pb-8 border-b-2 border-neutral-800">
+						<span class="font-display text-6xl font-bold leading-none">{plan.price}</span>
+						<span class="text-neutral-500 text-lg">{plan.period}</span>
 					</div>
-					<ul class="plan-features">
+					<ul class="mb-10 flex flex-col gap-4">
 						{#each plan.features as feature}
-							<li>
+							<li class="flex items-center gap-3 text-lg text-neutral-400">
 								<svg
-									class="checkmark"
+									class="w-5 h-5 text-amber-600 flex-shrink-0"
 									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
@@ -328,7 +378,11 @@
 							</li>
 						{/each}
 					</ul>
-					<button class="btn {plan.highlighted ? 'btn-primary' : 'btn-outline'} w-full">
+					<button
+						class="w-full px-10 py-4 font-semibold text-lg transition-all duration-300 border-2 {plan.highlighted
+							? 'bg-amber-600 hover:bg-amber-500 text-neutral-950 border-amber-600 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-600/30'
+							: 'bg-transparent text-neutral-200 border-neutral-800 hover:border-amber-600 hover:text-amber-600'}"
+					>
 						{plan.cta}
 					</button>
 				</div>
@@ -337,199 +391,124 @@
 	</section>
 
 	<!-- CTA Section -->
-	<section class="cta-section">
-		<div class="cta-content">
-			<h2 class="cta-title">Begin Your Language Journey Today</h2>
-			<p class="cta-subtitle">
+	<section
+		class="py-40 px-8 bg-gradient-to-br from-neutral-950 to-neutral-900 border-b-4 border-neutral-800"
+	>
+		<div class="max-w-4xl mx-auto text-center">
+			<h2 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+				Begin Your Language Journey Today
+			</h2>
+			<p class="text-2xl text-neutral-400 mb-12">
 				Join thousands of learners discovering the joy of reading in a new language.
 			</p>
-			<button class="btn btn-primary btn-large">Start Reading Free</button>
-			<p class="cta-note">No credit card required • 3 books free forever</p>
+			<button
+				class="px-12 py-5 bg-amber-600 hover:bg-amber-500 text-neutral-950 font-semibold text-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-600/30 border-2 border-amber-600"
+			>
+				Start Reading Free
+			</button>
+			<p class="mt-6 text-neutral-500 text-base">No credit card required • 3 books free forever</p>
 		</div>
 	</section>
 
 	<!-- Footer -->
-	<footer class="footer">
-		<div class="footer-content">
-			<div class="footer-brand">
-				<h3 class="footer-logo">readablock</h3>
-				<p class="footer-tagline">Language immersion through literature</p>
+	<footer class="pt-24 pb-12 px-8 bg-neutral-900">
+		<div
+			class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.5fr_2fr] gap-24 pb-16 border-b-2 border-neutral-800"
+		>
+			<div>
+				<h3 class="font-display text-4xl font-bold mb-4">readablock</h3>
+				<p class="text-neutral-500 text-lg">Language immersion through literature</p>
 			</div>
-			<div class="footer-links">
-				<div class="footer-column">
-					<h4>Product</h4>
-					<a href="#features">Features</a>
-					<a href="#pricing">Pricing</a>
-					<a href="#languages">Languages</a>
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-12">
+				<div>
+					<h4 class="font-display text-lg font-bold mb-6">Product</h4>
+					<div class="flex flex-col gap-3">
+						<a
+							href="#features"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200"
+							>Features</a
+						>
+						<a
+							href="#pricing"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200"
+							>Pricing</a
+						>
+						<a
+							href="#languages"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200"
+							>Languages</a
+						>
+					</div>
 				</div>
-				<div class="footer-column">
-					<h4>Resources</h4>
-					<a href="#github">GitHub</a>
-					<a href="#guides">Learning Guides</a>
-					<a href="#research">Research</a>
-					<a href="#faq">FAQ</a>
+				<div>
+					<h4 class="font-display text-lg font-bold mb-6">Resources</h4>
+					<div class="flex flex-col gap-3">
+						<a
+							href="#github"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200">GitHub</a
+						>
+						<a
+							href="#guides"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200"
+							>Learning Guides</a
+						>
+						<a
+							href="#research"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200"
+							>Research</a
+						>
+						<a
+							href="#faq"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200">FAQ</a
+						>
+					</div>
 				</div>
-				<div class="footer-column">
-					<h4>Company</h4>
-					<a href="#about">About</a>
-					<a href="#contact">Contact</a>
-					<a href="#privacy">Privacy</a>
-					<a href="#terms">Terms</a>
+				<div>
+					<h4 class="font-display text-lg font-bold mb-6">Company</h4>
+					<div class="flex flex-col gap-3">
+						<a
+							href="#about"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200">About</a
+						>
+						<a
+							href="#contact"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200"
+							>Contact</a
+						>
+						<a
+							href="#privacy"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200"
+							>Privacy</a
+						>
+						<a
+							href="#terms"
+							class="text-neutral-400 hover:text-amber-600 transition-colors duration-200">Terms</a
+						>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="footer-bottom">
+		<div class="max-w-7xl mx-auto pt-12 text-center text-neutral-500 text-base">
 			<p>&copy; 2026 readablock. All rights reserved.</p>
 		</div>
 	</footer>
 </div>
 
 <style>
-	:root {
-		--bg-primary: #0a0a0a;
-		--bg-secondary: #141414;
-		--bg-tertiary: #1a1a1a;
-		--text-primary: #e5e5e5;
-		--text-secondary: #a3a3a3;
-		--text-muted: #737373;
-		--accent-primary: #d97706;
-		--accent-secondary: #f59e0b;
-		--border-color: #262626;
-		--border-thick: 4px;
-		--spacing-section: 10rem;
-		--font-serif: 'Crimson Text', 'Georgia', serif;
-		--font-display: 'Libre Baskerville', 'Georgia', serif;
-	}
-
 	:global(body) {
 		margin: 0;
 		padding: 0;
-		background: var(--bg-primary);
-		color: var(--text-primary);
-		font-family: var(--font-serif);
+		font-family: 'Crimson Text', Georgia, serif;
 		font-size: 18px;
 		line-height: 1.7;
-		overflow-x: hidden;
 	}
 
-	.app-container {
-		width: 100%;
-		min-height: 100vh;
+	.font-serif {
+		font-family: 'Crimson Text', Georgia, serif;
 	}
 
-	/* Hero Section */
-	.hero-section {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 4rem 2rem;
-		position: relative;
-		border-bottom: var(--border-thick) solid var(--border-color);
-	}
-
-	.hero-content {
-		max-width: 1400px;
-		width: 100%;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 6rem;
-		align-items: center;
-	}
-
-	.hero-title {
-		font-family: var(--font-display);
-		font-size: clamp(3.5rem, 8vw, 7rem);
-		font-weight: 700;
-		line-height: 0.95;
-		margin: 0 0 2rem 0;
-		letter-spacing: -0.02em;
-	}
-
-	.gradient-text {
-		background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-	}
-
-	.hero-subtitle {
-		font-size: 1.4rem;
-		color: var(--text-secondary);
-		margin: 0 0 3rem 0;
-		max-width: 500px;
-		line-height: 1.6;
-	}
-
-	.hero-cta {
-		display: flex;
-		gap: 1rem;
-		flex-wrap: wrap;
-	}
-
-	/* Book Preview */
-	.hero-demo {
-		position: relative;
-	}
-
-	.book-preview {
-		background: var(--bg-secondary);
-		border: var(--border-thick) solid var(--border-color);
-		border-radius: 8px;
-		padding: 2rem;
-		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-		transform: perspective(1000px) rotateY(-5deg);
-		transition: transform 0.3s ease;
-	}
-
-	.book-preview:hover {
-		transform: perspective(1000px) rotateY(0deg);
-	}
-
-	.book-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding-bottom: 1.5rem;
-		border-bottom: 2px solid var(--border-color);
-		margin-bottom: 2rem;
-	}
-
-	.book-title {
-		font-family: var(--font-display);
-		font-size: 1.3rem;
-		font-weight: 700;
-		font-style: italic;
-	}
-
-	.book-progress {
-		color: var(--text-muted);
-		font-size: 0.9rem;
-	}
-
-	.book-content {
-		position: relative;
-		min-height: 300px;
-	}
-
-	.italian-text {
-		font-size: 1.3rem;
-		line-height: 2;
-		margin: 0;
-	}
-
-	.word {
-		background: none;
-		border: none;
-		color: var(--text-primary);
-		font-family: inherit;
-		font-size: inherit;
-		cursor: pointer;
-		padding: 2px 1px;
-		transition: all 0.2s ease;
-		position: relative;
-		animation: fadeInWord 0.6s ease backwards;
+	.font-display {
+		font-family: 'Libre Baskerville', Georgia, serif;
 	}
 
 	@keyframes fadeInWord {
@@ -543,45 +522,8 @@
 		}
 	}
 
-	.word:hover {
-		color: var(--accent-secondary);
-	}
-
-	.word::after {
-		content: '';
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		height: 2px;
-		background: var(--accent-primary);
-		transform: scaleX(0);
-		transition: transform 0.2s ease;
-	}
-
-	.word:hover::after {
-		transform: scaleX(1);
-	}
-
-	.word.selected {
-		color: var(--accent-primary);
-		font-weight: 600;
-	}
-
-	.translation-tooltip {
-		position: absolute;
-		bottom: 100%;
-		left: 50%;
-		transform: translateX(-50%);
-		background: var(--bg-tertiary);
-		border: 2px solid var(--accent-primary);
-		padding: 1rem 1.5rem;
-		border-radius: 8px;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		animation: tooltipAppear 0.3s ease;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+	.animate-fadeInWord {
+		animation: fadeInWord 0.6s ease backwards;
 	}
 
 	@keyframes tooltipAppear {
@@ -595,36 +537,8 @@
 		}
 	}
 
-	.tooltip-word {
-		font-size: 1.2rem;
-		font-weight: 700;
-		color: var(--accent-secondary);
-	}
-
-	.tooltip-translation {
-		font-size: 1rem;
-		color: var(--text-secondary);
-	}
-
-	/* Scroll Indicator */
-	.scroll-indicator {
-		position: absolute;
-		bottom: 3rem;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-		color: var(--text-muted);
-		font-size: 0.9rem;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-	}
-
-	.scroll-line {
-		width: 2px;
-		height: 60px;
-		background: linear-gradient(to bottom, transparent, var(--border-color), transparent);
-		animation: scrollPulse 2s ease-in-out infinite;
+	.animate-tooltipAppear {
+		animation: tooltipAppear 0.3s ease;
 	}
 
 	@keyframes scrollPulse {
@@ -639,47 +553,8 @@
 		}
 	}
 
-	/* Features Section */
-	.features-section {
-		padding: var(--spacing-section) 2rem;
-		border-bottom: var(--border-thick) solid var(--border-color);
-	}
-
-	.section-header {
-		text-align: center;
-		max-width: 800px;
-		margin: 0 auto 6rem auto;
-	}
-
-	.section-title {
-		font-family: var(--font-display);
-		font-size: clamp(2.5rem, 5vw, 4rem);
-		font-weight: 700;
-		margin: 0 0 1.5rem 0;
-		line-height: 1.1;
-	}
-
-	.section-subtitle {
-		font-size: 1.3rem;
-		color: var(--text-secondary);
-		margin: 0;
-	}
-
-	.features-grid {
-		max-width: 1400px;
-		margin: 0 auto;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-		gap: 3rem;
-	}
-
-	.feature-card {
-		background: var(--bg-secondary);
-		border: var(--border-thick) solid var(--border-color);
-		padding: 3rem;
-		position: relative;
-		transition: all 0.3s ease;
-		animation: fadeInUp 0.8s ease backwards;
+	.animate-scrollPulse {
+		animation: scrollPulse 2s ease-in-out infinite;
 	}
 
 	@keyframes fadeInUp {
@@ -693,450 +568,7 @@
 		}
 	}
 
-	.feature-card:hover {
-		transform: translateY(-10px);
-		border-color: var(--accent-primary);
-	}
-
-	.feature-card:hover .feature-border {
-		transform: scaleX(1);
-	}
-
-	.feature-icon {
-		font-size: 3.5rem;
-		margin-bottom: 2rem;
-		display: block;
-	}
-
-	.feature-title {
-		font-family: var(--font-display);
-		font-size: 1.8rem;
-		font-weight: 700;
-		margin: 0 0 1rem 0;
-	}
-
-	.feature-description {
-		color: var(--text-secondary);
-		margin: 0;
-		font-size: 1.1rem;
-	}
-
-	.feature-border {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		height: 4px;
-		background: var(--accent-primary);
-		transform: scaleX(0);
-		transform-origin: left;
-		transition: transform 0.3s ease;
-	}
-
-	/* How It Works Section */
-	.how-section {
-		padding: var(--spacing-section) 2rem;
-		background: var(--bg-secondary);
-		border-bottom: var(--border-thick) solid var(--border-color);
-	}
-
-	.how-content {
-		max-width: 1400px;
-		margin: 0 auto;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 6rem;
-		align-items: start;
-	}
-
-	.how-title {
-		font-family: var(--font-display);
-		font-size: clamp(2.5rem, 5vw, 4.5rem);
-		font-weight: 700;
-		line-height: 1;
-		margin: 0 0 2rem 0;
-	}
-
-	.how-description {
-		font-size: 1.3rem;
-		color: var(--text-secondary);
-		margin: 0 0 4rem 0;
-		line-height: 1.7;
-	}
-
-	.how-stats {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 2rem;
-	}
-
-	.stat {
-		border-left: var(--border-thick) solid var(--accent-primary);
-		padding-left: 1.5rem;
-	}
-
-	.stat-number {
-		font-family: var(--font-display);
-		font-size: 3rem;
-		font-weight: 700;
-		line-height: 1;
-		margin-bottom: 0.5rem;
-		color: var(--accent-secondary);
-	}
-
-	.stat-label {
-		font-size: 0.95rem;
-		color: var(--text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.process-steps {
-		display: flex;
-		flex-direction: column;
-		gap: 3rem;
-	}
-
-	.process-step {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		gap: 2rem;
-		align-items: start;
-	}
-
-	.step-number {
-		font-family: var(--font-display);
-		font-size: 4rem;
-		font-weight: 700;
-		line-height: 1;
-		color: var(--text-muted);
-	}
-
-	.step-content h4 {
-		font-family: var(--font-display);
-		font-size: 1.6rem;
-		font-weight: 700;
-		margin: 0 0 0.75rem 0;
-	}
-
-	.step-content p {
-		color: var(--text-secondary);
-		margin: 0;
-		font-size: 1.1rem;
-	}
-
-	/* Pricing Section */
-	.pricing-section {
-		padding: var(--spacing-section) 2rem;
-		border-bottom: var(--border-thick) solid var(--border-color);
-	}
-
-	.pricing-grid {
-		max-width: 1400px;
-		margin: 0 auto;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-		gap: 2rem;
-	}
-
-	.pricing-card {
-		background: var(--bg-secondary);
-		border: var(--border-thick) solid var(--border-color);
-		padding: 3rem;
-		position: relative;
-		transition: all 0.3s ease;
+	.animate-fadeInUp {
 		animation: fadeInUp 0.8s ease backwards;
-	}
-
-	.pricing-card.highlighted {
-		border-color: var(--accent-primary);
-		background: var(--bg-tertiary);
-		transform: scale(1.05);
-	}
-
-	.pricing-card:hover {
-		transform: translateY(-10px);
-	}
-
-	.pricing-card.highlighted:hover {
-		transform: translateY(-10px) scale(1.05);
-	}
-
-	.popular-badge {
-		position: absolute;
-		top: -12px;
-		left: 50%;
-		transform: translateX(-50%);
-		background: var(--accent-primary);
-		color: var(--bg-primary);
-		padding: 0.5rem 1.5rem;
-		font-size: 0.85rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-	}
-
-	.plan-name {
-		font-family: var(--font-display);
-		font-size: 1.8rem;
-		font-weight: 700;
-		margin: 0 0 1.5rem 0;
-	}
-
-	.plan-price {
-		display: flex;
-		align-items: baseline;
-		gap: 0.5rem;
-		margin-bottom: 2rem;
-		padding-bottom: 2rem;
-		border-bottom: 2px solid var(--border-color);
-	}
-
-	.price {
-		font-family: var(--font-display);
-		font-size: 3.5rem;
-		font-weight: 700;
-		line-height: 1;
-	}
-
-	.period {
-		color: var(--text-muted);
-		font-size: 1.1rem;
-	}
-
-	.plan-features {
-		list-style: none;
-		padding: 0;
-		margin: 0 0 2.5rem 0;
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.plan-features li {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		font-size: 1.05rem;
-		color: var(--text-secondary);
-	}
-
-	.checkmark {
-		width: 20px;
-		height: 20px;
-		color: var(--accent-primary);
-		flex-shrink: 0;
-	}
-
-	/* CTA Section */
-	.cta-section {
-		padding: var(--spacing-section) 2rem;
-		background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-		border-bottom: var(--border-thick) solid var(--border-color);
-	}
-
-	.cta-content {
-		max-width: 800px;
-		margin: 0 auto;
-		text-align: center;
-	}
-
-	.cta-title {
-		font-family: var(--font-display);
-		font-size: clamp(2.5rem, 5vw, 4rem);
-		font-weight: 700;
-		margin: 0 0 1.5rem 0;
-		line-height: 1.2;
-	}
-
-	.cta-subtitle {
-		font-size: 1.4rem;
-		color: var(--text-secondary);
-		margin: 0 0 3rem 0;
-	}
-
-	.cta-note {
-		margin-top: 1.5rem;
-		color: var(--text-muted);
-		font-size: 0.95rem;
-	}
-
-	/* Footer */
-	.footer {
-		padding: 6rem 2rem 3rem 2rem;
-		background: var(--bg-secondary);
-	}
-
-	.footer-content {
-		max-width: 1400px;
-		margin: 0 auto;
-		display: grid;
-		grid-template-columns: 1.5fr 2fr;
-		gap: 6rem;
-		padding-bottom: 4rem;
-		border-bottom: 2px solid var(--border-color);
-	}
-
-	.footer-logo {
-		font-family: var(--font-display);
-		font-size: 2rem;
-		font-weight: 700;
-		margin: 0 0 1rem 0;
-	}
-
-	.footer-tagline {
-		color: var(--text-muted);
-		margin: 0;
-		font-size: 1.05rem;
-	}
-
-	.footer-links {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 3rem;
-	}
-
-	.footer-column h4 {
-		font-family: var(--font-display);
-		font-size: 1.1rem;
-		font-weight: 700;
-		margin: 0 0 1.5rem 0;
-	}
-
-	.footer-column a {
-		display: block;
-		color: var(--text-secondary);
-		text-decoration: none;
-		margin-bottom: 0.75rem;
-		transition: color 0.2s ease;
-		font-size: 1rem;
-	}
-
-	.footer-column a:hover {
-		color: var(--accent-primary);
-	}
-
-	.footer-bottom {
-		max-width: 1400px;
-		margin: 0 auto;
-		padding-top: 3rem;
-		text-align: center;
-		color: var(--text-muted);
-		font-size: 0.95rem;
-	}
-
-	/* Buttons */
-	.btn {
-		font-family: var(--font-serif);
-		font-size: 1.05rem;
-		font-weight: 600;
-		padding: 1rem 2.5rem;
-		border: 2px solid transparent;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		text-transform: none;
-		letter-spacing: 0.02em;
-	}
-
-	.btn-primary {
-		background: var(--accent-primary);
-		color: var(--bg-primary);
-		border-color: var(--accent-primary);
-	}
-
-	.btn-primary:hover {
-		background: var(--accent-secondary);
-		border-color: var(--accent-secondary);
-		transform: translateY(-2px);
-		box-shadow: 0 10px 30px rgba(217, 119, 6, 0.3);
-	}
-
-	.btn-outline {
-		background: transparent;
-		color: var(--text-primary);
-		border-color: var(--border-color);
-	}
-
-	.btn-outline:hover {
-		border-color: var(--accent-primary);
-		color: var(--accent-primary);
-	}
-
-	.btn-large {
-		font-size: 1.2rem;
-		padding: 1.25rem 3rem;
-	}
-
-	.w-full {
-		width: 100%;
-	}
-
-	/* Responsive */
-	@media (max-width: 1024px) {
-		.hero-content,
-		.how-content {
-			grid-template-columns: 1fr;
-			gap: 4rem;
-		}
-
-		.book-preview {
-			transform: none;
-		}
-
-		.footer-content {
-			grid-template-columns: 1fr;
-			gap: 4rem;
-		}
-
-		.how-stats {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
-
-	@media (max-width: 768px) {
-		:root {
-			--spacing-section: 6rem;
-		}
-
-		.hero-section {
-			min-height: auto;
-			padding: 6rem 1.5rem 4rem 1.5rem;
-		}
-
-		.hero-cta {
-			flex-direction: column;
-			width: 100%;
-		}
-
-		.hero-cta .btn {
-			width: 100%;
-			justify-content: center;
-		}
-
-		.features-grid,
-		.pricing-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.how-stats {
-			grid-template-columns: 1fr;
-		}
-
-		.footer-links {
-			grid-template-columns: 1fr;
-			gap: 2rem;
-		}
-
-		.italian-text {
-			font-size: 1.1rem;
-		}
-
-		.pricing-card.highlighted {
-			transform: scale(1);
-		}
-
-		.pricing-card.highlighted:hover {
-			transform: translateY(-10px) scale(1);
-		}
 	}
 </style>
