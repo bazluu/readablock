@@ -7,6 +7,7 @@
 	let sentenceCount = 0;
 	let sentenceFirst = 0;
 	let hasPrevious = false;
+	let sentencesPerPage = 6;
 	let isLoading = true;
 	let error = null;
 
@@ -35,6 +36,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					sentence_last_read: sentenceLastRead,
+					sentences_per_page: sentencesPerPage,
 					page_turn: pageTurn
 				})
 			});
@@ -105,6 +107,11 @@
 		} finally {
 			translatingIndex = null;
 		}
+	}
+
+	function updateSentencesPerPage(sentencesAmount) {
+		sentencesPerPage = sentencesAmount;
+		getSentences();
 	}
 
 	async function handleWordClick(event, word, sentenceContext) {
@@ -207,6 +214,25 @@
 		<p class="text-center">No sentences found.</p>
 	{:else}
 		<div class="max-w-4xl mx-auto">
+			<div class="flex flex-row w-full justify-end mb-4">
+				<div class="dropdown">
+					<div tabindex="0" role="button" class="btn m-1">Blocks: {sentencesPerPage}</div>
+					<ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 p-2 shadow-sm">
+						<li>
+							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(4)}>4</button>
+						</li>
+						<li>
+							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(6)}>6</button>
+						</li>
+						<li>
+							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(8)}>8</button>
+						</li>
+						<li>
+							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(10)}>10</button>
+						</li>
+					</ul>
+				</div>
+			</div>
 			<progress
 				class="progress progress-primary w-full mb-4"
 				value={sentenceLastRead}
