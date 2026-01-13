@@ -35,10 +35,10 @@
 </script>
 
 <div
-	class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-base-100 to-secondary/20 p-4"
+	class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-base-100 to-secondary/20 p-4 overflow-x-hidden"
 >
 	<div class="card w-full max-w-md bg-base-100 shadow-2xl">
-		<div class="card-body p-4">
+		<div class="card-body p-6 sm:p-8">
 			<!-- Header -->
 			<div class="text-center mb-6">
 				<h2 class="text-3xl font-bold text-primary mb-2">
@@ -78,9 +78,9 @@
 							bind:value={loginData.password}
 							required
 						/>
-						<label class="label">
-							<a href="#" class="label-text-alt link link-hover text-primary">Forgot password?</a>
-						</label>
+						<div class="w-full text-right">
+							<a href="#" class="underline text-base-content/60 m-0">Forgot password? </a>
+						</div>
 					</div>
 
 					<div class="form-control mt-6">
@@ -165,7 +165,10 @@
 			<div class="text-center mt-6">
 				<p class="text-sm text-base-content/60">
 					{isLogin ? "Don't have an account?" : 'Already have an account?'}
-					<button type="button" on:click={toggleForm} class="link link-primary font-semibold ml-1">
+					<button
+						on:click={toggleForm}
+						class="btn btn-sm btn-outline text-base-content/60 font-semibold ml-1"
+					>
 						{isLogin ? 'Sign up' : 'Sign in'}
 					</button>
 				</p>
@@ -175,8 +178,13 @@
 </div>
 
 <style>
+	:global(*) {
+		box-sizing: border-box;
+	}
+
 	:global(body) {
 		margin: 0;
+		padding: 0;
 		font-family:
 			system-ui,
 			-apple-system,
