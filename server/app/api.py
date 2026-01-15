@@ -1,13 +1,46 @@
 from django.core.cache import cache
+from django.shortcuts import get_object_or_404
 
 from ninja import NinjaAPI
 from ninja.responses import Response
 import deepl
 
-from app import schema, services
+from app import schema, services, models
 
 
 api = NinjaAPI()
+
+@api.post("/login/")
+def login(request, data: schema.LoginSchema):
+    try:
+        user = models.User.objects.get(email=data.email)
+    except models.User.DoesNotExist:
+        return Response({"message": "User not found"}, status=404)
+
+    if user.check_password(data.password):
+        request.session["user_id"] = user.id
+        return Response({"message": "Login successful"}, status=200)
+
+    else:
+        return Response({"message": "Invalid password"}, status=401)
+
+@api.post("/signup/")
+def signup(request, data: schema.SignupSchema):
+    if models.User.objects.filter(email=data.email).exists():
+        return Response({"message": "Unable to create account"}, status=500)
+
+    try:
+        user = models.User(email=data.email)
+        user.set_password(data.password)
+        user.save()
+
+    except Exception as error:
+        print(error)
+        return Response({"message": "Unable to create account"}, status=500)
+
+    request.session["user_id"] = user.id
+
+    return Response({"message": "Login successful"}, status=200)
 
 @api.post("/read/")
 def read(request, data: schema.BookSchema):

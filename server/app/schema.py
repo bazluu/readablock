@@ -2,6 +2,16 @@ from ninja import Schema
 from typing import Optional
 
 
+class LoginSchema(Schema):
+    email: str
+    password: str
+
+
+class SignupSchema(Schema):
+    email: str
+    password: str
+
+
 class BookSchema(Schema):
     #book_id: int
     #character_limit: int
