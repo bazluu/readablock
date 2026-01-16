@@ -66,6 +66,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://readablock.com"
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
