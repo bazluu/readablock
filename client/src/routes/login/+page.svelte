@@ -1,4 +1,6 @@
 <script>
+	const baseURL = 'http://127.0.0.1:8000';
+
 	let isLogin = true;
 
 	let loginData = {
@@ -7,30 +9,99 @@
 	};
 
 	let signupData = {
-		name: '',
 		email: '',
 		password: '',
 		confirmPassword: ''
 	};
 
+	let errorMessage = '';
+	let successMessage = '';
+	let isLoading = false;
+
 	function toggleForm() {
 		isLogin = !isLogin;
+		errorMessage = '';
+		successMessage = '';
 	}
 
-	function handleLogin(e) {
+	async function handleLogin(e) {
 		e.preventDefault();
-		console.log('Login:', loginData);
-		// Add your login logic here
+		errorMessage = '';
+		successMessage = '';
+		isLoading = true;
+
+		try {
+			const response = await fetch(`${baseURL}/app/login/`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include',
+				body: JSON.stringify({
+					email: loginData.email,
+					password: loginData.password
+				})
+			});
+
+			const data = await response.json();
+
+			if (response.ok) {
+				successMessage = data.message;
+				setTimeout(() => {
+					window.location.href = '/read';
+				}, 1000);
+			} else {
+				errorMessage = data.message;
+			}
+		} catch (error) {
+			console.error('Login error:', error);
+			errorMessage = 'An error occurred during login. Please try again.';
+		} finally {
+			isLoading = false;
+		}
 	}
 
-	function handleSignup(e) {
+	async function handleSignup(e) {
 		e.preventDefault();
+		errorMessage = '';
+		successMessage = '';
+
 		if (signupData.password !== signupData.confirmPassword) {
-			alert('Passwords do not match!');
+			errorMessage = 'Passwords do not match!';
 			return;
 		}
-		console.log('Signup:', signupData);
-		// Add your signup logic here
+
+		isLoading = true;
+
+		try {
+			const response = await fetch(`${baseURL}/app/signup/`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include',
+				body: JSON.stringify({
+					email: signupData.email,
+					password: signupData.password
+				})
+			});
+
+			const data = await response.json();
+
+			if (response.ok) {
+				successMessage = data.message;
+				setTimeout(() => {
+					window.location.href = '/read';
+				}, 1000);
+			} else {
+				errorMessage = data.message;
+			}
+		} catch (error) {
+			console.error('Signup error:', error);
+			errorMessage = 'An error occurred during signup. Please try again.';
+		} finally {
+			isLoading = false;
+		}
 	}
 </script>
 
@@ -49,6 +120,45 @@
 				</p>
 			</div>
 
+			<!-- Error/Success Messages -->
+			{#if errorMessage}
+				<div class="alert alert-error mb-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="stroke-current shrink-0 h-6 w-6"
+						fill="none"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+					<span>{errorMessage}</span>
+				</div>
+			{/if}
+
+			{#if successMessage}
+				<div class="alert alert-success mb-4">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="stroke-current shrink-0 h-6 w-6"
+						fill="none"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+					<span>{successMessage}</span>
+				</div>
+			{/if}
+
 			{#if isLogin}
 				<!-- Login Form -->
 				<form on:submit={handleLogin} class="space-y-4">
@@ -62,6 +172,7 @@
 							placeholder="your@email.com"
 							class="input input-bordered w-full"
 							bind:value={loginData.email}
+							disabled={isLoading}
 							required
 						/>
 					</div>
@@ -76,34 +187,28 @@
 							placeholder="••••••••"
 							class="input input-bordered w-full"
 							bind:value={loginData.password}
+							disabled={isLoading}
 							required
 						/>
 						<div class="w-full text-right">
-							<a href="#" class="underline text-base-content/60 m-0">Forgot password? </a>
+							<a href="#" class="underline text-base-content/60 m-0">Forgot password?</a>
 						</div>
 					</div>
 
 					<div class="form-control mt-6">
-						<button type="submit" class="btn btn-primary w-full"> Sign In </button>
+						<button type="submit" class="btn btn-primary w-full" disabled={isLoading}>
+							{#if isLoading}
+								<span class="loading loading-spinner"></span>
+								Signing in...
+							{:else}
+								Sign In
+							{/if}
+						</button>
 					</div>
 				</form>
 			{:else}
 				<!-- Signup Form -->
 				<form on:submit={handleSignup} class="space-y-4">
-					<div class="form-control">
-						<label class="label" for="signup-name">
-							<span class="label-text">Full Name</span>
-						</label>
-						<input
-							id="signup-name"
-							type="text"
-							placeholder="John Doe"
-							class="input input-bordered w-full"
-							bind:value={signupData.name}
-							required
-						/>
-					</div>
-
 					<div class="form-control">
 						<label class="label" for="signup-email">
 							<span class="label-text">Email</span>
@@ -114,6 +219,7 @@
 							placeholder="your@email.com"
 							class="input input-bordered w-full"
 							bind:value={signupData.email}
+							disabled={isLoading}
 							required
 						/>
 					</div>
@@ -128,6 +234,7 @@
 							placeholder="••••••••"
 							class="input input-bordered w-full"
 							bind:value={signupData.password}
+							disabled={isLoading}
 							required
 						/>
 					</div>
@@ -142,13 +249,19 @@
 							placeholder="••••••••"
 							class="input input-bordered w-full"
 							bind:value={signupData.confirmPassword}
+							disabled={isLoading}
 							required
 						/>
 					</div>
 
 					<div class="form-control">
 						<label class="label cursor-pointer justify-start gap-2">
-							<input type="checkbox" class="checkbox checkbox-primary" required />
+							<input
+								type="checkbox"
+								class="checkbox checkbox-primary"
+								disabled={isLoading}
+								required
+							/>
 							<span class="label-text"
 								>I agree to the <a href="#" class="link link-primary">terms and conditions</a></span
 							>
@@ -156,7 +269,14 @@
 					</div>
 
 					<div class="form-control mt-6">
-						<button type="submit" class="btn btn-primary w-full"> Create Account </button>
+						<button type="submit" class="btn btn-primary w-full" disabled={isLoading}>
+							{#if isLoading}
+								<span class="loading loading-spinner"></span>
+								Creating Account...
+							{:else}
+								Create Account
+							{/if}
+						</button>
 					</div>
 				</form>
 			{/if}
@@ -168,6 +288,7 @@
 					<button
 						on:click={toggleForm}
 						class="btn btn-sm btn-outline text-base-content/60 font-semibold ml-1"
+						disabled={isLoading}
 					>
 						{isLogin ? 'Sign up' : 'Sign in'}
 					</button>
