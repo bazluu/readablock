@@ -1,6 +1,6 @@
 services:
 
-  server:
+  readablock_server:
     build:
       context: ./server
       dockerfile: Dockerfile.prod
@@ -20,13 +20,13 @@ services:
       - redis
     restart: unless-stopped
 
-  client:
+  readablock_client:
     build:
       context: ./client
       dockerfile: Dockerfile.prod
     container_name: client
     ports:
-      - "3000:3000"
+      - "3001:3000"
     restart: unless-stopped
 
   redis:

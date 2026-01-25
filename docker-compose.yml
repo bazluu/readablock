@@ -1,6 +1,6 @@
 services:
 
-  server:
+  readablock_server:
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -16,7 +16,7 @@ services:
     depends_on:
       - redis
 
-  client:
+  readablock_client:
     build:
       context: ./client
       dockerfile: Dockerfile
