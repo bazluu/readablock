@@ -12,3 +12,28 @@ class User(models.Model):
 
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
+
+
+class Book(models.Model):
+    """
+    Model for books with access control.
+    Books can be either public (accessible to all) or private (only accessible to the uploader).
+    """
+    title = models.CharField(max_length=200)
+    author = models.CharField(max_length=100, null=True)
+    description = models.TextField(null=True)
+    file = models.FileField(upload_to='books/%Y/%m/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    # Access control
+    uploaded_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='uploaded_books'
+    )
+    is_public = models.BooleanField(default=False)
+
+
+class BookProgress(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
