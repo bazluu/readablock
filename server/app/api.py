@@ -42,6 +42,45 @@ def signup(request, data: schema.SignupSchema):
 
     return Response({"message": "Login successful"}, status=200)
 
+@api.get("/dashboard/books")
+def dashboard_books(request):
+    user_id = models.User.objects.get(id=request.session["user_id"]).id
+
+    response = {
+        "continue_reading": [],
+        "library": []
+    }
+
+    for book in models.Book.objects.filter(uploaded_by_id=user_id).values("id", "title", "author"):
+        response["library"].append({
+                "id": book["id"],
+                "title": book["title"],
+                "author": book["author"]
+        })
+
+    books_in_progress = models.BookProgress.objects \
+        .filter(user_id=user_id) \
+        .values("book_id", "book__title", "book__author", "sentence_last_read", "book__is_public")
+
+    for book_progress in books_in_progress:
+        if book_progress["sentence_last_read"] > 0:
+            response["continue_reading"].append({
+                "id": book_progress["book_id"],
+                "title": book_progress["book__title"],
+                "author": book_progress["book__author"],
+                "sentence_last_read": book_progress["sentence_last_read"]
+            })
+
+        # A public book will show up in "library" but not in "continue_reading" if the user hasn't read it yet
+        elif book_progress["sentence_last_read"] == 0 and book_progress["book__is_public"]:
+            response["library"].append({
+                "id": book_progress["book_id"],
+                "title": book_progress["book__title"],
+                "author": book_progress["book__author"]
+            })
+
+    return Response(response, status=200)
+
 @api.post("/read/")
 def read(request, data: schema.BookSchema):
     sentence_last_read = cache.get("sentence_last_read") or 0
