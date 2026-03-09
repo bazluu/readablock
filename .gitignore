@@ -6,7 +6,6 @@ db.sqlite3
 
 # Development books
 server/media/books/raw/.*
-server/media/books/json/.*
 
 # Output
 .output

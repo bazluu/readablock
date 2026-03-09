@@ -2,7 +2,8 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
-from ninja import NinjaAPI
+from ninja import NinjaAPI, File
+from ninja.files import UploadedFile
 from ninja.responses import Response
 import deepl
 
@@ -138,3 +139,21 @@ def translate(request, data: schema.TranslationSchema):
 
     except Exception as error:
         return Response({"error": f"Translation error: {str(error)}"}, status=500)
+
+
+@api.post("/books/upload/")
+def upload_book(request, data: schema.BookUploadSchema, file: UploadedFile = File(...)):
+    # user_id = request.session["user_id"]
+    user_id = 1
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"message": "User not found"}, status=404)
+
+    book = models.BookUnprocessed(
+        title=data.title, author=data.author, file=file, file_type=data.file_type, user=user
+    )
+    book.save()
+
+    return Response({"id": book.id, "message": "Book uploaded successfully"}, status=201)
