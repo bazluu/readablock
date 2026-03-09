@@ -4,6 +4,10 @@ db.sqlite3
 **/__pycache__/
 .ropeproject/
 
+# Development books
+server/media/books/raw/.*
+server/media/books/json/.*
+
 # Output
 .output
 .wrangler
