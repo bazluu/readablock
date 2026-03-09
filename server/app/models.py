@@ -7,6 +7,7 @@ class Book(models.Model):
     Model for books with access control.
     Books can be either public (accessible to all) or private (only accessible to the uploader).
     """
+
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
@@ -14,11 +15,7 @@ class Book(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     # Access control
-    uploaded_by = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="uploaded_books"
-    )
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uploaded_books")
     is_public = models.BooleanField(default=False)
 
 
@@ -27,6 +24,19 @@ class BookProgress(models.Model):
     Model for book progress tracking.
     The very existence of a row in this table means that the user has this book in their library.
     """
+
     book = models.ForeignKey(Book, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     sentence_last_read = models.IntegerField(default=0)
+
+
+class BookUnprocessed(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.CharField(max_length=100, null=True)
+    file = models.FileField(upload_to="books/raw/")
+
+    BOOK_FILE_TYPES = (("epub", "epub"), ("pdf", "pdf"), ("txt", "txt"), ("kepub", "kepub"))
+    file_type = models.CharField(choices=BOOK_FILE_TYPES, max_length=10)
+
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    processed = models.BooleanField(default=False)
