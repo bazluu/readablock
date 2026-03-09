@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "storages",
     "app.apps.AppConfig",
+    "core",
 ]
 
 MIDDLEWARE = [

@@ -1,11 +1,13 @@
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 
 from ninja import NinjaAPI
 from ninja.responses import Response
 import deepl
 
 from app import schema, services, models
+from core import models as core_models
 
 api = NinjaAPI()
 
@@ -13,12 +15,12 @@ api = NinjaAPI()
 @api.post("/login/")
 def login(request, data: schema.LoginSchema):
     try:
-        user = models.User.objects.get(email=data.email)
-    except models.User.DoesNotExist:
+        auth_user = User.objects.get(email=data.email)
+    except User.DoesNotExist:
         return Response({"message": "User not found"}, status=404)
 
-    if user.check_password(data.password):
-        request.session["user_id"] = user.id
+    if auth_user.check_password(data.password):
+        request.session["user_id"] = auth_user.id
         return Response({"message": "Login successful"}, status=200)
 
     else:
@@ -27,19 +29,26 @@ def login(request, data: schema.LoginSchema):
 
 @api.post("/signup/")
 def signup(request, data: schema.SignupSchema):
-    if models.User.objects.filter(email=data.email).exists():
+    if User.objects.filter(email=data.email).exists():
         return Response({"message": "Unable to create account"}, status=500)
 
     try:
-        user = models.User(email=data.email)
-        user.set_password(data.password)
-        user.save()
+        username = services.convert_email_to_username(data.email)
+    except Exception as error:
+        print(error)
+        username = data.email
 
+    try:
+        auth_user = User(username=username, email=data.email)
+        auth_user.set_password(data.password)
+        auth_user.save()
+
+        core_models.UserMeta.objects.create(user=auth_user)
     except Exception as error:
         print(error)
         return Response({"message": "Unable to create account"}, status=500)
 
-    request.session["user_id"] = user.id
+    request.session["user_id"] = auth_user.id
 
     return Response({"message": "Login successful"}, status=200)
 
