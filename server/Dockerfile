@@ -5,7 +5,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 RUN apk add --no-cache build-base \
-  && pip install --no-cache-dir -r requirements.txt \
+  file \
+    && pip install --no-cache-dir -r requirements.txt \
   && python -m textblob.download_corpora \
   && apk del build-base
 
@@ -17,4 +18,3 @@ RUN chmod +r /app/.env || true
 EXPOSE 8000
 
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
-
