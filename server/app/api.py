@@ -6,11 +6,25 @@ from ninja import NinjaAPI, File
 from ninja.files import UploadedFile
 from ninja.responses import Response
 import deepl
+import os
+import magic
 
 from app import schema, services, models
 from core import models as core_models
 
 api = NinjaAPI()
+
+ALLOWED_EXTENSIONS = {".epub", ".pdf", ".txt", ".kepub"}
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
+
+# epub and kepub are ZIP-based; python-magic reports them as application/zip or
+# application/epub+zip depending on the version and file structure.
+ALLOWED_MIME_TYPES = {
+    ".epub": {"application/epub+zip", "application/zip"},
+    ".kepub": {"application/epub+zip", "application/zip"},
+    ".pdf": {"application/pdf"},
+    ".txt": {"text/plain"},
+}
 
 
 @api.post("/login/")
@@ -146,11 +160,28 @@ def upload_book(request, data: schema.BookUploadSchema, file: UploadedFile = Fil
     # user_id = request.session["user_id"]
     user_id = 1
 
+    if file.size > MAX_FILE_SIZE:
+        return Response({"error": "File exceeds the 50 MB size limit"}, status=400)
+
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return Response(
+            {"error": f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"},
+            status=400,
+        )
+
+    mime = magic.from_buffer(file.read(2048), mime=True)
+    file.seek(0)
+    if mime not in ALLOWED_MIME_TYPES[ext]:
+        return Response({"error": "File content does not match the expected type"}, status=400)
+
+    file_type = ext.lstrip(".")
+
     book = models.Book(
         title=data.title,
         author=data.author,
         file=file,
-        file_type=data.file_type,
+        file_type=file_type,
         uploaded_by_id=user_id,
     )
     book.save()

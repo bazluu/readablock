@@ -1,5 +1,5 @@
 from ninja import Schema
-from typing import Optional, Literal
+from typing import Optional
 
 
 class LoginSchema(Schema):
@@ -23,7 +23,6 @@ class BookSchema(Schema):
 class BookUploadSchema(Schema):
     title: str
     author: str
-    file_type: Literal["epub", "pdf", "txt", "kepub"]
 
 
 class TranslationSchema(Schema):
