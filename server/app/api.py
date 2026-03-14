@@ -146,13 +146,12 @@ def upload_book(request, data: schema.BookUploadSchema, file: UploadedFile = Fil
     # user_id = request.session["user_id"]
     user_id = 1
 
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        return Response({"message": "User not found"}, status=404)
-
-    book = models.BookUnprocessed(
-        title=data.title, author=data.author, file=file, file_type=data.file_type, user=user
+    book = models.Book(
+        title=data.title,
+        author=data.author,
+        file=file,
+        file_type=data.file_type,
+        uploaded_by_id=user_id,
     )
     book.save()
 
