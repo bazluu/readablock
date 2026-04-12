@@ -1,5 +1,5 @@
 <script>
-	const baseURL = 'http://127.0.0.1:8000';
+	import { baseURL } from '$lib/state.svelte.js';
 
 	const ALLOWED_EXTENSIONS = '.epub,.pdf,.txt,.kepub';
 	const MAX_FILE_SIZE_MB = 50;

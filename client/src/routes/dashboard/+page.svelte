@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	const baseURL = 'http://127.0.0.1:8000';
+	import { baseURL } from '$lib/state.svelte.js';
 
 	let continueReading = [];
 	let library = [];
