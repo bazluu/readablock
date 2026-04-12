@@ -1,6 +1,7 @@
 import os
 import random
 import string
+import uuid
 
 from django.conf import settings
 
@@ -81,3 +82,9 @@ def translate(text: str, source: str | None, target: str, context: str | None):
     )
 
     return translated
+
+
+def get_book_upload_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+
+    return f"books/{uuid.uuid4()}{ext}"

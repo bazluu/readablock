@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
-from ninja import NinjaAPI, File
+from ninja import NinjaAPI, File, Form
 from ninja.files import UploadedFile
 from ninja.responses import Response
 import deepl
@@ -155,8 +155,8 @@ def translate(request, data: schema.TranslationSchema):
         return Response({"error": f"Translation error: {str(error)}"}, status=500)
 
 
-@api.post("/books/upload/")
-def upload_book(request, data: schema.BookUploadSchema, file: UploadedFile = File(...)):
+@api.post("/books/upload")
+def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile = File(...)):
     # user_id = request.session["user_id"]
     user_id = 1
 

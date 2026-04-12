@@ -1,5 +1,9 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import User
+
+
+extensions_allowed = FileExtensionValidator(allowed_extensions=["epub", "pdf", "txt", "kepub"])
 
 
 class Book(models.Model):
