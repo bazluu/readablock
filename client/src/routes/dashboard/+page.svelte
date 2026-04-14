@@ -1,11 +1,11 @@
 <script>
 	import { onMount } from 'svelte';
-	import { baseURL } from '$lib/state.svelte.js';
+	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
 
-	let continueReading = [];
-	let library = [];
-	let isLoading = true;
-	let error = null;
+	let continueReading = $state([]);
+	let library = $state([]);
+	let isLoading = $state(true);
+	let error = $state(null);
 
 	async function fetchBooks() {
 		isLoading = true;
@@ -96,6 +96,7 @@
 						{#each continueReading as book}
 							<a
 								href="/read?id={book.id}"
+								onclick={() => (selectedBookId.value = book.id)}
 								class="card bg-base-200 hover:bg-base-300 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl border-2 border-transparent hover:border-primary"
 							>
 								<div class="card-body">
@@ -132,6 +133,7 @@
 						{#each library as book}
 							<a
 								href="/read?id={book.id}"
+								onclick={() => (selectedBookId.value = book.id)}
 								class="card bg-base-200 hover:bg-base-300 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-md border-2 border-transparent hover:border-secondary"
 							>
 								<figure class="px-4 pt-4">
