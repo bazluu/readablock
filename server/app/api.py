@@ -9,7 +9,7 @@ import deepl
 import os
 import magic
 
-from app import schema, services, models
+from app import schema, services, selectors, models
 from core import models as core_models
 
 api = NinjaAPI()
@@ -126,7 +126,7 @@ def read(request, data: schema.BookSchema):
     epub = services.convert_epub_to_str(epub_file)
     epub_cleaned = services.remove_html(epub)
 
-    sentence_last_read = cache.get("sentence_last_read") or 0
+    sentence_last_read = selectors.get_sentence_last_read(user_id, data.book_id) or 0
 
     # Pagination
     if data.page_turn == "next":
