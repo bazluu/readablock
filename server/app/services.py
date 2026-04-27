@@ -1,3 +1,4 @@
+import io
 import os
 import random
 import string
@@ -50,9 +51,10 @@ def remove_html(text: str):
 
 
 def convert_epub_to_str(file):
-    epub_path = os.path.join(os.path.dirname(__file__), file)
+    with file.open("rb") as f:
+        data = f.read()
 
-    book = epub.read_epub(epub_path)
+    book = epub.read_epub(io.BytesIO(data))
 
     text = []
     for item in book.get_items():

@@ -146,10 +146,17 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
 AWS_ACCESS_KEY_ID = os.getenv("STORAGE_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("STORAGE_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = "readablock-dev" if DEBUG else "readablock"
 AWS_STORAGE_BUCKET_NAME = os.getenv("STORAGE_BUCKET_NAME")
 AWS_S3_ENDPOINT_URL = os.getenv("STORAGE_S3_ENDPOINT_URL")
 AWS_S3_REGION_NAME = os.getenv("STORAGE_S3_REGION_NAME")
