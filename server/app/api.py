@@ -111,13 +111,22 @@ def dashboard_books(request):
 @api.post("/read/")
 def read(request, data: schema.BookSchema):
     user_id = 1
+    # user_id = request.session["user_id"]
 
     if services.verify_book_access(data.book_id, user_id) is False:
         return Response({"error": "Access denied"}, status=403)
 
-    sentence_last_read = cache.get("sentence_last_read") or 0
-    epub = services.convert_epub_to_str()
+    try:
+        book = models.Book.objects.get(id=data.book_id)
+    except models.Book.DoesNotExist:
+        return Response({"error": "Book not found"}, status=404)
+
+    epub_file = book.file
+
+    epub = services.convert_epub_to_str(epub_file)
     epub_cleaned = services.remove_html(epub)
+
+    sentence_last_read = cache.get("sentence_last_read") or 0
 
     # Pagination
     if data.page_turn == "next":

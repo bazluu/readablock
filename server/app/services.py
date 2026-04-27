@@ -49,8 +49,8 @@ def remove_html(text: str):
     return clean_text
 
 
-def convert_epub_to_str():
-    epub_path = os.path.join(os.path.dirname(__file__), "../Gatto e topo in società.epub")
+def convert_epub_to_str(file):
+    epub_path = os.path.join(os.path.dirname(__file__), file)
 
     book = epub.read_epub(epub_path)
 
