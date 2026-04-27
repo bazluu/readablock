@@ -19,7 +19,7 @@ class PageTurn(enum.Enum):
 
 class BookSchema(Schema):
     book_id: int
-    character_limit: int
+    # character_limit: int
     sentence_last_read: int = 0
     sentences_per_page: int
     page_turn: PageTurn | None = None
