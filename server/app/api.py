@@ -129,13 +129,13 @@ def read(request, data: schema.BookSchema):
     sentence_last_read = selectors.get_sentence_last_read(user_id, data.book_id) or 0
 
     # Pagination
+    # sentence_last_read stores sentence_first of the last viewed page
     if data.page_turn == "next":
-        sentence_first = sentence_last_read + 1
+        sentence_first = sentence_last_read + 5
     elif data.page_turn == "previous":
-        # Go back by 5 sentences (or adjust based on your needs)
-        sentence_first = max(0, sentence_last_read - 9)  # -4 for current page, -5 for previous
+        sentence_first = max(0, sentence_last_read - 5)
     else:
-        sentence_first = sentence_last_read if sentence_last_read > 0 else 0
+        sentence_first = sentence_last_read
 
     # TODO calculate this based on character limit
     sentence_last = sentence_first + 4
@@ -143,7 +143,7 @@ def read(request, data: schema.BookSchema):
     sentences = services.convert_text_to_sentences(epub_cleaned, sentence_first, sentence_last)
 
     models.BookProgress.objects.update_or_create(
-        book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_last}
+        book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_first}
     )
 
     return Response(

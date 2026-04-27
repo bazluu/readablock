@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { baseURL } from '$lib/state.svelte.js';
+	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
 
 	let sentences = [];
 	let sentenceLastRead = 0;
@@ -8,6 +8,8 @@
 	let sentenceFirst = 0;
 	let hasPrevious = false;
 	let sentencesPerPage = 6;
+	const characterLimit = 1200;
+	let bookId = null;
 	let isLoading = true;
 	let error = null;
 
@@ -27,14 +29,44 @@
 		y: 0
 	};
 
+	function resolveBookId() {
+		const params = new URLSearchParams(window.location.search);
+		const queryBookId = Number(params.get('id'));
+
+		if (Number.isInteger(queryBookId) && queryBookId > 0) {
+			selectedBookId.value = queryBookId;
+			return queryBookId;
+		}
+
+		const stateBookId = Number(selectedBookId.value);
+		if (Number.isInteger(stateBookId) && stateBookId > 0) {
+			return stateBookId;
+		}
+
+		return null;
+	}
+
 	async function getSentences(pageTurn = null) {
 		isLoading = true;
 		error = null;
+
+		if (bookId === null) {
+			bookId = resolveBookId();
+		}
+
+		if (bookId === null) {
+			error = 'No book selected';
+			isLoading = false;
+			return;
+		}
+
 		try {
 			const response = await fetch(`${baseURL}/app/read/`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
+					book_id: bookId,
+					character_limit: characterLimit,
 					sentence_last_read: sentenceLastRead,
 					sentences_per_page: sentencesPerPage,
 					page_turn: pageTurn
@@ -170,6 +202,7 @@
 	}
 
 	onMount(async () => {
+		bookId = resolveBookId();
 		await getSentences();
 
 		// Add global click listener
