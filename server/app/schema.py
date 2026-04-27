@@ -1,5 +1,5 @@
+import enum
 from ninja import Schema
-from typing import Optional
 
 
 class LoginSchema(Schema):
@@ -12,12 +12,17 @@ class SignupSchema(Schema):
     password: str
 
 
+class PageTurn(enum.Enum):
+    NEXT = "next"
+    PREVIOUS = "previous"
+
+
 class BookSchema(Schema):
-    # book_id: int
-    # character_limit: int
-    # sentence_last_read: int = 0
+    book_id: int
+    character_limit: int
+    sentence_last_read: int = 0
     sentences_per_page: int
-    page_turn: str | None = None  # "next" | "previous"
+    page_turn: PageTurn | None = None
 
 
 class BookUploadSchema(Schema):
