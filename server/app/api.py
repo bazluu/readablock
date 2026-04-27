@@ -110,6 +110,11 @@ def dashboard_books(request):
 
 @api.post("/read/")
 def read(request, data: schema.BookSchema):
+    user_id = 1
+
+    if services.verify_book_access(data.book_id, user_id) is False:
+        return Response({"error": "Access denied"}, status=403)
+
     sentence_last_read = cache.get("sentence_last_read") or 0
     epub = services.convert_epub_to_str()
     epub_cleaned = services.remove_html(epub)
@@ -127,7 +132,10 @@ def read(request, data: schema.BookSchema):
     sentence_last = sentence_first + 4
 
     sentences = services.convert_text_to_sentences(epub_cleaned, sentence_first, sentence_last)
-    cache.set("sentence_last_read", sentence_last, 300)
+
+    models.BookProgress.objects.update_or_create(
+        book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_last}
+    )
 
     return Response(
         {

@@ -10,6 +10,8 @@ from bs4 import BeautifulSoup
 from textblob import TextBlob
 import deepl
 
+from app import models
+
 
 def convert_email_to_username(email: str, length: int = 6) -> str:
     seed = email
@@ -88,3 +90,15 @@ def get_book_upload_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
 
     return f"books/{uuid.uuid4()}{ext}"
+
+
+def verify_book_access(book_id: int, user_id: int) -> bool:
+    book = models.Book.objects.get(id=book_id)
+
+    if book.is_public:
+        return True
+
+    if book.uploaded_by_id == user_id:
+        return True
+
+    return False
