@@ -48,7 +48,7 @@
 			if (response.ok) {
 				successMessage = data.message;
 				setTimeout(() => {
-					window.location.href = '/read';
+					window.location.href = '/dashboard';
 				}, 1000);
 			} else {
 				errorMessage = data.message;
@@ -91,7 +91,7 @@
 			if (response.ok) {
 				successMessage = data.message;
 				setTimeout(() => {
-					window.location.href = '/read';
+					window.location.href = '/dashboard';
 				}, 1000);
 			} else {
 				errorMessage = data.message;
