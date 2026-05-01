@@ -170,7 +170,7 @@
 				</p>
 				<div class="flex gap-4 flex-wrap">
 					<a
-						href="/read"
+						href="/dashboard"
 						class="px-10 py-4 bg-amber-600 hover:bg-amber-500 text-neutral-950 font-semibold text-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-600/30 border-2 border-amber-600 tracking-wide"
 					>
 						Start Reading

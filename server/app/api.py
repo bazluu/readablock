@@ -1,3 +1,4 @@
+from cmath import e
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -70,8 +71,10 @@ def signup(request, data: schema.SignupSchema):
 
 @api.get("/dashboard/books")
 def dashboard_books(request):
-    # user_id = models.User.objects.get(id=request.session["user_id"]).id
-    user_id = 1
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
 
     response = {"continue_reading": [], "library": []}
 
@@ -110,8 +113,10 @@ def dashboard_books(request):
 
 @api.post("/read/")
 def read(request, data: schema.BookSchema):
-    user_id = 1
-    # user_id = request.session["user_id"]
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
 
     if services.verify_book_access(data.book_id, user_id) is False:
         return Response({"error": "Access denied"}, status=403)
@@ -174,8 +179,10 @@ def translate(request, data: schema.TranslationSchema):
 
 @api.post("/books/upload")
 def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile = File(...)):
-    # user_id = request.session["user_id"]
-    user_id = 1
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
 
     if file.size > MAX_FILE_SIZE:
         return Response({"error": "File exceeds the 50 MB size limit"}, status=400)
