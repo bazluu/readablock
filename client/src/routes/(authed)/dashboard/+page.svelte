@@ -48,18 +48,6 @@
 				<p class="py-6 text-lg text-base-content/70">
 					Continue your reading journey or explore your library
 				</p>
-				<div class="stats stats-vertical sm:stats-horizontal shadow-lg bg-base-100">
-					{#if continueReading.length > 0}
-						<div class="stat">
-							<div class="stat-title">Continue Reading</div>
-							<div class="stat-value text-primary">{continueReading.length}</div>
-						</div>
-					{/if}
-					<div class="stat">
-						<div class="stat-title">Library</div>
-						<div class="stat-value text-secondary">{library.length}</div>
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>
