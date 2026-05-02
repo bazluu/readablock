@@ -63,6 +63,7 @@
 		try {
 			const response = await fetch(`${baseURL}/app/read/`, {
 				method: 'POST',
+				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					book_id: bookId,
