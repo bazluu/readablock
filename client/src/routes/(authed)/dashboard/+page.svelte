@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
+	import { AlertCircle, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
 
 	let continueReading = $state([]);
 	let library = $state([]);
@@ -45,7 +46,9 @@
 	<div class="bg-base-200 border-b border-base-300">
 		<div class="max-w-6xl mx-auto px-8 py-10">
 			<h1 class="font-display text-4xl font-bold text-primary">Dashboard</h1>
-			<p class="mt-2 text-base-content/60">Continue your reading journey or explore your library.</p>
+			<p class="mt-2 text-base-content/60">
+				Continue your reading journey or explore your library.
+			</p>
 		</div>
 	</div>
 
@@ -56,23 +59,25 @@
 			</div>
 		{:else if error}
 			<div role="alert" class="alert alert-error">
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-				</svg>
+				<AlertCircle class="h-6 w-6 shrink-0" />
 				<span>{error}</span>
-				<button class="btn btn-sm btn-ghost" onclick={fetchBooks}>Retry</button>
+				<button class="btn btn-sm btn-ghost gap-1" onclick={fetchBooks}>
+					<RotateCcw class="h-4 w-4" /> Retry
+				</button>
 			</div>
 		{:else if continueReading.length === 0 && library.length === 0}
 			<!-- Empty state -->
 			<div class="hero min-h-[60vh]">
 				<div class="hero-content text-center flex-col">
-					<div class="text-7xl mb-4">📚</div>
+					<Library class="h-20 w-20 text-base-content/20" />
 					<div>
 						<h2 class="text-2xl font-bold">No books yet</h2>
 						<p class="py-4 text-base-content/60 max-w-sm">
 							Start your reading journey by uploading your first book.
 						</p>
-						<a href="/upload" class="btn btn-primary btn-lg">Upload a book</a>
+						<a href="/upload" class="btn btn-primary btn-lg gap-2">
+							<Upload class="h-5 w-5" /> Upload a book
+						</a>
 					</div>
 				</div>
 			</div>
@@ -81,6 +86,7 @@
 			{#if continueReading.length > 0}
 				<section class="mb-12">
 					<div class="flex items-center gap-3 mb-6">
+						<BookOpen class="h-5 w-5 text-primary" />
 						<h2 class="text-xl font-bold text-base-content">Continue Reading</h2>
 						<div class="badge badge-primary badge-outline">{continueReading.length}</div>
 					</div>
@@ -132,8 +138,10 @@
 								class="card bg-base-200 border border-base-300 hover:border-secondary hover:shadow-md transition-all duration-200 cursor-pointer"
 							>
 								<figure class="px-4 pt-4">
-									<div class="aspect-[2/3] w-full bg-base-300 rounded-lg flex items-center justify-center text-3xl">
-										📖
+									<div
+										class="aspect-[2/3] w-full bg-base-300 rounded-lg flex items-center justify-center"
+									>
+										<BookOpen class="h-10 w-10 text-base-content/30" />
 									</div>
 								</figure>
 								<div class="card-body p-3 gap-1">
