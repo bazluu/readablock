@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
 	import { AlertCircle, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
 
@@ -35,6 +36,11 @@
 	onMount(async () => {
 		await fetchBooks();
 	});
+
+	function openBook(id) {
+		selectedBookId.value = id;
+		goto('/read');
+	}
 </script>
 
 <svelte:head>
@@ -92,9 +98,7 @@
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 						{#each continueReading as book}
-							<a
-								href="/read?id={book.id}"
-								onclick={() => (selectedBookId.value = book.id)}
+							<div
 								class="card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer"
 							>
 								<div class="card-body gap-3">
@@ -112,10 +116,12 @@
 										></progress>
 									</div>
 									<div class="card-actions justify-end">
-										<span class="btn btn-primary btn-sm">Continue</span>
+										<button onclick={() => openBook(book.id)} class="btn btn-primary btn-sm"
+											>Continue</button
+										>
 									</div>
 								</div>
-							</a>
+							</div>
 						{/each}
 					</div>
 				</section>
@@ -133,8 +139,8 @@
 					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 						{#each library as book}
 							<a
-								href="/read?id={book.id}"
-								onclick={() => (selectedBookId.value = book.id)}
+								href="/read"
+								onclick={() => openBook(book.id)}
 								class="card bg-base-200 border border-base-300 hover:border-secondary hover:shadow-md transition-all duration-200 cursor-pointer"
 							>
 								<figure class="px-4 pt-4">
