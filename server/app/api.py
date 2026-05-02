@@ -41,30 +41,30 @@ def login(request, data: schema.LoginSchema):
         return Response({"message": "Invalid password"}, status=401)
 
 
-@api.post("/signup/")
-def signup(request, data: schema.SignupSchema):
-    if User.objects.filter(email=data.email).exists():
-        return Response({"message": "Unable to create account"}, status=500)
+# @api.post("/signup/")
+# def signup(request, data: schema.SignupSchema):
+#     if User.objects.filter(email=data.email).exists():
+#         return Response({"message": "Unable to create account"}, status=500)
 
-    try:
-        username = services.convert_email_to_username(data.email)
-    except Exception as error:
-        print(error)
-        username = data.email
+#     try:
+#         username = services.convert_email_to_username(data.email)
+#     except Exception as error:
+#         print(error)
+#         username = data.email
 
-    try:
-        auth_user = User(username=username, email=data.email)
-        auth_user.set_password(data.password)
-        auth_user.save()
+#     try:
+#         auth_user = User(username=username, email=data.email)
+#         auth_user.set_password(data.password)
+#         auth_user.save()
 
-        core_models.UserMeta.objects.create(user=auth_user)
-    except Exception as error:
-        print(error)
-        return Response({"message": "Unable to create account"}, status=500)
+#         core_models.UserMeta.objects.create(user=auth_user)
+#     except Exception as error:
+#         print(error)
+#         return Response({"message": "Unable to create account"}, status=500)
 
-    request.session["user_id"] = auth_user.id
+#     request.session["user_id"] = auth_user.id
 
-    return Response({"message": "Login successful"}, status=200)
+#     return Response({"message": "Login successful"}, status=200)
 
 
 @api.get("/dashboard/books")

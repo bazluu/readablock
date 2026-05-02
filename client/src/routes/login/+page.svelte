@@ -8,21 +8,9 @@
 		password: ''
 	};
 
-	let signupData = {
-		email: '',
-		password: '',
-		confirmPassword: ''
-	};
-
 	let errorMessage = '';
 	let successMessage = '';
 	let isLoading = false;
-
-	function toggleForm() {
-		isLogin = !isLogin;
-		errorMessage = '';
-		successMessage = '';
-	}
 
 	async function handleLogin(e) {
 		e.preventDefault();
@@ -56,49 +44,6 @@
 		} catch (error) {
 			console.error('Login error:', error);
 			errorMessage = 'An error occurred during login. Please try again.';
-		} finally {
-			isLoading = false;
-		}
-	}
-
-	async function handleSignup(e) {
-		e.preventDefault();
-		errorMessage = '';
-		successMessage = '';
-
-		if (signupData.password !== signupData.confirmPassword) {
-			errorMessage = 'Passwords do not match!';
-			return;
-		}
-
-		isLoading = true;
-
-		try {
-			const response = await fetch(`${baseURL}/app/signup/`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				credentials: 'include',
-				body: JSON.stringify({
-					email: signupData.email,
-					password: signupData.password
-				})
-			});
-
-			const data = await response.json();
-
-			if (response.ok) {
-				successMessage = data.message;
-				setTimeout(() => {
-					window.location.href = '/dashboard';
-				}, 1000);
-			} else {
-				errorMessage = data.message;
-			}
-		} catch (error) {
-			console.error('Signup error:', error);
-			errorMessage = 'An error occurred during signup. Please try again.';
 		} finally {
 			isLoading = false;
 		}
@@ -159,141 +104,48 @@
 				</div>
 			{/if}
 
-			{#if isLogin}
-				<!-- Login Form -->
-				<form on:submit={handleLogin} class="space-y-4">
-					<div class="form-control">
-						<label class="label" for="login-email">
-							<span class="label-text">Email</span>
-						</label>
-						<input
-							id="login-email"
-							type="email"
-							placeholder="your@email.com"
-							class="input input-bordered w-full"
-							bind:value={loginData.email}
-							disabled={isLoading}
-							required
-						/>
-					</div>
-
-					<div class="form-control">
-						<label class="label" for="login-password">
-							<span class="label-text">Password</span>
-						</label>
-						<input
-							id="login-password"
-							type="password"
-							placeholder="••••••••"
-							class="input input-bordered w-full"
-							bind:value={loginData.password}
-							disabled={isLoading}
-							required
-						/>
-						<div class="w-full text-right">
-							<a href="#" class="underline text-base-content/60 m-0">Forgot password?</a>
-						</div>
-					</div>
-
-					<div class="form-control mt-6">
-						<button type="submit" class="btn btn-primary w-full" disabled={isLoading}>
-							{#if isLoading}
-								<span class="loading loading-spinner"></span>
-								Signing in...
-							{:else}
-								Sign In
-							{/if}
-						</button>
-					</div>
-				</form>
-			{:else}
-				<!-- Signup Form -->
-				<form on:submit={handleSignup} class="space-y-4">
-					<div class="form-control">
-						<label class="label" for="signup-email">
-							<span class="label-text">Email</span>
-						</label>
-						<input
-							id="signup-email"
-							type="email"
-							placeholder="your@email.com"
-							class="input input-bordered w-full"
-							bind:value={signupData.email}
-							disabled={isLoading}
-							required
-						/>
-					</div>
-
-					<div class="form-control">
-						<label class="label" for="signup-password">
-							<span class="label-text">Password</span>
-						</label>
-						<input
-							id="signup-password"
-							type="password"
-							placeholder="••••••••"
-							class="input input-bordered w-full"
-							bind:value={signupData.password}
-							disabled={isLoading}
-							required
-						/>
-					</div>
-
-					<div class="form-control">
-						<label class="label" for="signup-confirm">
-							<span class="label-text">Confirm Password</span>
-						</label>
-						<input
-							id="signup-confirm"
-							type="password"
-							placeholder="••••••••"
-							class="input input-bordered w-full"
-							bind:value={signupData.confirmPassword}
-							disabled={isLoading}
-							required
-						/>
-					</div>
-
-					<div class="form-control">
-						<label class="label cursor-pointer justify-start gap-2">
-							<input
-								type="checkbox"
-								class="checkbox checkbox-primary"
-								disabled={isLoading}
-								required
-							/>
-							<span class="label-text"
-								>I agree to the <a href="#" class="link link-primary">terms and conditions</a></span
-							>
-						</label>
-					</div>
-
-					<div class="form-control mt-6">
-						<button type="submit" class="btn btn-primary w-full" disabled={isLoading}>
-							{#if isLoading}
-								<span class="loading loading-spinner"></span>
-								Creating Account...
-							{:else}
-								Create Account
-							{/if}
-						</button>
-					</div>
-				</form>
-			{/if}
-
-			<!-- Toggle Form -->
-			<div class="text-center mt-6">
-				<p class="text-sm text-base-content/60">
-					{isLogin ? "Don't have an account?" : 'Already have an account?'}
-					<button
-						on:click={toggleForm}
-						class="btn btn-sm btn-outline text-base-content/60 font-semibold ml-1"
+			<form on:submit={handleLogin} class="space-y-4">
+				<div class="form-control">
+					<label class="label" for="login-email">
+						<span class="label-text">Email</span>
+					</label>
+					<input
+						id="login-email"
+						type="email"
+						placeholder="your@email.com"
+						class="input input-bordered w-full"
+						bind:value={loginData.email}
 						disabled={isLoading}
-					>
-						{isLogin ? 'Sign up' : 'Sign in'}
+						required
+					/>
+				</div>
+
+				<div class="form-control">
+					<label class="label" for="login-password">
+						<span class="label-text">Password</span>
+					</label>
+					<input
+						id="login-password"
+						type="password"
+						placeholder="••••••••"
+						class="input input-bordered w-full"
+						bind:value={loginData.password}
+						disabled={isLoading}
+						required
+					/>
+				</div>
+
+				<div class="form-control mt-6">
+					<button type="submit" class="btn btn-primary w-full" disabled={isLoading}>
+						{#if isLoading}
+							<span class="loading loading-spinner"></span>
+							Signing in...
+						{:else}
+							Sign In
+						{/if}
 					</button>
-				</p>
-			</div>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
