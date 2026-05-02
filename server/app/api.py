@@ -15,7 +15,7 @@ from core import models as core_models
 
 api = NinjaAPI()
 
-ALLOWED_EXTENSIONS = {".epub", ".pdf", ".txt", ".kepub"}
+ALLOWED_EXTENSIONS = {".epub", ".kepub"}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 
 # epub and kepub are ZIP-based; python-magic reports them as application/zip or
@@ -23,8 +23,6 @@ MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 ALLOWED_MIME_TYPES = {
     ".epub": {"application/epub+zip", "application/zip"},
     ".kepub": {"application/epub+zip", "application/zip"},
-    ".pdf": {"application/pdf"},
-    ".txt": {"text/plain"},
 }
 
 
