@@ -15,11 +15,27 @@
 	font-family: 'Montserrat';
 	src: url('/fonts/montserrat-bold.woff2') format('woff2');
 	font-weight: 700;
+	font-style: bold;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Merriwether';
+	src: url('/fonts/merriweather-regular.woff2') format('woff2');
+	font-weight: 400;
 	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Merriwether';
+	src: url('/fonts/merriweather-bold.woff2') format('woff2');
+	font-weight: 700;
+	font-style: bold;
 	font-display: swap;
 }
 @theme {
 	--font-sans: 'Montserrat', sans-serif;
+	--font-serif: 'Merriwether', serif;
+	--font-display: 'Montserrat', sans-serif;
 }
 
 body {
