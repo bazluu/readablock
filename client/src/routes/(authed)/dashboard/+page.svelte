@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
-	import { AlertCircle, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
+	import { AlertCircle, Book, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
 
 	let continueReading = $state([]);
 	let library = $state([]);
@@ -98,12 +98,13 @@
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 						{#each continueReading as book}
-							<button onclick={() => openBook(book.id)}
+							<button
+								onclick={() => openBook(book.id)}
 								class="card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left"
 							>
 								<div class="card-body gap-3">
 									<h3 class="card-title text-base line-clamp-2 leading-snug">{book.title}</h3>
-									<p class="text-sm text-base-content/50">{book.author}</p>
+									<p class="text-lg text-base-content/50">{book.author}</p>
 									<div>
 										<div class="flex justify-between text-xs mb-1.5">
 											<span class="text-base-content/40">Progress</span>
@@ -139,14 +140,14 @@
 							>
 								<figure class="px-4 pt-4">
 									<div
-										class="aspect-[2/3] w-full bg-base-300 rounded-lg flex items-center justify-center"
+										class="aspect-[2/3] w-full bg-base-300 rounded-md flex items-center justify-center"
 									>
-										<BookOpen class="h-10 w-10 text-base-content/30" />
+										<Book class="h-10 w-10 text-base-content-30" />
 									</div>
 								</figure>
 								<div class="card-body p-3 gap-1">
 									<p class="text-sm font-semibold line-clamp-2 leading-snug">{book.title}</p>
-									<p class="text-xs text-base-content/50 line-clamp-1">{book.author}</p>
+									<p class="text-lg text-base-content/50 line-clamp-1">{book.author}</p>
 								</div>
 							</button>
 						{/each}
