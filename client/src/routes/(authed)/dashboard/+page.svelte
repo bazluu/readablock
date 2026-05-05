@@ -98,8 +98,8 @@
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 						{#each continueReading as book}
-							<div
-								class="card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer"
+							<button onclick={() => openBook(book.id)}
+								class="card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left"
 							>
 								<div class="card-body gap-3">
 									<h3 class="card-title text-base line-clamp-2 leading-snug">{book.title}</h3>
@@ -115,13 +115,8 @@
 											max="100"
 										></progress>
 									</div>
-									<div class="card-actions justify-end">
-										<button onclick={() => openBook(book.id)} class="btn btn-primary btn-sm"
-											>Continue</button
-										>
-									</div>
 								</div>
-							</div>
+							</button>
 						{/each}
 					</div>
 				</section>
@@ -138,10 +133,9 @@
 					</div>
 					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 						{#each library as book}
-							<a
-								href="/read"
+							<button
 								onclick={() => openBook(book.id)}
-								class="card bg-base-200 border border-base-300 hover:border-secondary hover:shadow-md transition-all duration-200 cursor-pointer"
+								class="card bg-base-200 border border-base-300 hover:border-secondary hover:shadow-md transition-all duration-200 cursor-pointer text-left"
 							>
 								<figure class="px-4 pt-4">
 									<div
@@ -154,7 +148,7 @@
 									<p class="text-sm font-semibold line-clamp-2 leading-snug">{book.title}</p>
 									<p class="text-xs text-base-content/50 line-clamp-1">{book.author}</p>
 								</div>
-							</a>
+							</button>
 						{/each}
 					</div>
 				</section>
