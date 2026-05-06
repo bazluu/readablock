@@ -100,22 +100,28 @@
 						{#each continueReading as book}
 							<button
 								onclick={() => openBook(book.id)}
-								class="card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left"
+								class="aspect-[2/3] card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left pt-4 px-4"
 							>
-								<div class="card-body gap-3">
-									<h3 class="card-title text-base line-clamp-2 leading-snug">{book.title}</h3>
-									<p class="text-lg text-base-content/50">{book.author}</p>
-									<div>
-										<div class="flex justify-between text-xs mb-1.5">
-											<span class="text-base-content/40">Progress</span>
-											<span class="font-semibold text-primary">{book.sentence_last_read}%</span>
-										</div>
+								<div class="flex flex-col">
+									<div
+										class="aspect-[2/3] w-2/3 bg-base-300 rounded-md flex items-center justify-center mx-auto"
+									>
+										<BookOpen class="h-10 w-10 text-base-content-30" />
+									</div>
+									<div class="flex flex-row gap-2">
 										<progress
-											class="progress progress-primary w-full h-1.5"
+											class="progress progress-primary w-7/8 h-2 my-auto"
 											value={book.sentence_last_read}
 											max="100"
 										></progress>
+										<div class="w-1/8">
+											<p class="font-semibold text-primary">{book.sentence_last_read}%</p>
+										</div>
 									</div>
+									<p class="-mt-0.5 text-lg leading-none">{book.title}</p>
+									<p class="-mt-0.5 text-md font-semibold text-base-content/50 leading-none">
+										{book.author}
+									</p>
 								</div>
 							</button>
 						{/each}
@@ -145,9 +151,11 @@
 										<Book class="h-10 w-10 text-base-content-30" />
 									</div>
 								</figure>
-								<div class="card-body p-3 gap-1">
-									<p class="text-sm font-semibold line-clamp-2 leading-snug">{book.title}</p>
-									<p class="text-lg text-base-content/50 line-clamp-1">{book.author}</p>
+								<div class="card-body p-3 gap-0">
+									<p class="text-sm font-semibold line-clamp-2 leading-none">{book.title}</p>
+									<p class="-mt-0.5 text-xs text-base-content/50 line-clamp-1 leading-none">
+										{book.author}
+									</p>
 								</div>
 							</button>
 						{/each}
