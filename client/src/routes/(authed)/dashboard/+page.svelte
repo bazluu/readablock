@@ -94,7 +94,7 @@
 					<div class="flex items-center gap-3 mb-6">
 						<BookOpen class="h-5 w-5 text-primary" />
 						<h2 class="text-xl font-bold text-base-content">Continue Reading</h2>
-						<div class="badge badge-primary badge-outline">{continueReading.length}</div>
+						<div class="badge badge-primary badge-soft">{continueReading.length}</div>
 					</div>
 					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 						{#each continueReading as book}
@@ -141,8 +141,9 @@
 			{#if library.length > 0}
 				<section>
 					<div class="flex items-center gap-3 mb-6">
+						<Book class="h-5 w-5 text-secondary" />
 						<h2 class="text-xl font-bold text-base-content">Your Library</h2>
-						<div class="badge badge-secondary badge-outline">{library.length}</div>
+						<div class="badge badge-secondary badge-soft">{library.length}</div>
 					</div>
 					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 						{#each library as book}
