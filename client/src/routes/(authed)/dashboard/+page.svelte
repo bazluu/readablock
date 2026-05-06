@@ -96,15 +96,15 @@
 						<h2 class="text-xl font-bold text-base-content">Continue Reading</h2>
 						<div class="badge badge-primary badge-outline">{continueReading.length}</div>
 					</div>
-					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-start">
 						{#each continueReading as book}
 							<button
 								onclick={() => openBook(book.id)}
-								class="card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left pt-4 px-4"
+								class="card w-full max-w-xs bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left py-4 px-3"
 							>
 								<div class="flex flex-col">
 									<div
-										class="aspect-[2/3] w-2/3 bg-base-300 rounded-md flex items-center justify-center mx-auto"
+										class="aspect-[2/3] w-1/2 bg-base-300 rounded-md flex items-center justify-center mx-auto"
 									>
 										<BookOpen class="h-10 w-10 text-base-content-30" />
 									</div>
@@ -118,8 +118,8 @@
 											<p class="font-semibold text-primary">{book.sentence_last_read}%</p>
 										</div>
 									</div>
-									<p class="-mt-0.5 text-lg leading-none">{book.title}</p>
-									<p class="-mt-0.5 text-font-semibold text-base-content/50 leading-none">
+									<p class="-mt-0.5 text-base font-semibold leading-none">{book.title}</p>
+									<p class="-mt-0.5 font-semibold text-base-content/50 leading-none">
 										{book.author}
 									</p>
 								</div>
