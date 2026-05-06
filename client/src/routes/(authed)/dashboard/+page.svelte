@@ -100,7 +100,7 @@
 						{#each continueReading as book}
 							<button
 								onclick={() => openBook(book.id)}
-								class="aspect-[2/3] card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left pt-4 px-4"
+								class="card bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left pt-4 px-4"
 							>
 								<div class="flex flex-col">
 									<div
@@ -119,7 +119,7 @@
 										</div>
 									</div>
 									<p class="-mt-0.5 text-lg leading-none">{book.title}</p>
-									<p class="-mt-0.5 text-md font-semibold text-base-content/50 leading-none">
+									<p class="-mt-0.5 text-font-semibold text-base-content/50 leading-none">
 										{book.author}
 									</p>
 								</div>
