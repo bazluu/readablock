@@ -149,20 +149,20 @@
 						{#each library as book}
 							<button
 								onclick={() => openBook(book.id)}
-								class="card bg-base-200 border border-base-300 hover:border-secondary hover:shadow-md transition-all duration-200 cursor-pointer text-left"
+								class="card w-full bg-base-200 border border-base-300 hover:border-secondary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
 							>
-								<figure class="px-4 pt-4">
+								<div class="flex flex-col gap-4">
 									<div
-										class="aspect-[2/3] w-full bg-base-300 rounded-md flex items-center justify-center"
+										class="aspect-[3/4] w-full bg-base-300 rounded-lg flex items-center justify-center"
 									>
-										<Book class="h-10 w-10 text-base-content-30" />
+										<Book class="h-12 w-12 text-secondary" />
 									</div>
-								</figure>
-								<div class="card-body p-3 gap-0">
-									<p class="text-sm font-semibold line-clamp-2 leading-none">{book.title}</p>
-									<p class="-mt-0.5 text-xs text-base-content/50 line-clamp-1 leading-none">
-										{book.author}
-									</p>
+									<div class="flex flex-col gap-1">
+										<p class="font-bold text-base leading-tight line-clamp-2">{book.title}</p>
+										<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
+											{book.author}
+										</p>
+									</div>
 								</div>
 							</button>
 						{/each}
