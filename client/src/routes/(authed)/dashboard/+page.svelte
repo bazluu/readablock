@@ -96,32 +96,38 @@
 						<h2 class="text-xl font-bold text-base-content">Continue Reading</h2>
 						<div class="badge badge-primary badge-outline">{continueReading.length}</div>
 					</div>
-					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-start">
+					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 						{#each continueReading as book}
 							<button
 								onclick={() => openBook(book.id)}
-								class="card w-full max-w-xs bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left py-4 px-3"
+								class="card w-full bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
 							>
-								<div class="flex flex-col">
+								<div class="flex flex-col gap-4">
 									<div
-										class="aspect-[2/3] w-1/2 bg-base-300 rounded-md flex items-center justify-center mx-auto"
+										class="aspect-[3/4] w-full bg-base-300 rounded-lg flex items-center justify-center"
 									>
-										<BookOpen class="h-10 w-10 text-base-content-30" />
+										<BookOpen class="h-12 w-12 text-primary" />
 									</div>
-									<div class="flex flex-row gap-2">
-										<progress
-											class="progress progress-primary w-7/8 h-2 my-auto"
-											value={book.sentence_last_read}
-											max="100"
-										></progress>
-										<div class="w-1/8">
-											<p class="font-semibold text-primary">{book.sentence_last_read}%</p>
+									<div class="flex flex-col gap-3">
+										<div class="flex flex-row items-center gap-3">
+											<progress
+												class="progress progress-primary flex-1 h-1.5"
+												value={book.sentence_last_read}
+												max="100"
+											></progress>
+											<span class="text-xs font-bold text-primary">{book.sentence_last_read}%</span>
+										</div>
+										<div class="flex flex-col gap-1">
+											<p class="font-bold text-base leading-tight line-clamp-2">
+												{book.title}
+											</p>
+											<p
+												class="-mt-0.5 text-sm font-medium text-base-content/50 leading-tight line-clamp-1"
+											>
+												{book.author}
+											</p>
 										</div>
 									</div>
-									<p class="-mt-0.5 text-base font-semibold leading-none">{book.title}</p>
-									<p class="-mt-0.5 font-semibold text-base-content/50 leading-none">
-										{book.author}
-									</p>
 								</div>
 							</button>
 						{/each}
