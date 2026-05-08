@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
+	import { Languages } from 'lucide-svelte';
 
 	let sentences = [];
 	let sentenceLastRead = 0;
@@ -273,66 +274,62 @@
 				max={sentenceCount}
 			></progress>
 
-			<!-- Sentences Table -->
-			<div class="overflow-x-auto">
-				<table class="table w-full border-collapse">
-					<tbody>
-						{#each sentences as sentence, index}
-							<tr>
-								<td class="border border-base-300 px-2 py-2">
-									<div class="mb-2">
-										{#each splitWords(sentence) as part}
-											{#if part.trim().length > 0}
-												<button
-													class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300"
-													on:click={(e) => handleWordClick(e, part, sentence)}
-												>
-													{part}
-												</button>
-											{:else}
+			<!-- Sentences -->
+			<div class="flex flex-col gap-4">
+				{#each sentences as sentence, index}
+					<div class="border border-base-300 rounded-lg px-4 py-3 bg-base-200">
+						<div class="flex items-start justify-between gap-2">
+							<div class="flex-1">
+								<div class="mb-2">
+									{#each splitWords(sentence) as part}
+										{#if part.trim().length > 0}
+											<button
+												class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300"
+												on:click={(e) => handleWordClick(e, part, sentence)}
+											>
 												{part}
-											{/if}
-										{/each}
-									</div>
-
-									{#if translations[index]}
-										<div
-											class="mt-2 p-2 bg-primary rounded-lg text-accent-content shadow-xl border-2 border-accent-focus"
-										>
-											<div class="flex items-start justify-between">
-												<div class="flex-1">
-													<p class="text-sm">{translations[index].translated}</p>
-												</div>
-												<button
-													class="btn btn-ghost btn-xs"
-													on:click={() => {
-														delete translations[index];
-														translations = { ...translations };
-													}}
-												>
-													✕
-												</button>
-											</div>
-										</div>
-									{/if}
-								</td>
-								<td class="border border-base-300 w-12 text-center">
-									<button
-										class="btn btn-ghost btn-xs"
-										on:click={() => handleTranslate(sentence, index)}
-										disabled={translatingIndex === index}
-									>
-										{#if translatingIndex === index}
-											<span class="loading loading-spinner loading-xs"></span>
+											</button>
 										{:else}
-											⬇️
+											{part}
 										{/if}
-									</button>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
+									{/each}
+								</div>
+
+								{#if translations[index]}
+									<div
+										class="mt-2 p-2 bg-primary rounded-lg text-accent-content shadow-xl border-2 border-accent-focus"
+									>
+										<div class="flex items-start justify-between">
+											<div class="flex-1">
+												<p class="text-sm">{translations[index].translated}</p>
+											</div>
+											<button
+												class="btn btn-ghost btn-xs"
+												on:click={() => {
+													delete translations[index];
+													translations = { ...translations };
+												}}
+											>
+												✕
+											</button>
+										</div>
+									</div>
+								{/if}
+							</div>
+							<button
+								class="btn btn-ghost btn-xs shrink-0"
+								on:click={() => handleTranslate(sentence, index)}
+								disabled={translatingIndex === index}
+							>
+								{#if translatingIndex === index}
+									<span class="loading loading-spinner loading-xs"></span>
+								{:else}
+									<Languages />
+								{/if}
+							</button>
+						</div>
+					</div>
+				{/each}
 			</div>
 
 			<!-- Pagination Controls -->
