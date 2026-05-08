@@ -275,59 +275,56 @@
 			></progress>
 
 			<!-- Sentences -->
-			<div class="flex flex-col gap-4">
+			<div class="flex flex-col gap-2">
 				{#each sentences as sentence, index}
-					<div class="border border-base-300 rounded-lg px-4 py-3 bg-base-200">
-						<div class="flex items-start justify-between gap-2">
-							<div class="flex-1">
-								<div class="mb-2">
-									{#each splitWords(sentence) as part}
-										{#if part.trim().length > 0}
-											<button
-												class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300"
-												on:click={(e) => handleWordClick(e, part, sentence)}
-											>
-												{part}
-											</button>
-										{:else}
+					<div class="rounded-lg flex gap-2">
+						<div class="flex-1 border border-base-300 rounded-lg bg-base-200">
+							<div class="px-2 pt-1">
+								{#each splitWords(sentence) as part}
+									{#if part.trim().length > 0}
+										<button
+											class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300 text-lg text-white font-serif"
+											on:click={(e) => handleWordClick(e, part, sentence)}
+										>
 											{part}
-										{/if}
-									{/each}
-								</div>
-
-								{#if translations[index]}
-									<div
-										class="mt-2 p-2 bg-primary rounded-lg text-accent-content shadow-xl border-2 border-accent-focus"
-									>
-										<div class="flex items-start justify-between">
-											<div class="flex-1">
-												<p class="text-sm">{translations[index].translated}</p>
-											</div>
-											<button
-												class="btn btn-ghost btn-xs"
-												on:click={() => {
-													delete translations[index];
-													translations = { ...translations };
-												}}
-											>
-												✕
-											</button>
-										</div>
-									</div>
-								{/if}
+										</button>
+									{:else}
+										{part}
+									{/if}
+								{/each}
 							</div>
-							<button
-								class="btn btn-ghost btn-xs shrink-0"
-								on:click={() => handleTranslate(sentence, index)}
-								disabled={translatingIndex === index}
-							>
-								{#if translatingIndex === index}
-									<span class="loading loading-spinner loading-xs"></span>
-								{:else}
-									<Languages />
-								{/if}
-							</button>
+
+							{#if translations[index]}
+								<div class="mt-2 px-2 border-1 bg-primary rounded-b-lg text-black">
+									<div class="flex items-start justify-between">
+										<div class="flex-1">
+											<p class="text-md">{translations[index].translated}</p>
+										</div>
+										<button
+											class="btn btn-ghost btn-xs"
+											on:click={() => {
+												delete translations[index];
+												translations = { ...translations };
+											}}
+										>
+											✕
+										</button>
+									</div>
+								</div>
+							{/if}
 						</div>
+
+						<button
+							class="btn btn-xs shrink-0 {translations[index] ? 'btn-success' : 'btn-ghost'}"
+							on:click={() => handleTranslate(sentence, index)}
+							disabled={translatingIndex === index}
+						>
+							{#if translatingIndex === index}
+								<span class="loading loading-spinner loading-xs"></span>
+							{:else}
+								<Languages />
+							{/if}
+						</button>
 					</div>
 				{/each}
 			</div>
