@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
-	import { Languages, ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import { Languages, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-svelte';
 
 	let sentences = [];
 	let sentenceLastRead = 0;
@@ -256,7 +256,14 @@
 		<p class="text-center">No sentences found.</p>
 	{:else}
 		<div class="max-w-4xl mx-auto">
-			<div class="flex flex-row w-full justify-end mb-4">
+			<div class="flex flex-row w-full justify-between items-center mb-4">
+				<a
+					href="/dashboard"
+					class="btn btn-ghost gap-1 text-base-content/70 hover:text-base-content"
+				>
+					<ArrowLeft size={20} />
+					Dashboard
+				</a>
 				<div class="dropdown">
 					<div tabindex="0" role="button" class="btn m-1">Blocks: {sentencesPerPage}</div>
 					<ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 p-2 shadow-sm">
