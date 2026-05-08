@@ -127,6 +127,11 @@
 	}
 
 	async function translateSentence(sentence, index) {
+		// Close translation if it's already open for this sentence
+		if (translations[index]) {
+			translations = {};
+			return;
+		}
 		translations = {};
 		translatingIndex = index;
 		try {
@@ -297,20 +302,11 @@
 							</div>
 
 							{#if translations[index]}
-								<div class="mt-2 px-2 border-1 bg-primary rounded-b-lg text-black">
+								<div class="px-4 border-1 bg-primary rounded-b-lg text-black">
 									<div class="flex items-start justify-between">
 										<div class="flex-1">
 											<p class="text-md">{translations[index].translated}</p>
 										</div>
-										<button
-											class="btn btn-ghost btn-xs"
-											on:click={() => {
-												delete translations[index];
-												translations = { ...translations };
-											}}
-										>
-											✕
-										</button>
 									</div>
 								</div>
 							{/if}
