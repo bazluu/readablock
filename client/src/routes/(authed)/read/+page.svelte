@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
-	import { Languages } from 'lucide-svelte';
+	import { Languages, ChevronLeft, ChevronRight } from 'lucide-svelte';
 
 	let sentences = [];
 	let sentenceLastRead = 0;
@@ -334,15 +334,17 @@
 			<!-- Pagination Controls -->
 			<div class="flex justify-between items-center mt-4">
 				<button
-					class="btn btn-primary"
+					class="btn btn-neutral"
 					on:click={handlePreviousPage}
 					disabled={!hasPrevious || isLoading}
 				>
-					← Previous
+					<ChevronLeft />
+					<p class="mr-2">PREV</p>
 				</button>
 				<span class="text-sm">Sentences {sentenceFirst + 1} - {sentenceLastRead + 1}</span>
-				<button class="btn btn-primary" on:click={handleNextPage} disabled={isLoading}>
-					Next →
+				<button class="btn btn-neutral" on:click={handleNextPage} disabled={isLoading}>
+					<p class="ml-2">NEXT</p>
+					<ChevronRight />
 				</button>
 			</div>
 		</div>
