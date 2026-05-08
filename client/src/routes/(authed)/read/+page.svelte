@@ -315,7 +315,9 @@
 						</div>
 
 						<button
-							class="btn btn-xs shrink-0 {translations[index] ? 'btn-success' : 'btn-ghost'}"
+							class="border border-base-300 btn btn-sm shrink-0 {translations[index]
+								? 'btn-primary'
+								: 'btn-ghost'}"
 							on:click={() => handleTranslate(sentence, index)}
 							disabled={translatingIndex === index}
 						>
