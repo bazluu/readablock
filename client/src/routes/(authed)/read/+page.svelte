@@ -312,19 +312,21 @@
 							{/if}
 						</div>
 
-						<button
-							class="border border-base-300 btn btn-sm shrink-0 {translations[index]
-								? 'btn-primary'
-								: 'btn-ghost'}"
-							on:click={() => handleTranslate(sentence, index)}
-							disabled={translatingIndex === index}
-						>
-							{#if translatingIndex === index}
-								<span class="loading loading-spinner loading-xs"></span>
-							{:else}
-								<Languages />
-							{/if}
-						</button>
+						<div class="flex flex-col">
+							<button
+								class="border border-base-300 btn btn-sm shrink-0 my-auto {translations[index]
+									? 'btn-primary'
+									: 'btn-ghost'}"
+								on:click={() => handleTranslate(sentence, index)}
+								disabled={translatingIndex === index}
+							>
+								{#if translatingIndex === index}
+									<span class="loading loading-spinner loading-xs"></span>
+								{:else}
+									<Languages />
+								{/if}
+							</button>
+						</div>
 					</div>
 				{/each}
 			</div>
