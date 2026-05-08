@@ -127,14 +127,16 @@
 	}
 
 	async function translateSentence(sentence, index) {
+		translations = {};
 		translatingIndex = index;
 		try {
 			const translated = await translateText(sentence);
-			translations[index] = {
-				original: sentence,
-				translated: translated
+			translations = {
+				[index]: {
+					original: sentence,
+					translated: translated
+				}
 			};
-			translations = { ...translations }; // Trigger reactivity
 		} catch (err) {
 			console.error('Translation error:', err);
 			alert(`Translation error: ${err.message}`);
