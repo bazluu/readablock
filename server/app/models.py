@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 
 extensions_allowed = FileExtensionValidator(allowed_extensions=["epub", "pdf", "txt", "kepub"])
+supported_languages = ("it", "de")
 
 
 class Book(models.Model):
@@ -14,6 +15,9 @@ class Book(models.Model):
 
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100, null=True)
+    language = models.CharField(
+        max_length=5, choices=[(lang, lang) for lang in supported_languages]
+    )
     description = models.TextField(null=True)
 
     file = models.FileField(upload_to="books/")
