@@ -10,7 +10,7 @@ import deepl
 import os
 import magic
 
-from app import schema, services, selectors, models
+from app import schema, services, selectors, models, constants
 from core import models as core_models
 
 api = NinjaAPI()
@@ -65,6 +65,11 @@ def login(request, data: schema.LoginSchema):
 #     request.session["user_id"] = auth_user.id
 
 #     return Response({"message": "Login successful"}, status=200)
+
+
+@api.get("/languages")
+def get_supported_languages(request):
+    return Response({"languages": constants.SUPPORTED_LANGUAGES}, status=200)
 
 
 @api.get("/dashboard/books")
@@ -185,6 +190,12 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
     if file.size > MAX_FILE_SIZE:
         return Response({"error": "File exceeds the 50 MB size limit"}, status=400)
 
+    if data.language not in constants.SUPPORTED_LANGUAGES:
+        return Response(
+            {"error": f"Invalid language. Supported languages: {', '.join(constants.SUPPORTED_LANGUAGES)}"},
+            status=400,
+        )
+
     ext = os.path.splitext(file.name)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         return Response(
@@ -202,6 +213,7 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
     book = models.Book(
         title=data.title,
         author=data.author,
+        language=data.language,
         file=file,
         file_type=file_type,
         uploaded_by_id=user_id,

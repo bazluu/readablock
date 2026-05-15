@@ -2,9 +2,9 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import User
 
+from app import constants
 
 extensions_allowed = FileExtensionValidator(allowed_extensions=["epub", "pdf", "txt", "kepub"])
-supported_languages = ("it", "de")
 
 
 class Book(models.Model):
@@ -16,7 +16,7 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100, null=True)
     language = models.CharField(
-        max_length=5, choices=[(lang, lang) for lang in supported_languages]
+        max_length=5, choices=[(lang, lang) for lang in constants.SUPPORTED_LANGUAGES]
     )
     description = models.TextField(null=True)
 

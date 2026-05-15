@@ -23,6 +23,7 @@ class BookSchema(Schema):
 class BookUploadSchema(Schema):
     title: str
     author: str
+    language: str
 
 
 class TranslationSchema(Schema):

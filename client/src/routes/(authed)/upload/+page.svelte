@@ -1,18 +1,96 @@
 <script>
+	import { onMount } from 'svelte';
 	import { baseURL } from '$lib/state.svelte.js';
 
 	const ALLOWED_EXTENSIONS = '.epub,.pdf,.txt,.kepub';
 	const MAX_FILE_SIZE_MB = 50;
 	const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
+	const FLAG_EMOJI = {
+		it: '🇮🇹',
+		de: '🇩🇪',
+		en: '🇬🇧',
+		fr: '🇫🇷',
+		es: '🇪🇸',
+		pt: '🇵🇹',
+		ru: '🇷🇺',
+		zh: '🇨🇳',
+		ja: '🇯🇵',
+		ko: '🇰🇷',
+		ar: '🇸🇦',
+		hi: '🇮🇳',
+		nl: '🇳🇱',
+		pl: '🇵🇱',
+		tr: '🇹🇷',
+		sv: '🇸🇪',
+		da: '🇩🇰',
+		fi: '🇫🇮',
+		no: '🇳🇴',
+		cs: '🇨🇿',
+		el: '🇬🇷',
+		th: '🇹🇭',
+		uk: '🇺🇦',
+		ro: '🇷🇴',
+		hu: '🇭🇺',
+		id: '🇮🇩',
+		ms: '🇲🇾',
+		vi: '🇻🇳'
+	};
+
+	const LANGUAGE_NAMES = {
+		it: 'Italian',
+		de: 'German',
+		en: 'English',
+		fr: 'French',
+		es: 'Spanish',
+		pt: 'Portuguese',
+		ru: 'Russian',
+		zh: 'Chinese',
+		ja: 'Japanese',
+		ko: 'Korean',
+		ar: 'Arabic',
+		hi: 'Hindi',
+		nl: 'Dutch',
+		pl: 'Polish',
+		tr: 'Turkish',
+		sv: 'Swedish',
+		da: 'Danish',
+		fi: 'Finnish',
+		no: 'Norwegian',
+		cs: 'Czech',
+		el: 'Greek',
+		th: 'Thai',
+		uk: 'Ukrainian',
+		ro: 'Romanian',
+		hu: 'Hungarian',
+		id: 'Indonesian',
+		ms: 'Malay',
+		vi: 'Vietnamese'
+	};
+
 	let title = '';
 	let author = '';
 	let file = null;
 	let fileName = '';
+	let language = '';
+
+	let languages = [];
 
 	let errorMessage = '';
 	let successMessage = '';
 	let isLoading = false;
+
+	onMount(async () => {
+		try {
+			const response = await fetch(`${baseURL}/app/languages`, {
+				credentials: 'include'
+			});
+			const data = await response.json();
+			languages = data.languages;
+		} catch (error) {
+			console.error('Failed to load languages:', error);
+		}
+	});
 
 	function handleFileChange(e) {
 		const selected = e.target.files[0];
@@ -82,6 +160,7 @@
 			formData.append('title', title);
 			formData.append('author', author);
 			formData.append('file', file);
+			formData.append('language', language);
 
 			const response = await fetch(`${baseURL}/app/books/upload`, {
 				method: 'POST',
@@ -95,6 +174,7 @@
 				successMessage = data.message;
 				title = '';
 				author = '';
+				language = 'it';
 				file = null;
 				fileName = '';
 			} else {
@@ -121,9 +201,7 @@
 			<!-- Header -->
 			<div class="text-center mb-6">
 				<h2 class="text-3xl font-bold text-primary mb-2">Upload a Book</h2>
-				<p class="text-base-content/60">
-					Add a book to your library (.epub, .pdf, .txt, .kepub)
-				</p>
+				<p class="text-base-content/60">Add a book to your library (.epub, .pdf, .txt, .kepub)</p>
 			</div>
 
 			<!-- Error Message -->
@@ -198,6 +276,26 @@
 						disabled={isLoading}
 						required
 					/>
+				</div>
+
+				<!-- Language -->
+				<div class="form-control">
+					<label class="label" for="book-language">
+						<span class="label-text">Language</span>
+					</label>
+					<select
+						id="book-language"
+						class="select select-bordered w-full"
+						bind:value={language}
+						disabled={isLoading}
+					>
+						{#each languages as lang}
+							<option value={lang}>
+								{FLAG_EMOJI[lang] || ''}
+								{LANGUAGE_NAMES[lang] || lang}
+							</option>
+						{/each}
+					</select>
 				</div>
 
 				<!-- File Upload -->

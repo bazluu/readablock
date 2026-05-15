@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
-	import { Languages, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-svelte';
+	import { Languages, ChevronLeft, ChevronRight, ArrowLeft, Volume2 } from 'lucide-svelte';
 
 	let sentences = [];
 	let sentenceLastRead = 0;
@@ -320,6 +320,9 @@
 						</div>
 
 						<div class="flex flex-col">
+							<button class="border border-base-300 btn btn-sm shrink-0 my-auto">
+								<Volume2 />
+							</button>
 							<button
 								class="border border-base-300 btn btn-sm shrink-0 my-auto {translations[index]
 									? 'btn-primary'
