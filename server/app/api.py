@@ -9,6 +9,7 @@ from ninja.responses import Response
 import deepl
 import os
 import magic
+import requests
 
 from app import schema, services, selectors, models, constants
 from core import models as core_models
@@ -192,7 +193,9 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
 
     if data.language not in constants.SUPPORTED_LANGUAGES:
         return Response(
-            {"error": f"Invalid language. Supported languages: {', '.join(constants.SUPPORTED_LANGUAGES)}"},
+            {
+                "error": f"Invalid language. Supported languages: {', '.join(constants.SUPPORTED_LANGUAGES)}"
+            },
             status=400,
         )
 
@@ -221,3 +224,48 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
     book.save()
 
     return Response({"id": book.id, "message": "Book uploaded successfully"}, status=201)
+
+
+# Maps DeepL language codes to BCP-47 codes for Google TTS
+TTS_LANGUAGE_MAP = {
+    "IT": "it-IT",
+    "EN-GB": "en-GB",
+    "EN-US": "en-US",
+    "DE": "de-DE",
+    "FR": "fr-FR",
+    "ES": "es-ES",
+    "PT-PT": "pt-PT",
+    "PT-BR": "pt-BR",
+    "NL": "nl-NL",
+    "PL": "pl-PL",
+    "RU": "ru-RU",
+    "JA": "ja-JP",
+    "ZH": "zh-CN",
+}
+
+
+@api.post("/tts/")
+def text_to_speech(request, data: schema.TTSSchema):
+    api_key = os.environ.get("GOOGLE_TTS_API_KEY")
+    if not api_key:
+        return Response({"error": "TTS not configured"}, status=500)
+
+    language_code = TTS_LANGUAGE_MAP.get(data.language.upper())
+
+    payload = {
+        "input": {"text": data.text},
+        "voice": {"languageCode": language_code, "ssmlGender": "NEUTRAL"},
+        "audioConfig": {"audioEncoding": "MP3"},
+    }
+
+    try:
+        response = requests.post(
+            f"https://texttospeech.googleapis.com/v1/text:synthesize?key={api_key}",
+            json=payload,
+            timeout=10,
+        )
+        response.raise_for_status()
+        audio_content = response.json().get("audioContent", "")
+        return Response({"audio": audio_content}, status=200)
+    except requests.RequestException as error:
+        return Response({"error": f"TTS error: {str(error)}"}, status=500)

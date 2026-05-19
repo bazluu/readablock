@@ -31,3 +31,8 @@ class TranslationSchema(Schema):
     source: str = "IT"
     target: str = "EN-GB"
     context: str | None = None
+
+
+class TTSSchema(Schema):
+    text: str
+    language: str = "IT"
