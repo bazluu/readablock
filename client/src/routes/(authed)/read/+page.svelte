@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { baseURL, selectedBookId, ttsSpeed } from '$lib/state.svelte.js';
 	import {
 		Languages,
@@ -298,14 +299,11 @@
 		<p class="text-center">No sentences found.</p>
 	{:else}
 		<div class="max-w-4xl mx-auto">
-			<div class="flex flex-row w-full justify-between items-center mb-4">
-				<a
-					href="/dashboard"
-					class="btn btn-ghost gap-1 text-base-content/70 hover:text-base-content"
-				>
+			<div class="flex flex-row w-full justify-between items-end mb-4">
+				<button class="btn gap-2" on:click={() => goto('/dashboard')}>
 					<ArrowLeft size={20} />
 					Dashboard
-				</a>
+				</button>
 				<!-- <div class="flex flex-col items-start gap-1">
 					<span class="text-xs text-base-content/50">Blocks</span>
 					<select class="select select-neutral" value={sentencesPerPage} on:change={(e) => updateSentencesPerPage(Number(e.target.value))}>
