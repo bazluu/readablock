@@ -1,7 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
-	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
-	import { Languages, ChevronLeft, ChevronRight, ArrowLeft, Volume2 } from 'lucide-svelte';
+	import { baseURL, selectedBookId, ttsSpeed } from '$lib/state.svelte.js';
+	import {
+		Languages,
+		ChevronLeft,
+		ChevronRight,
+		ArrowLeft,
+		Volume2,
+		Minus,
+		Plus
+	} from 'lucide-svelte';
 
 	let sentences = [];
 	let sentenceLastRead = 0;
@@ -19,6 +27,17 @@
 	let translatingIndex = null;
 	let targetLang = 'EN-GB';
 	let sourceLang = 'IT';
+
+	// TTS state
+	let speakingIndex = null;
+
+	function increaseTtsSpeed() {
+		ttsSpeed.value = Math.min(1.5, Math.round((ttsSpeed.value + 0.1) * 10) / 10);
+	}
+
+	function decreaseTtsSpeed() {
+		ttsSpeed.value = Math.max(0.4, Math.round((ttsSpeed.value - 0.1) * 10) / 10);
+	}
 
 	// Word translation dropdown state
 	let wordDropdown = {
@@ -241,6 +260,29 @@
 	const handleTranslate = async (sentence, index) => {
 		await translateSentence(sentence, index);
 	};
+
+	const handleSpeak = async (sentence, index) => {
+		if (speakingIndex === index) return;
+		speakingIndex = index;
+		try {
+			const response = await fetch(`${baseURL}/app/tts/`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ text: sentence, language: sourceLang })
+			});
+			if (!response.ok) throw new Error('TTS request failed');
+			const data = await response.json();
+			const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+			audio.playbackRate = ttsSpeed.value;
+			audio.onended = () => (speakingIndex = null);
+			audio.onerror = () => (speakingIndex = null);
+			audio.play();
+		} catch (err) {
+			console.error('TTS error:', err);
+			speakingIndex = null;
+		}
+	};
 </script>
 
 <svelte:window on:keydown={(e) => e.key === 'Escape' && closeWordDropdown()} />
@@ -264,22 +306,30 @@
 					<ArrowLeft size={20} />
 					Dashboard
 				</a>
-				<div class="dropdown">
-					<div tabindex="0" role="button" class="btn m-1">Blocks: {sentencesPerPage}</div>
-					<ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 p-2 shadow-sm">
-						<li>
-							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(4)}>4</button>
-						</li>
-						<li>
-							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(6)}>6</button>
-						</li>
-						<li>
-							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(8)}>8</button>
-						</li>
-						<li>
-							<button class="btn btn-ghost" on:click={() => updateSentencesPerPage(10)}>10</button>
-						</li>
-					</ul>
+				<!-- <div class="flex flex-col items-start gap-1">
+					<span class="text-xs text-base-content/50">Blocks</span>
+					<select class="select select-neutral" value={sentencesPerPage} on:change={(e) => updateSentencesPerPage(Number(e.target.value))}>
+						<option value={4}>4</option>
+						<option value={6}>6</option>
+						<option value={8}>8</option>
+						<option value={10}>10</option>
+					</select>
+				</div> -->
+				<div class="flex flex-col items-start gap-1">
+					<span class="text-xs text-base-content/50">TTS Speed</span>
+					<div class="join">
+						<button
+							class="join-item btn"
+							on:click={decreaseTtsSpeed}
+							disabled={ttsSpeed.value <= 0.4}><Minus size={16} /></button
+						>
+						<button class="join-item btn pointer-events-none">{ttsSpeed.value.toFixed(1)}</button>
+						<button
+							class="join-item btn"
+							on:click={increaseTtsSpeed}
+							disabled={ttsSpeed.value >= 1.5}><Plus size={16} /></button
+						>
+					</div>
 				</div>
 			</div>
 			<progress
@@ -320,8 +370,16 @@
 						</div>
 
 						<div class="flex flex-col">
-							<button class="border border-base-300 btn btn-sm shrink-0 my-auto">
-								<Volume2 />
+							<button
+								class="border border-base-300 btn btn-sm shrink-0 my-auto"
+								on:click={() => handleSpeak(sentence, index)}
+								disabled={speakingIndex === index}
+							>
+								{#if speakingIndex === index}
+									<span class="loading loading-spinner loading-xs"></span>
+								{:else}
+									<Volume2 />
+								{/if}
 							</button>
 							<button
 								class="border border-base-300 btn btn-sm shrink-0 my-auto {translations[index]
