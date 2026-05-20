@@ -245,27 +245,13 @@ TTS_LANGUAGE_MAP = {
 
 
 @api.post("/tts/")
-def text_to_speech(request, data: schema.TTSSchema):
-    api_key = os.environ.get("GOOGLE_TTS_API_KEY")
-    if not api_key:
-        return Response({"error": "TTS not configured"}, status=500)
-
+def tts(request, data: schema.TTSSchema):
     language_code = TTS_LANGUAGE_MAP.get(data.language.upper())
 
-    payload = {
-        "input": {"text": data.text},
-        "voice": {"languageCode": language_code, "ssmlGender": "NEUTRAL"},
-        "audioConfig": {"audioEncoding": "MP3"},
-    }
-
     try:
-        response = requests.post(
-            f"https://texttospeech.googleapis.com/v1/text:synthesize?key={api_key}",
-            json=payload,
-            timeout=10,
-        )
-        response.raise_for_status()
-        audio_content = response.json().get("audioContent", "")
+        audio_content = services.text_to_speech(data.text, language_code, data.speed)
         return Response({"audio": audio_content}, status=200)
+    except ValueError as error:
+        return Response({"error": str(error)}, status=500)
     except requests.RequestException as error:
         return Response({"error": f"TTS error: {str(error)}"}, status=500)

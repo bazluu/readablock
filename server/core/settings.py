@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
+GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")

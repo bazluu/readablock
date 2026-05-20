@@ -10,6 +10,7 @@ from ebooklib import epub, ITEM_DOCUMENT
 from bs4 import BeautifulSoup
 from textblob import TextBlob
 import deepl
+import requests
 
 from app import models
 
@@ -104,3 +105,27 @@ def verify_book_access(book_id: int, user_id: int) -> bool:
         return True
 
     return False
+
+
+def text_to_speech(text, language_code, speed=0.9, tier="Standard", variant="A"):
+    if not settings.GOOGLE_TTS_API_KEY:
+        raise ValueError("TTS not configured")
+
+    payload = {
+        "input": {"text": text},
+        "voice": {
+            "languageCode": language_code,
+            "name": f"{language_code}-{tier}-{variant}",
+            "ssmlGender": "NEUTRAL",
+        },
+        "audioConfig": {"audioEncoding": "MP3", "speakingRate": speed},
+    }
+
+    response = requests.post(
+        f"https://texttospeech.googleapis.com/v1/text:synthesize?key={settings.GOOGLE_TTS_API_KEY}",
+        json=payload,
+        timeout=10,
+    )
+    response.raise_for_status()
+
+    return response.json().get("audioContent", "")
