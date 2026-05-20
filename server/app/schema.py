@@ -35,5 +35,5 @@ class TranslationSchema(Schema):
 
 class TTSSchema(Schema):
     text: str
-    language: str = "IT"
-    speed: float = 0.8
+    language: str
+    speed: float = 0.9
