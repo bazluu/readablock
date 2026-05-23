@@ -1,4 +1,5 @@
 from cmath import e
+from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -71,6 +72,61 @@ def login(request, data: schema.LoginSchema):
 @api.get("/languages")
 def get_supported_languages(request):
     return Response({"languages": constants.SUPPORTED_LANGUAGES}, status=200)
+
+
+@api.get("/supported-languages/")
+def supported_languages(request):
+    cache_key = "supported_languages"
+    # cached = cache.get(cache_key)
+    # if cached is not None:
+    #     return Response({"languages": cached}, status=200)
+
+    try:
+        translator = deepl.Translator(settings.DEEPL_API_KEY)
+
+        source_langs = translator.get_source_languages()
+        target_langs = translator.get_target_languages()
+
+        deepl_eng_codes = set()
+        for lang in source_langs:
+            code = lang.code.upper()
+            if code != "EN":
+                deepl_eng_codes.add(code)
+
+        for lang in target_langs:
+            code = lang.code.upper()
+            base = code.split("-")[0]
+            if base != "EN":
+                deepl_eng_codes.add(code)
+
+        resp = requests.get(
+            f"https://texttospeech.googleapis.com/v1/voices?key={settings.GOOGLE_TTS_API_KEY}",
+            timeout=10,
+        )
+        resp.raise_for_status()
+        voices = resp.json().get("voices", [])
+
+        tts_standard_codes = set()
+        for voice in voices:
+            if "Standard" in voice.get("name", ""):
+                tts_standard_codes.update(voice.get("languageCodes", []))
+
+        available = [
+            d
+            for d, t in TTS_LANGUAGE_MAP.items()
+            if d in deepl_eng_codes and t in tts_standard_codes
+        ]
+
+        cache.set(cache_key, available, 3600)
+
+        return Response({"languages": available}, status=200)
+
+    except deepl.DeepLException as error:
+        return Response({"error": f"DeepL API error: {str(error)}"}, status=400)
+    except requests.RequestException as error:
+        return Response({"error": f"TTS API error: {str(error)}"}, status=400)
+    except Exception as error:
+        return Response({"error": str(error)}, status=500)
 
 
 @api.get("/dashboard/books")
