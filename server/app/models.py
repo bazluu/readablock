@@ -20,6 +20,7 @@ class Book(models.Model):
     )
     description = models.TextField(null=True)
     reading_ease_score = models.FloatField(null=True)
+    tags = models.JSONField(default=list, blank=True)
 
     file = models.FileField(upload_to="books/")
     BOOK_FILE_TYPES = (("epub", "epub"), ("pdf", "pdf"), ("txt", "txt"), ("kepub", "kepub"))
