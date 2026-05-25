@@ -28,7 +28,7 @@ class BookUploadSchema(Schema):
 
 class TranslationSchema(Schema):
     text: str
-    source: str = "IT"
+    source: str
     target: str = "EN-GB"
     context: str | None = None
 

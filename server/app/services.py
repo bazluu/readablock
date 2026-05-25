@@ -13,6 +13,16 @@ import deepl
 import requests
 
 from app import models
+from app.constants import LANGUAGES
+
+
+def get_supported_languages():
+    supported = [{"name": "Latin", "deepl": "LA", "google_tts": None, "marc": "lat"}]
+    for lang in LANGUAGES:
+        if lang["deepl"] and lang["google_tts"]:
+            supported.append(lang)
+
+    return supported
 
 
 def convert_email_to_username(email: str, length: int = 6) -> str:

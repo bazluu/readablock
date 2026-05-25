@@ -16,7 +16,7 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100, null=True)
     language = models.CharField(
-        max_length=5, choices=[(lang, lang) for lang in constants.SUPPORTED_LANGUAGES]
+        max_length=7, choices=[(lang, lang) for lang in constants.SUPPORTED_LANGUAGES]
     )
     description = models.TextField(null=True)
 
