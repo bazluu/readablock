@@ -82,7 +82,7 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch(`${baseURL}/app/languages`, {
+			const response = await fetch(`${baseURL}/app/supported-languages/`, {
 				credentials: 'include'
 			});
 			const data = await response.json();
@@ -289,12 +289,11 @@
 						bind:value={language}
 						disabled={isLoading}
 					>
-						{#each languages as lang}
-							<option value={lang}>
-								{FLAG_EMOJI[lang] || ''}
-								{LANGUAGE_NAMES[lang] || lang}
-							</option>
-						{/each}
+				{#each languages as lang}
+					<option value={lang.deepl}>
+						{lang.name} ({lang.deepl})
+					</option>
+				{/each}
 					</select>
 				</div>
 
