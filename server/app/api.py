@@ -112,13 +112,20 @@ def dashboard_books(request):
 
     response = {"continue_reading": [], "library": []}
 
+    # Fetch user's own books
     for book in models.Book.objects.filter(uploaded_by_id=user_id).values("id", "title", "author"):
         response["library"].append(
             {"id": book["id"], "title": book["title"], "author": book["author"]}
         )
 
+    # Fetch public books from other users
+    for book in models.Book.objects.filter(is_public=True).exclude(uploaded_by_id=user_id).values("id", "title", "author"):
+        response["library"].append(
+            {"id": book["id"], "title": book["title"], "author": book["author"]}
+        )
+
     books_in_progress = models.BookProgress.objects.filter(user_id=user_id).values(
-        "book_id", "book__title", "book__author", "sentence_last_read", "book__is_public"
+        "book_id", "book__title", "book__author", "sentence_last_read"
     )
 
     for book_progress in books_in_progress:
@@ -129,16 +136,6 @@ def dashboard_books(request):
                     "title": book_progress["book__title"],
                     "author": book_progress["book__author"],
                     "sentence_last_read": book_progress["sentence_last_read"],
-                }
-            )
-
-        # A public book will show up in "library" but not in "continue_reading" if the user hasn't read it yet
-        elif book_progress["sentence_last_read"] == 0 and book_progress["book__is_public"]:
-            response["library"].append(
-                {
-                    "id": book_progress["book_id"],
-                    "title": book_progress["book__title"],
-                    "author": book_progress["book__author"],
                 }
             )
 
