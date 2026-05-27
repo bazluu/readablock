@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { baseURL } from '$lib/state.svelte.js';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 
 	const ALLOWED_EXTENSIONS = '.epub';
 	const MAX_FILE_SIZE_MB = 50;
@@ -147,18 +148,13 @@
 	<title>Upload Book — readablock</title>
 </svelte:head>
 
-<div
-	class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-base-100 to-secondary/20 p-4 overflow-x-hidden"
->
-	<div class="card w-full max-w-lg bg-base-100 shadow-2xl">
-		<div class="card-body p-6 sm:p-8">
-			<!-- Header -->
-			<div class="text-center mb-6">
-				<h2 class="text-3xl font-bold text-primary mb-2">Upload a Book</h2>
-				<p class="text-base-content/60">Add a book to your library (.epub)</p>
-			</div>
+<div class="min-h-screen bg-base-100">
+	<PageHeader title="Upload a Book" subtitle="Add a book to your library (.epub)" />
 
-			<!-- Error Message -->
+	<div class="flex items-center justify-center p-4">
+		<div class="card w-full max-w-lg bg-base-100 shadow-2xl">
+			<div class="card-body p-6 sm:p-8">
+				<!-- Error Message -->
 			{#if errorMessage}
 				<div class="alert alert-error mb-4">
 					<svg
@@ -367,6 +363,7 @@
 				<a href="/dashboard" class="btn btn-sm btn-outline text-base-content/60">
 					Back to Dashboard
 				</a>
+			</div>
 			</div>
 		</div>
 	</div>
