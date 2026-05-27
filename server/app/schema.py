@@ -24,6 +24,7 @@ class BookUploadSchema(Schema):
     title: str
     author: str
     language: str
+    is_public: bool = False
 
 
 class TranslationSchema(Schema):

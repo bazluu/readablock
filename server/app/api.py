@@ -37,6 +37,7 @@ def login(request, data: schema.LoginSchema):
 
     if auth_user.check_password(data.password):
         request.session["user_id"] = auth_user.id
+
         return Response({"message": "Login successful"}, status=200)
 
     else:
@@ -69,12 +70,32 @@ def login(request, data: schema.LoginSchema):
 #     return Response({"message": "Login successful"}, status=200)
 
 
+@api.get("/user")
+def user(request):
+    try:
+        user_id = request.session["user_id"]
+        user = User.objects.get(id=user_id)
+
+        return Response(
+            {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "is_superuser": user.is_superuser,
+            },
+            status=200,
+        )
+
+    except (KeyError, User.DoesNotExist):
+        return Response({"error": "Authentication required"}, status=401)
+
+
 @api.get("/languages")
 def get_supported_languages(request):
     return Response({"languages": constants.SUPPORTED_LANGUAGES}, status=200)
 
 
-@api.get("/supported-languages/")
+@api.get("/supported-languages")
 def supported_languages(request):
     languages = services.get_supported_languages()
 
@@ -192,8 +213,8 @@ def translate(request, data: schema.TranslationSchema):
 @api.post("/books/upload")
 def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile = File(...)):
     try:
-        user_id = request.session["user_id"]
-    except KeyError:
+        user = User.objects.get(id=request.session["user_id"])
+    except (KeyError, User.DoesNotExist):
         return Response({"error": "Authentication required"}, status=401)
 
     if file.size > MAX_FILE_SIZE:
@@ -221,13 +242,16 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
 
     file_type = ext.lstrip(".")
 
+    is_public = data.is_public if user.is_superuser else False
+
     book = models.Book(
         title=data.title,
         author=data.author,
         language=data.language,
         file=file,
         file_type=file_type,
-        uploaded_by_id=user_id,
+        uploaded_by_id=user.id,
+        is_public=is_public,
     )
     book.save()
 
