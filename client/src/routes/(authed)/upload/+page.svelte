@@ -152,7 +152,7 @@
 	<PageHeader title="Upload a Book" subtitle="Add a book to your library (.epub)" />
 
 	<div class="flex items-center justify-center p-4">
-		<div class="card w-full max-w-lg bg-base-100 shadow-2xl">
+		<div class="card w-full max-w-lg bg-base-200 border border-base-300">
 			<div class="card-body p-6 sm:p-8">
 				<!-- Error Message -->
 			{#if errorMessage}
