@@ -1,6 +1,4 @@
-from cmath import e
 from django.conf import settings
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
 from ninja import NinjaAPI, File, Form
@@ -71,6 +69,12 @@ def login(request, data: schema.LoginSchema):
 #     return Response({"message": "Login successful"}, status=200)
 
 
+@api.post("/logout/")
+def logout(request):
+    request.session.flush()
+    return Response({"message": "Logged out"}, status=200)
+
+
 @api.get("/user")
 def user(request):
     try:
@@ -119,7 +123,11 @@ def dashboard_books(request):
         )
 
     # Fetch public books from other users
-    for book in models.Book.objects.filter(is_public=True).exclude(uploaded_by_id=user_id).values("id", "title", "author"):
+    for book in (
+        models.Book.objects.filter(is_public=True)
+        .exclude(uploaded_by_id=user_id)
+        .values("id", "title", "author")
+    ):
         response["library"].append(
             {"id": book["id"], "title": book["title"], "author": book["author"]}
         )

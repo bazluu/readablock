@@ -5,3 +5,5 @@ export const user = $state({ value: null });
 export const selectedBookId = $state({ value: null });
 
 export const ttsSpeed = $state({ value: 1.0 });
+
+export const selectedLanguage = $state({ value: null });

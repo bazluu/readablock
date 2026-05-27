@@ -360,7 +360,7 @@
 
 			<!-- Back Link -->
 			<div class="text-center mt-6">
-				<a href="/dashboard" class="btn btn-sm btn-outline text-base-content/60">
+				<a href="/dashboard" class="btn btn-sm btn-outline text-base-content/60 no-underline">
 					Back to Dashboard
 				</a>
 			</div>
