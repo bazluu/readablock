@@ -7,6 +7,7 @@ from ninja import NinjaAPI, File, Form
 from ninja.files import UploadedFile
 from ninja.responses import Response
 import deepl
+import secrets
 import os
 import magic
 import requests
@@ -241,6 +242,10 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
         return Response({"error": "File content does not match the expected type"}, status=400)
 
     file_type = ext.lstrip(".")
+
+    random_suffix = secrets.token_hex(8)
+    base_name = os.path.splitext(file.name)[0]
+    file.name = f"{base_name}_{random_suffix}{ext}"
 
     is_public = data.is_public if user.is_superuser else False
 
