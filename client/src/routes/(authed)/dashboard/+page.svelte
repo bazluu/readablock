@@ -1,14 +1,16 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { baseURL, selectedBookId } from '$lib/state.svelte.js';
+	import { baseURL, selectedBookId, selectedLanguage } from '$lib/state.svelte.js';
 	import { AlertCircle, Book, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 
 	let continueReading = $state([]);
 	let library = $state([]);
 	let isLoading = $state(true);
 	let error = $state(null);
+	let showLanguageModal = $state(false);
 
 	async function fetchBooks() {
 		isLoading = true;
@@ -36,6 +38,7 @@
 
 	onMount(async () => {
 		await fetchBooks();
+		if (!selectedLanguage.value) showLanguageModal = true;
 	});
 
 	function openBook(id) {
@@ -165,3 +168,5 @@
 		{/if}
 	</div>
 </div>
+
+<LanguageSelector bind:open={showLanguageModal} />
