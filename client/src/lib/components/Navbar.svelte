@@ -40,8 +40,31 @@
 	<div class="navbar-start">
 		<button
 			onclick={() => goto('/dashboard')}
-			class="font-display text-xl font-bold text-primary btn btn-ghost btn-lg">Readablock</button
+			class="font-display text-2xl font-bold text-primary btn btn-ghost btn-lg">Readablock</button
 		>
+
+		<div class="dropdown dropdown-end">
+			<div tabindex="0" role="button" class="btn btn-ghost gap-2">
+				<Languages class="h-4 w-4" />
+				{currentLanguageName()}
+			</div>
+			<ul
+				tabindex="0"
+				class="dropdown-content menu bg-base-200 border border-base-300 rounded-box z-1 w-52 p-2 shadow-sm max-h-64 overflow-y-auto"
+			>
+				{#each languages as lang}
+					<li>
+						<button
+							class="gap-2"
+							class:active={selectedLanguage.value === lang.deepl}
+							onclick={() => selectLanguage(lang.deepl)}
+						>
+							{lang.name}
+						</button>
+					</li>
+				{/each}
+			</ul>
+		</div>
 	</div>
 
 	<div class="navbar-center">
@@ -70,29 +93,6 @@
 	</div>
 
 	<div class="navbar-end gap-1">
-		<div class="dropdown dropdown-end">
-			<div tabindex="0" role="button" class="btn btn-ghost gap-2">
-				<Languages class="h-4 w-4" />
-				{currentLanguageName()}
-			</div>
-			<ul
-				tabindex="0"
-				class="dropdown-content menu bg-base-200 border border-base-300 rounded-box z-1 w-52 p-2 shadow-sm max-h-64 overflow-y-auto"
-			>
-				{#each languages as lang}
-					<li>
-						<button
-							class="gap-2"
-							class:active={selectedLanguage.value === lang.deepl}
-							onclick={() => selectLanguage(lang.deepl)}
-						>
-							{lang.name}
-						</button>
-					</li>
-				{/each}
-			</ul>
-		</div>
-
 		<button class="btn btn-ghost" onclick={logout}>
 			<LogOut class="h-4 w-4" />
 		</button>
