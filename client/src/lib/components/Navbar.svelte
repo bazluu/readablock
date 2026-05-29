@@ -48,22 +48,20 @@
 				<Languages class="h-4 w-4" />
 				{currentLanguageName()}
 			</div>
-			<ul
+			<div
 				tabindex="0"
-				class="dropdown-content menu bg-base-200 border border-base-300 rounded-box z-1 w-52 p-2 shadow-sm max-h-64 overflow-y-auto"
+				class="dropdown-content list bg-base-200 rounded-box z-1 w-52 overflow-y-auto max-h-64 shadow-sm"
 			>
 				{#each languages as lang}
-					<li>
-						<button
-							class="gap-2"
-							class:active={selectedLanguage.value === lang.deepl}
-							onclick={() => selectLanguage(lang.deepl)}
-						>
-							{lang.name}
-						</button>
-					</li>
+					<div
+						class="list-row cursor-pointer hover:bg-base-300"
+						class:bg-base-300={selectedLanguage.value === lang.deepl}
+						onclick={() => selectLanguage(lang.deepl)}
+					>
+						{lang.name}
+					</div>
 				{/each}
-			</ul>
+			</div>
 		</div>
 	</div>
 
