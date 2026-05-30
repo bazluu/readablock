@@ -6,6 +6,7 @@
 	import { Library, Upload, Languages, LogOut } from 'lucide-svelte';
 
 	let languages = $state([]);
+	let langDropdownOpen = $state(false);
 
 	onMount(async () => {
 		const response = await fetch(`${baseURL}/app/supported-languages`, {
@@ -17,8 +18,23 @@
 		}
 	});
 
+	function clickOutside(node, callback) {
+		const handleClick = (event) => {
+			if (!node.contains(event.target)) {
+				callback();
+			}
+		};
+		document.addEventListener('click', handleClick, true);
+		return {
+			destroy() {
+				document.removeEventListener('click', handleClick, true);
+			}
+		};
+	}
+
 	function selectLanguage(deepl) {
 		selectedLanguage.value = deepl;
+		langDropdownOpen = false;
 	}
 
 	async function logout() {
@@ -36,62 +52,72 @@
 	}
 </script>
 
-<div class="navbar bg-base-200 border-b border-base-300">
-	<div class="navbar-start">
+<div
+	class="flex items-center px-4 py-2 bg-base-200 border-b border-base-300 text-neutral-100 gap-4"
+>
+	<div class="flex items-center flex-1 gap-2">
 		<button
 			onclick={() => goto('/dashboard')}
-			class="font-display text-2xl font-bold text-primary btn btn-ghost btn-lg">Readablock</button
+			class="btn font-display text-xl sm:text-2xl font-bold text-primary transition-colors"
 		>
+			Readablock
+		</button>
 
-		<div class="dropdown dropdown-end">
-			<div tabindex="0" role="button" class="btn btn-ghost gap-2">
-				<Languages class="h-4 w-4" />
-				{currentLanguageName()}
-			</div>
-			<div
-				tabindex="0"
-				class="dropdown-content list bg-base-200 rounded-box z-1 w-52 overflow-y-auto max-h-64 shadow-sm"
+		<div class="relative shrink-0" use:clickOutside={() => (langDropdownOpen = false)}>
+			<button
+				onclick={() => (langDropdownOpen = !langDropdownOpen)}
+				class="btn inline-flex items-center gap-2 px-3 py-2 rounded-lg"
 			>
-				{#each languages as lang}
-					<div
-						class="list-row cursor-pointer hover:bg-base-300"
-						class:bg-base-300={selectedLanguage.value === lang.deepl}
-						onclick={() => selectLanguage(lang.deepl)}
-					>
-						{lang.name}
-					</div>
-				{/each}
-			</div>
+				<Languages class="h-4 w-4" />
+				<span class="hidden sm:inline">{currentLanguageName()}</span>
+			</button>
+			{#if langDropdownOpen}
+				<div class="absolute top-full left-0 mt-1 z-50 w-52 overflow-y-auto max-h-64">
+					{#each languages as lang}
+						<button
+							class="w-full text-left px-4 py-2 btn {selectedLanguage.value === lang.deepl
+								? 'btn-neutral'
+								: ''}"
+							onclick={() => selectLanguage(lang.deepl)}
+						>
+							{lang.name}
+						</button>
+					{/each}
+				</div>
+			{/if}
 		</div>
 	</div>
 
-	<div class="navbar-center">
-		<ul class="menu menu-horizontal px-1 gap-1">
-			<li>
-				<button
-					onclick={() => goto('/dashboard')}
-					class="gap-2 btn"
-					class:active={$page.url.pathname === '/dashboard'}
-				>
-					<Library class="h-4 w-4" />
-					Dashboard
-				</button>
-			</li>
-			<li>
-				<button
-					onclick={() => goto('/upload')}
-					class="gap-2 btn"
-					class:active={$page.url.pathname === '/upload'}
-				>
-					<Upload class="h-4 w-4" />
-					Upload
-				</button>
-			</li>
-		</ul>
+	<div class="flex items-center justify-center">
+		<div class="flex gap-1">
+			<button
+				onclick={() => goto('/dashboard')}
+				class="btn inline-flex items-center gap-2 px-4 py-2 rounded-lg {$page.url.pathname ===
+				'/dashboard'
+					? 'btn-neutral'
+					: ''}"
+			>
+				<Library class="h-4 w-4" />
+				<span class="hidden sm:inline">Dashboard</span>
+			</button>
+			<button
+				onclick={() => goto('/upload')}
+				class="btn inline-flex items-center gap-2 px-4 py-2 rounded-lg {$page.url.pathname ===
+				'/upload'
+					? 'btn-neutral'
+					: ''}"
+			>
+				<Upload class="h-4 w-4" />
+				<span class="hidden sm:inline">Upload</span>
+			</button>
+		</div>
 	</div>
 
-	<div class="navbar-end gap-1">
-		<button class="btn btn-ghost" onclick={logout}>
+	<div class="flex items-center justify-end flex-1 gap-1 min-w-0">
+		<button
+			class="btn inline-flex items-center justify-center p-2 transition-colors shrink-0"
+			onclick={logout}
+		>
 			<LogOut class="h-4 w-4" />
 		</button>
 	</div>
