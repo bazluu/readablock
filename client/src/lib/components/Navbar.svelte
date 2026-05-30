@@ -72,7 +72,7 @@
 				<span class="hidden sm:inline">{currentLanguageName()}</span>
 			</button>
 			{#if langDropdownOpen}
-				<div class="absolute top-full left-0 mt-1 z-50 w-52 overflow-y-auto max-h-64">
+				<div class="absolute top-full left-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52 overflow-y-auto max-h-64">
 					{#each languages as lang}
 						<button
 							class="w-full text-left px-4 py-2 btn {selectedLanguage.value === lang.deepl
