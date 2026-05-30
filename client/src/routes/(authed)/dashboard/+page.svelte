@@ -1,5 +1,4 @@
 <script>
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { baseURL, selectedBookId, selectedLanguage } from '$lib/state.svelte.js';
 	import { AlertCircle, Book, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
@@ -16,7 +15,7 @@
 		isLoading = true;
 		error = null;
 		try {
-			const response = await fetch(`${baseURL}/app/dashboard/books`, {
+			const response = await fetch(`${baseURL}/app/dashboard/books?language=${selectedLanguage.value}`, {
 				credentials: 'include'
 			});
 			if (!response.ok) {
@@ -36,9 +35,12 @@
 		}
 	}
 
-	onMount(async () => {
-		await fetchBooks();
-		if (!selectedLanguage.value) showLanguageModal = true;
+	$effect(() => {
+		if (selectedLanguage.value) {
+			fetchBooks();
+		} else {
+			showLanguageModal = true;
+		}
 	});
 
 	function openBook(id) {

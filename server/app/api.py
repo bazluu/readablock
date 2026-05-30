@@ -108,7 +108,7 @@ def supported_languages(request):
 
 
 @api.get("/dashboard/books")
-def dashboard_books(request):
+def dashboard_books(request, language: str):
     try:
         user_id = request.session["user_id"]
     except KeyError:
@@ -117,14 +117,16 @@ def dashboard_books(request):
     response = {"continue_reading": [], "library": []}
 
     # Fetch user's own books
-    for book in models.Book.objects.filter(uploaded_by_id=user_id).values("id", "title", "author"):
+    for book in models.Book.objects.filter(uploaded_by_id=user_id, language=language).values(
+        "id", "title", "author"
+    ):
         response["library"].append(
             {"id": book["id"], "title": book["title"], "author": book["author"]}
         )
 
     # Fetch public books from other users
     for book in (
-        models.Book.objects.filter(is_public=True)
+        models.Book.objects.filter(is_public=True, language=language)
         .exclude(uploaded_by_id=user_id)
         .values("id", "title", "author")
     ):
@@ -132,9 +134,9 @@ def dashboard_books(request):
             {"id": book["id"], "title": book["title"], "author": book["author"]}
         )
 
-    books_in_progress = models.BookProgress.objects.filter(user_id=user_id).values(
-        "book_id", "book__title", "book__author", "sentence_last_read"
-    )
+    books_in_progress = models.BookProgress.objects.filter(
+        user_id=user_id, book__language=language
+    ).values("book_id", "book__title", "book__author", "sentence_last_read")
 
     for book_progress in books_in_progress:
         if book_progress["sentence_last_read"] > 0:
