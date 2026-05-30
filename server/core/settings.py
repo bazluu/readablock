@@ -16,13 +16,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 import os
-from dotenv import load_dotenv
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-load_dotenv()
 
 DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
 GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY")
@@ -31,7 +27,10 @@ GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+if os.getenv("DEBUG") in ("False", False):
+    DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = []
 

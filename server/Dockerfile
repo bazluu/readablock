@@ -12,9 +12,6 @@ RUN apk add --no-cache build-base \
 
 COPY . .
 
-COPY .env /app/.env
-RUN chmod +r /app/.env || true
-
 EXPOSE 8000
 
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
