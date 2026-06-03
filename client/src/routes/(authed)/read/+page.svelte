@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { baseURL, selectedBookId, ttsSpeed } from '$lib/state.svelte.js';
+	import { baseURL, selectedBookId, lastReadBookId, ttsSpeed } from '$lib/state.svelte.js';
 	import {
 		Languages,
 		ChevronLeft,
@@ -64,6 +64,11 @@
 			return stateBookId;
 		}
 
+		const lastBookId = Number(lastReadBookId.value);
+		if (Number.isInteger(lastBookId) && lastBookId > 0) {
+			return lastBookId;
+		}
+
 		return null;
 	}
 
@@ -103,6 +108,7 @@
 			sentenceCount = data.sentence_count;
 			sentenceFirst = data.sentence_first;
 			hasPrevious = data.has_previous;
+			lastReadBookId.value = bookId;
 		} catch (err) {
 			error = err.message;
 			console.error('Error fetching sentences:', err);
@@ -232,6 +238,10 @@
 
 	onMount(async () => {
 		bookId = resolveBookId();
+		if (bookId === null) {
+			goto('/dashboard');
+			return;
+		}
 		await getSentences();
 
 		// Add global click listener
