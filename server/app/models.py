@@ -41,3 +41,11 @@ class BookProgress(models.Model):
     book = models.ForeignKey(Book, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     sentence_last_read = models.IntegerField(default=0)
+
+
+class Feedback(models.Model):
+    type = models.CharField(
+        max_length=20, choices=[(t, t) for t in ("bug", "feature_request", "general")]
+    )
+    body = models.TextField()
+    date_created = models.DateTimeField(auto_now_add=True)
