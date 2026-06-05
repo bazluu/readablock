@@ -38,3 +38,8 @@ class TTSSchema(Schema):
     text: str
     language: str
     speed: float = 0.9
+
+
+class FeedbackSchema(Schema):
+    type: str
+    body: str

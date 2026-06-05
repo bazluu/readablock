@@ -270,6 +270,26 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
     return Response({"id": book.id, "message": "Book uploaded successfully"}, status=201)
 
 
+@api.post("/feedback/")
+def create_feedback(request, data: schema.FeedbackSchema):
+    try:
+        request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    allowed_types = {choice[0] for choice in models.Feedback._meta.get_field("type").choices}
+
+    if data.type not in allowed_types:
+        return Response({"error": "Invalid feedback type"}, status=400)
+
+    if not data.body.strip():
+        return Response({"error": "Feedback message is required"}, status=400)
+
+    models.Feedback.objects.create(type=data.type, body=data.body.strip())
+
+    return Response({"message": "Feedback submitted successfully"}, status=201)
+
+
 @api.post("/tts/")
 def tts(request, data: schema.TTSSchema):
     language_code = DEEPL_TO_GOOGLE.get(data.language.upper())

@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { baseURL, selectedLanguage } from '$lib/state.svelte.js';
-	import { Library, Upload, Languages, LogOut } from 'lucide-svelte';
+	import { Library, Upload, Languages, MessageSquare, LogOut } from 'lucide-svelte';
 
 	let languages = $state([]);
 	let langDropdownOpen = $state(false);
@@ -72,7 +72,9 @@
 				<span class="hidden sm:inline">{currentLanguageName()}</span>
 			</button>
 			{#if langDropdownOpen}
-				<div class="absolute top-full left-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52 overflow-y-auto max-h-64">
+				<div
+					class="absolute top-full left-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52 overflow-y-auto max-h-64"
+				>
 					{#each languages as lang}
 						<button
 							class="w-full text-left px-4 py-2 btn {selectedLanguage.value === lang.deepl
@@ -109,6 +111,16 @@
 			>
 				<Upload class="h-4 w-4" />
 				<span class="hidden sm:inline">Upload</span>
+			</button>
+			<button
+				onclick={() => goto('/feedback')}
+				class="btn inline-flex items-center gap-2 px-4 py-2 rounded-lg {$page.url.pathname ===
+				'/feedback'
+					? 'btn-neutral'
+					: ''}"
+			>
+				<MessageSquare class="h-4 w-4" />
+				<span class="hidden sm:inline">Feedback</span>
 			</button>
 		</div>
 	</div>
