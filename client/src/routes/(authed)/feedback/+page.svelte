@@ -83,17 +83,19 @@
 				{/if}
 
 				<form on:submit={handleSubmit} class="space-y-5">
-					<div class="tabs tabs-box box-border w-full bg-base-300 p-1">
+					<div class="flex gap-4">
 						{#each feedbackTypes as type}
-							<input
-								type="radio"
-								name="feedback-type"
-								class="tab flex-1 m-0"
-								aria-label={type.label}
-								value={type.value}
-								bind:group={feedbackType}
-								disabled={isLoading}
-							/>
+							<label class="flex items-center gap-2 cursor-pointer">
+								<input
+									type="radio"
+									name="feedback-type"
+									class="radio radio-primary"
+									value={type.value}
+									bind:group={feedbackType}
+									disabled={isLoading}
+								/>
+								<span class="label-text text-lg leading-none">{type.label}</span>
+							</label>
 						{/each}
 					</div>
 
