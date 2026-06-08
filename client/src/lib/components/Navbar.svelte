@@ -52,13 +52,11 @@
 	}
 </script>
 
-<div
-	class="flex items-center px-4 py-2 bg-base-200 border-b border-base-300 text-neutral-100 gap-4"
->
+<div class="flex items-center py-2 bg-base-200 border-b border-base-300 text-neutral-100 gap-2">
 	<div class="flex items-center flex-1 gap-2">
 		<button
 			onclick={() => goto('/dashboard')}
-			class="btn font-display text-xl sm:text-2xl font-bold text-primary transition-colors"
+			class="btn font-display text-lg sm:text-2xl font-bold text-primary transition-colors"
 		>
 			Readablock
 		</button>
