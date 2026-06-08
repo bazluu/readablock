@@ -69,8 +69,9 @@
 				onclick={() => (langDropdownOpen = !langDropdownOpen)}
 				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 rounded-lg"
 			>
-				<Languages class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-				<span class="hidden sm:inline">{currentLanguageName()}</span>
+				<Languages class="h-4 w-4 sm:h-5 sm:w-5" />
+				<span class="sm:hidden">{selectedLanguage.value || 'Lang'}</span>
+			<span class="hidden sm:inline">{currentLanguageName()}</span>
 			</button>
 			{#if langDropdownOpen}
 				<div
@@ -100,7 +101,7 @@
 					? 'btn-neutral'
 					: ''}"
 			>
-				<Library class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+				<Library class="h-4 w-4 sm:h-5 sm:w-5" />
 				<span class="hidden sm:inline">Dashboard</span>
 			</button>
 			<button
@@ -110,7 +111,7 @@
 					? 'btn-neutral'
 					: ''}"
 			>
-				<Upload class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+				<Upload class="h-4 w-4 sm:h-5 sm:w-5" />
 				<span class="hidden sm:inline">Upload</span>
 			</button>
 			<button
@@ -120,7 +121,7 @@
 					? 'btn-neutral'
 					: ''}"
 			>
-				<MessageSquare class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+				<MessageSquare class="h-4 w-4 sm:h-5 sm:w-5" />
 				<span class="hidden sm:inline">Feedback</span>
 			</button>
 		</div>
@@ -131,7 +132,7 @@
 			class="btn inline-flex items-center justify-center p-1.5 sm:p-2 transition-colors shrink-0"
 			onclick={logout}
 		>
-			<LogOut class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+			<LogOut class="h-4 w-4 sm:h-5 sm:w-5" />
 		</button>
 	</div>
 </div>
