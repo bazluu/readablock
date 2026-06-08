@@ -83,7 +83,7 @@
 				{/if}
 
 				<form on:submit={handleSubmit} class="space-y-5">
-					<div class="tabs tabs-box w-full bg-base-300 p-1">
+					<div class="tabs tabs-box box-border w-full bg-base-300 p-1">
 						{#each feedbackTypes as type}
 							<input
 								type="radio"
@@ -98,14 +98,16 @@
 					</div>
 
 					<div class="form-control">
-						<textarea
-							id="feedback-body"
-							class="textarea textarea-bordered min-h-40 w-full"
-							placeholder="Message. Be as specific as you can."
-							bind:value={body}
-							disabled={isLoading}
-							required
-						></textarea>
+						<div class="relative w-full min-h-60 overflow-hidden">
+							<textarea
+								id="feedback-body"
+								class="textarea box-border w-full min-h-60 overflow-auto p-2 resize-none"
+								placeholder="Message (please be as specific as you can)"
+								bind:value={body}
+								disabled={isLoading}
+								required
+							></textarea>
+						</div>
 					</div>
 
 					<div class="form-control mt-6">
