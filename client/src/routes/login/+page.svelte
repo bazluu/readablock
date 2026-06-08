@@ -50,10 +50,12 @@
 	}
 </script>
 
-<div
-	class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-base-100 to-secondary/20 p-4 overflow-x-hidden"
->
-	<div class="card w-full max-w-md bg-base-100 shadow-2xl">
+<svelte:head>
+	<title>Login — readablock</title>
+</svelte:head>
+
+<div class="fixed inset-0 bg-base-100 flex items-center justify-center p-4">
+	<div class="card w-full max-w-md bg-base-200 border border-base-300">
 		<div class="card-body p-6 sm:p-8">
 			<!-- Header -->
 			<div class="text-center mb-6">
@@ -113,7 +115,7 @@
 						id="login-email"
 						type="email"
 						placeholder="your@email.com"
-						class="input input-bordered w-full"
+						class="input input-bordered w-full box-border"
 						bind:value={loginData.email}
 						disabled={isLoading}
 						required
@@ -128,7 +130,7 @@
 						id="login-password"
 						type="password"
 						placeholder="••••••••"
-						class="input input-bordered w-full"
+						class="input input-bordered w-full box-border"
 						bind:value={loginData.password}
 						disabled={isLoading}
 						required
