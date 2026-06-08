@@ -58,15 +58,16 @@
 	<div class="flex items-center flex-1 gap-1 sm:gap-2">
 		<button
 			onclick={() => goto('/dashboard')}
-			class="btn font-display text-base sm:text-2xl font-bold text-primary transition-colors"
+			class="btn font-display text-base sm:text-lg md:text-2xl font-bold text-primary transition-colors"
 		>
-			Readablock
+			<span class="hidden md:inline">Readablock</span>
+			<span class="md:hidden">R</span>
 		</button>
 
 		<div class="relative shrink-0" use:clickOutside={() => (langDropdownOpen = false)}>
 			<button
 				onclick={() => (langDropdownOpen = !langDropdownOpen)}
-				class="btn inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg"
+				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 rounded-lg"
 			>
 				<Languages class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
 				<span class="hidden sm:inline">{currentLanguageName()}</span>
@@ -94,7 +95,7 @@
 		<div class="flex gap-0.5 sm:gap-1">
 			<button
 				onclick={() => goto('/dashboard')}
-				class="btn inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg {$page
+				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
 					.url.pathname === '/dashboard'
 					? 'btn-neutral'
 					: ''}"
@@ -104,7 +105,7 @@
 			</button>
 			<button
 				onclick={() => goto('/upload')}
-				class="btn inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg {$page
+				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
 					.url.pathname === '/upload'
 					? 'btn-neutral'
 					: ''}"
@@ -114,7 +115,7 @@
 			</button>
 			<button
 				onclick={() => goto('/feedback')}
-				class="btn inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg {$page
+				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
 					.url.pathname === '/feedback'
 					? 'btn-neutral'
 					: ''}"
