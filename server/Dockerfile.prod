@@ -11,6 +11,7 @@ RUN apk add --no-cache build-base \
 
 COPY . .
 
+RUN python manage.py migrate --noinput
 RUN python manage.py collectstatic --noinput || true
 
 EXPOSE 8000
