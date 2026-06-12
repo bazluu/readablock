@@ -4,7 +4,9 @@ services:
       context: ./server
       dockerfile: Dockerfile.prod
     container_name: server
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+      gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4"
     working_dir: /app
     volumes:
       - ./server:/app
@@ -20,8 +22,12 @@ services:
       - STORAGE_BUCKET_NAME="readablock"
       - STORAGE_S3_ENDPOINT_URL
       - STORAGE_S3_REGION_NAME
+      - LIBSQL_URL
     depends_on:
       - redis
+    networks:
+      - default
+      - dokploy-network
     restart: unless-stopped
 
   readablock_client:
@@ -46,3 +52,7 @@ volumes:
   redis_data:
   static_volume:
   media_volume:
+
+networks:
+  dokploy-network:
+    external: true
