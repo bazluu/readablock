@@ -10,4 +10,4 @@ redis==7.1.0
 django-storages[s3]==1.14.4
 boto3==1.36.21
 python-magic==0.4.27
-psycopg2-binary==2.9.10
+psycopg2==2.9.10
