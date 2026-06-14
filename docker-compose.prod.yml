@@ -26,7 +26,11 @@ services:
       - STORAGE_S3_REGION_NAME=${STORAGE_S3_REGION_NAME}
       - CLOUDFLARE_API_KEY=${CLOUDFLARE_API_KEY}
       - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID}
-      - LIBSQL_URL=${LIBSQL_URL}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
     depends_on:
       - redis
     networks:
