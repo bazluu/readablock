@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN apk add --no-cache build-base cmake openssl-dev postgresql-dev \
+RUN apk add --no-cache build-base cmake openssl-dev postgresql-dev libpq \
   && pip install --no-cache-dir -r requirements.txt gunicorn \
   && python -m textblob.download_corpora \
   && apk del build-base cmake openssl-dev postgresql-dev
