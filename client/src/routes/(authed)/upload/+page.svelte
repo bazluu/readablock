@@ -205,7 +205,7 @@
 							id="book-title"
 							type="text"
 							placeholder="Book title"
-							class="input input-bordered w-full"
+							class="input input-bordered w-full box-border"
 							bind:value={title}
 							disabled={isLoading}
 							required
@@ -221,7 +221,7 @@
 							id="book-author"
 							type="text"
 							placeholder="Author name"
-							class="input input-bordered w-full"
+							class="input input-bordered w-full box-border"
 							bind:value={author}
 							disabled={isLoading}
 							required
@@ -357,13 +357,6 @@
 						</button>
 					</div>
 				</form>
-
-				<!-- Back Link -->
-				<div class="text-center mt-6">
-					<a href="/dashboard" class="btn btn-sm btn-outline text-base-content/60 no-underline">
-						Back to Dashboard
-					</a>
-				</div>
 			</div>
 		</div>
 	</div>
