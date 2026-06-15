@@ -5,18 +5,34 @@
 	import { baseURL } from '$lib/state.svelte.js';
 	import Navbar from '$lib/components/Navbar.svelte';
 
+	let authed = $state(null);
+
 	onMount(async () => {
-		const response = await fetch(`${baseURL}/app/dashboard/books`, {
-			credentials: 'include'
-		});
-		if (response.status === 401 || response.status === 403) {
+		try {
+			const response = await fetch(`${baseURL}/app/user`, {
+				credentials: 'include'
+			});
+			if (response.ok) {
+				authed = true;
+			} else {
+				authed = false;
+				goto('/login');
+			}
+		} catch {
+			authed = false;
 			goto('/login');
 		}
 	});
 </script>
 
-{#if !$page.url.pathname.startsWith('/read')}
-	<Navbar />
-{/if}
+{#if authed === null}
+	<div class="min-h-screen bg-base-100 flex items-center justify-center">
+		<span class="loading loading-spinner loading-lg"></span>
+	</div>
+{:else if authed}
+	{#if !$page.url.pathname.startsWith('/read')}
+		<Navbar />
+	{/if}
 
-<slot />
+	<slot />
+{/if}
