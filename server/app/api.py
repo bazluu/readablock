@@ -255,11 +255,14 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
     file.name = f"{base_name}_{random_suffix}{ext}"
 
     is_public = data.is_public if user.is_superuser else False
+    reading_ease_score = data.reading_ease_score if user.is_superuser else None
 
     book = models.Book(
         title=data.title,
         author=data.author,
         language=data.language,
+        description=data.description,
+        reading_ease_score=reading_ease_score,
         file=file,
         file_type=file_type,
         uploaded_by_id=user.id,

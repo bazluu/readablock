@@ -13,6 +13,8 @@
 	let fileName = '';
 	let language = '';
 	let isPublic = false;
+	let description = '';
+	let readingEaseScore = '';
 	let isSuperuser = false;
 
 	let languages = [];
@@ -115,6 +117,8 @@
 			formData.append('file', file);
 			formData.append('language', language);
 			formData.append('is_public', isPublic);
+			formData.append('description', description);
+			formData.append('reading_ease_score', readingEaseScore);
 
 			const response = await fetch(`${baseURL}/app/books/upload`, {
 				method: 'POST',
@@ -130,6 +134,8 @@
 				author = '';
 				language = 'it';
 				isPublic = false;
+				description = '';
+				readingEaseScore = '';
 				file = null;
 				fileName = '';
 			} else {
@@ -244,23 +250,53 @@
 									{lang.name} ({lang.deepl})
 								</option>
 							{/each}
-						</select>
+					</select>
+				</div>
+
+				<!-- Description -->
+				<div class="form-control">
+					<label class="label" for="book-description">
+						<span class="label-text">Description</span>
+					</label>
+					<textarea
+						id="book-description"
+						placeholder="Book description"
+						class="textarea textarea-bordered w-full box-border"
+						bind:value={description}
+						disabled={isLoading}
+					></textarea>
+				</div>
+
+				{#if isSuperuser}
+					<!-- Reading Ease Score (Superuser Only) -->
+					<div class="form-control">
+						<label class="label" for="reading-ease-score">
+							<span class="label-text">Reading Ease Score</span>
+						</label>
+						<input
+							id="reading-ease-score"
+							type="number"
+							step="0.1"
+							placeholder="e.g. 75.5"
+							class="input input-bordered w-full box-border"
+							bind:value={readingEaseScore}
+							disabled={isLoading}
+						/>
 					</div>
 
-					{#if isSuperuser}
-						<!-- Public Book (Superuser Only) -->
-						<div class="form-control">
-							<label class="label cursor-pointer justify-start gap-3">
-								<input
-									type="checkbox"
-									class="checkbox checkbox-primary"
-									bind:checked={isPublic}
-									disabled={isLoading}
-								/>
-								<span class="label-text">Make this book public</span>
-							</label>
-						</div>
-					{/if}
+					<!-- Public Book (Superuser Only) -->
+					<div class="form-control">
+						<label class="label cursor-pointer justify-start gap-3">
+							<input
+								type="checkbox"
+								class="checkbox checkbox-primary"
+								bind:checked={isPublic}
+								disabled={isLoading}
+							/>
+							<span class="label-text">Make this book public</span>
+						</label>
+					</div>
+				{/if}
 
 					<!-- File Upload -->
 					<div class="form-control">
