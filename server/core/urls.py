@@ -23,7 +23,15 @@ from django.conf.urls.static import static
 from app.api import api as app_api
 
 
-urlpatterns = [path("admin/", admin.site.urls), path("app/", app_api.urls)]
+def trigger_error(request):
+    division_by_zero = 1 / 0
+
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("app/", app_api.urls),
+    path("sentry-debug/", trigger_error),
+]
 
 if settings.DEBUG == "True" or settings.DEBUG is True:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
