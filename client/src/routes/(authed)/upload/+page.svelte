@@ -117,8 +117,10 @@
 			formData.append('file', file);
 			formData.append('language', language);
 			formData.append('is_public', isPublic);
-			formData.append('description', description);
+		formData.append('description', description);
+		if (readingEaseScore !== '') {
 			formData.append('reading_ease_score', readingEaseScore);
+		}
 
 			const response = await fetch(`${baseURL}/app/books/upload`, {
 				method: 'POST',
