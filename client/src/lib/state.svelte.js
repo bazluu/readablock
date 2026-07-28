@@ -33,9 +33,9 @@ export const lastReadBookId = {
 
 let _selectedLanguage = $state(null);
 
-// Guard against server-side rendering (Node has no sessionStorage). If we're in a browser, sessionStorage exists; otherwise we skip.
-if (typeof sessionStorage !== 'undefined') {
-	const stored = sessionStorage.getItem('selectedLanguage');
+// Guard against server-side rendering (Node has no localStorage). If we're in a browser, localStorage exists; otherwise we skip.
+if (typeof localStorage !== 'undefined') {
+	const stored = localStorage.getItem('selectedLanguage');
 	if (stored) _selectedLanguage = stored;
 }
 
@@ -45,11 +45,11 @@ export const selectedLanguage = {
 	},
 	set value(v) {
 		_selectedLanguage = v;
-		if (typeof sessionStorage !== 'undefined') {
+		if (typeof localStorage !== 'undefined') {
 			if (v) {
-				sessionStorage.setItem('selectedLanguage', v);
+				localStorage.setItem('selectedLanguage', v);
 			} else {
-				sessionStorage.removeItem('selectedLanguage');
+				localStorage.removeItem('selectedLanguage');
 			}
 		}
 	}
