@@ -79,8 +79,6 @@ class BookUpload(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uploaded_books")
-
 
 class Feedback(models.Model):
     type = models.CharField(
