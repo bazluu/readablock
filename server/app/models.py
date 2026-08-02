@@ -64,19 +64,22 @@ class BookUpload(models.Model):
     This model is used to track the status of book uploads and to store the uploaded file before it is processed.
     """
 
-    STATUS_CHOICES = [
+    STATUS_CHOICES = (
         ("pending", "Pending"),
         ("processing", "Processing"),
         ("completed", "Completed"),
         ("failed", "Failed"),
-    ]
+    )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     file = models.FileField(upload_to="uploads/", validators=[extensions_allowed])
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     error_message = models.TextField(null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uploaded_books")
 
 
 class Feedback(models.Model):
