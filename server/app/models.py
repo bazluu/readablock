@@ -32,6 +32,21 @@ class Book(models.Model):
     is_public = models.BooleanField(default=False)
 
 
+class Sentence(models.Model):
+    """
+    Model for sentences in a book.
+    Each sentence is linked to a book and has an index indicating its order in the book.
+    """
+
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="sentences")
+    index = models.IntegerField()
+    text = models.TextField()
+
+    class Meta:
+        unique_together = ("book", "index")
+        ordering = ["index"]
+
+
 class BookProgress(models.Model):
     """
     Model for book progress tracking.
