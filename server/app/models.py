@@ -58,6 +58,27 @@ class BookProgress(models.Model):
     sentence_last_read = models.IntegerField(default=0)
 
 
+class BookUpload(models.Model):
+    """
+    Model for book uploads.
+    This model is used to track the status of book uploads and to store the uploaded file before it is processed.
+    """
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("processing", "Processing"),
+        ("completed", "Completed"),
+        ("failed", "Failed"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    file = models.FileField(upload_to="uploads/", validators=[extensions_allowed])
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    error_message = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Feedback(models.Model):
     type = models.CharField(
         max_length=20, choices=[(t, t) for t in ("bug", "feature_request", "general")]
