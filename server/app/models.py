@@ -22,9 +22,6 @@ class Book(models.Model):
     reading_ease_score = models.FloatField(null=True)
     tags = models.JSONField(default=list, blank=True)
 
-    file = models.FileField(upload_to="books/")
-    BOOK_FILE_TYPES = (("epub", "epub"), ("pdf", "pdf"), ("txt", "txt"), ("kepub", "kepub"))
-    file_type = models.CharField(choices=BOOK_FILE_TYPES, max_length=10)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     # Access control
@@ -72,7 +69,11 @@ class BookUpload(models.Model):
     )
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
+
     file = models.FileField(upload_to="uploads/", validators=[extensions_allowed])
+    BOOK_FILE_TYPES = (("epub", "epub"), ("pdf", "pdf"), ("txt", "txt"), ("kepub", "kepub"))
+    file_type = models.CharField(choices=BOOK_FILE_TYPES, max_length=10)
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     error_message = models.TextField(null=True)
 
