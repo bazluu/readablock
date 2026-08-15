@@ -14,18 +14,21 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("email", type=str, help="Email address for the new user")
         parser.add_argument("--superuser", action="store_true", help="Create a superuser instead of a regular user")
+        parser.add_argument("--password", type=str, default=None, help="Password for the new user (randomly generated if omitted)")
 
     def handle(self, *args, **options):
         email = options["email"]
         is_superuser = options["superuser"]
+        password = options.get("password")
 
         username = services.convert_email_to_username(email)
 
         if User.objects.filter(email=email).exists():
             raise CommandError(f'User with email "{email}" already exists')
 
-        alphabet = string.ascii_letters + string.digits + string.punctuation
-        password = "".join(secrets.choice(alphabet) for _ in range(20))
+        if not password:
+            alphabet = string.ascii_letters + string.digits + string.punctuation
+            password = "".join(secrets.choice(alphabet) for _ in range(20))
 
         if is_superuser:
             user = User.objects.create_superuser(username=username, email=email, password=password)
