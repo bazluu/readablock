@@ -5,6 +5,7 @@ import string
 import uuid
 
 from django.conf import settings
+from django.core.cache import cache
 
 from ebooklib import epub, ITEM_DOCUMENT
 from bs4 import BeautifulSoup
@@ -44,14 +45,14 @@ def get_total_sentence_count(text: str) -> int:
     return total
 
 
-def convert_text_to_sentences(text: str, start: int, end: int):
+def convert_text_to_sentences(text: str) -> tuple[str]:
     blob = TextBlob(text)
 
     sentences = []
-    for sentence in blob.sentences[start:end]:
+    for sentence in blob.sentences:
         sentences.append(str(sentence))
 
-    return sentences
+    return tuple(sentences)
 
 
 def remove_html(text: str):
@@ -103,6 +104,19 @@ def get_book_upload_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
 
     return f"books/{uuid.uuid4()}{ext}"
+
+
+def cache_book_sentences(book_id: int, user_id: int, cache_timeout: int = 1800) -> str:
+    book = models.Book.objects.get(id=book_id)
+
+    epub_file = book.file
+    epub = convert_epub_to_str(epub_file)
+    epub_cleaned = remove_html(epub)
+    sentences = convert_text_to_sentences(epub_cleaned)
+
+    cache.set(f"{user_id}:{book_id}", sentences, timeout=cache_timeout)
+
+    return epub_cleaned
 
 
 def verify_book_access(book_id: int, user_id: int) -> bool:

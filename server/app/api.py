@@ -162,15 +162,14 @@ def read(request, data: schema.BookSchema):
     if services.verify_book_access(data.book_id, user_id) is False:
         return Response({"error": "Access denied"}, status=403)
 
-    try:
-        book = models.Book.objects.get(id=data.book_id)
-    except models.Book.DoesNotExist:
-        return Response({"error": "Book not found"}, status=404)
+    # Save book sentences to cache if not already loaded
+    if cache.get(f"{user_id}:{data.book_id}") is None:
+        try:
+            all_sentences = services.cache_book_sentences(data.book_id, user_id)
+        except models.Book.DoesNotExist:
+            return Response({"error": "Book not found"}, status=404)
 
-    epub_file = book.file
-
-    epub = services.convert_epub_to_str(epub_file)
-    epub_cleaned = services.remove_html(epub)
+    all_sentences = cache.get(f"{user_id}:{data.book_id}")
 
     sentence_last_read = selectors.get_sentence_last_read(user_id, data.book_id) or 0
 
@@ -186,7 +185,7 @@ def read(request, data: schema.BookSchema):
     # TODO calculate this based on character limit
     sentence_last = sentence_first + 4
 
-    sentences = services.convert_text_to_sentences(epub_cleaned, sentence_first, sentence_last)
+    sentences = all_sentences[sentence_first:sentence_last]
 
     models.BookProgress.objects.update_or_create(
         book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_first}
@@ -195,7 +194,7 @@ def read(request, data: schema.BookSchema):
     return Response(
         {
             "sentences": sentences,
-            "sentence_count": services.get_total_sentence_count(epub_cleaned),
+            "sentence_count": len(all_sentences),
             "sentence_last_read": sentence_last,
             "sentence_first": sentence_first,
             "has_previous": sentence_first > 0,
