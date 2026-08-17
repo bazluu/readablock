@@ -296,7 +296,13 @@
 	};
 </script>
 
-<svelte:window on:keydown={(e) => e.key === 'Escape' && closeWordDropdown()} />
+<svelte:window
+	on:keydown={(e) => {
+		if (e.key === 'Escape') closeWordDropdown();
+		if (e.key === 'ArrowRight' && !isLoading) handleNextPage();
+		if (e.key === 'ArrowLeft' && !isLoading && hasPrevious) handlePreviousPage();
+	}}
+/>
 
 <div class="min-h-screen bg-base-100 text-base-content p-4">
 	{#if isLoading}
