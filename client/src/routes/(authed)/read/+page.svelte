@@ -417,7 +417,7 @@
 					<ChevronLeft />
 					<p class="mr-2">PREV</p>
 				</button>
-				<span class="text-sm">Sentences {sentenceFirst + 1} - {sentenceLastRead + 1}</span>
+				<span class="text-sm">Sentence {sentenceFirst + 1}</span>
 				<button class="btn btn-neutral" on:click={handleNextPage} disabled={isLoading}>
 					<p class="ml-2">NEXT</p>
 					<ChevronRight />

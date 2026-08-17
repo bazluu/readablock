@@ -177,14 +177,13 @@ def read(request, data: schema.BookSchema):
     # Pagination
     # sentence_last_read stores sentence_first of the last viewed page
     if data.page_turn == "next":
-        sentence_first = sentence_last_read + 5
+        sentence_first = sentence_last_read + 1
     elif data.page_turn == "previous":
-        sentence_first = max(0, sentence_last_read - 5)
+        sentence_first = max(0, sentence_last_read - 1)
     else:
         sentence_first = sentence_last_read
 
-    # TODO calculate this based on character limit
-    sentence_last = sentence_first + 4
+    sentence_last = sentence_first + 1
 
     sentences = all_sentences[sentence_first:sentence_last]
 
