@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 
 from ninja import NinjaAPI, File, Form
 from ninja.files import UploadedFile
@@ -265,6 +266,47 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
         reading_ease_score=reading_ease_score,
         file=file,
         file_type=file_type,
+        uploaded_by_id=user.id,
+        is_public=is_public,
+    )
+    book.save()
+
+    return Response({"id": book.id, "message": "Book uploaded successfully"}, status=201)
+
+
+@api.post("/books/upload-content")
+def upload_book_content(request, data: schema.BookUploadContentSchema):
+    try:
+        user = User.objects.get(id=request.session["user_id"])
+    except (KeyError, User.DoesNotExist):
+        return Response({"error": "Authentication required"}, status=401)
+
+    if data.language not in constants.SUPPORTED_LANGUAGES:
+        return Response(
+            {
+                "error": f"Invalid language. Supported languages: {', '.join(constants.SUPPORTED_LANGUAGES)}"
+            },
+            status=400
+        )
+
+    if not data.content.strip():
+        return Response({"error": "Content cannot be empty"}, status=400)
+
+    is_public = data.is_public if user.is_superuser else False
+    reading_ease_score = data.reading_ease_score if user.is_superuser else None
+
+    random_suffix = secrets.token_hex(8)
+    file_name = f"{data.title}_{random_suffix}.txt"
+    content_file = ContentFile(data.content.encode("utf-8"), name=file_name)
+
+    book = models.Book(
+        title=data.title,
+        author=data.author,
+        language=data.language,
+        description=data.description,
+        reading_ease_score=reading_ease_score,
+        file=content_file,
+        file_type="txt",
         uploaded_by_id=user.id,
         is_public=is_public,
     )

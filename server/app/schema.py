@@ -42,6 +42,16 @@ class TTSSchema(Schema):
     speed: float = 0.9
 
 
+class BookUploadContentSchema(Schema):
+    title: str
+    author: str
+    language: str
+    content: str
+    is_public: bool = False
+    description: str | None = None
+    reading_ease_score: float | None = None
+
+
 class FeedbackSchema(Schema):
     type: str
     body: str
