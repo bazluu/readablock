@@ -383,32 +383,32 @@
 							{/if}
 						</div>
 
-					<div class="join join-vertical my-auto border border-base-300 rounded-lg">
-						<button
-							class="join-item btn btn-sm shrink-0"
-							on:click={() => handleSpeak(sentence, index)}
-							disabled={speakingIndex === index}
-						>
-							{#if speakingIndex === index}
-								<span class="loading loading-spinner loading-xs"></span>
-							{:else}
-								<Volume2 />
-							{/if}
-						</button>
-						<button
-							class="join-item btn btn-sm shrink-0 {translations[index]
-								? 'btn-primary'
-								: 'btn-ghost'}"
-							on:click={() => handleTranslate(sentence, index)}
-							disabled={translatingIndex === index}
-						>
-							{#if translatingIndex === index}
-								<span class="loading loading-spinner loading-xs"></span>
-							{:else}
-								<Languages />
-							{/if}
-						</button>
-					</div>
+						<div class="join join-vertical my-auto border border-base-300 rounded-lg">
+							<button
+								class="join-item btn btn-sm shrink-0"
+								on:click={() => handleSpeak(sentence, index)}
+								disabled={speakingIndex === index}
+							>
+								{#if speakingIndex === index}
+									<span class="loading loading-spinner loading-xs"></span>
+								{:else}
+									<Volume2 />
+								{/if}
+							</button>
+							<button
+								class="join-item btn btn-sm shrink-0 {translations[index]
+									? 'btn-primary'
+									: 'btn-ghost'}"
+								on:click={() => handleTranslate(sentence, index)}
+								disabled={translatingIndex === index}
+							>
+								{#if translatingIndex === index}
+									<span class="loading loading-spinner loading-xs"></span>
+								{:else}
+									<Languages />
+								{/if}
+							</button>
+						</div>
 					</div>
 				{/each}
 			</div>

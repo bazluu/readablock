@@ -71,7 +71,7 @@
 			>
 				<Languages class="h-4 w-4 sm:h-5 sm:w-5" />
 				<span class="sm:hidden">{selectedLanguage.value || 'Lang'}</span>
-			<span class="hidden sm:inline">{currentLanguageName()}</span>
+				<span class="hidden sm:inline">{currentLanguageName()}</span>
 			</button>
 			{#if langDropdownOpen}
 				<div

@@ -15,9 +15,12 @@
 		isLoading = true;
 		error = null;
 		try {
-			const response = await fetch(`${baseURL}/app/dashboard/books?language=${selectedLanguage.value}`, {
-				credentials: 'include'
-			});
+			const response = await fetch(
+				`${baseURL}/app/dashboard/books?language=${selectedLanguage.value}`,
+				{
+					credentials: 'include'
+				}
+			);
 			if (!response.ok) {
 				throw new Error('Failed to fetch books');
 			}

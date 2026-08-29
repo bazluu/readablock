@@ -267,7 +267,7 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
         file=file,
         file_type=file_type,
         uploaded_by_id=user.id,
-        is_public=is_public,
+        is_public=is_public
     )
     book.save()
 
@@ -308,7 +308,7 @@ def upload_book_content(request, data: schema.BookUploadContentSchema):
         file=content_file,
         file_type="txt",
         uploaded_by_id=user.id,
-        is_public=is_public,
+        is_public=is_public
     )
     book.save()
 
