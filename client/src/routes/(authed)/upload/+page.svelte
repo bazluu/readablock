@@ -122,7 +122,7 @@
 			formData.append('reading_ease_score', readingEaseScore);
 		}
 
-			const response = await fetch(`${baseURL}/app/books/upload`, {
+			const response = await fetch(`${baseURL}/app/books/upload-file`, {
 				method: 'POST',
 				credentials: 'include',
 				body: formData

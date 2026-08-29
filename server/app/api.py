@@ -218,7 +218,7 @@ def translate(request, data: schema.TranslationSchema):
         return Response({"error": f"Translation error: {str(error)}"}, status=500)
 
 
-@api.post("/books/upload")
+@api.post("/books/upload-file")
 def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile = File(...)):
     try:
         user = User.objects.get(id=request.session["user_id"])
