@@ -109,14 +109,17 @@ def get_book_upload_path(instance, filename):
 def cache_book_sentences(book_id: int, user_id: int, cache_timeout: int = 1800) -> str:
     book = models.Book.objects.get(id=book_id)
 
-    epub_file = book.file
-    epub = convert_epub_to_str(epub_file)
-    epub_cleaned = remove_html(epub)
-    sentences = convert_text_to_sentences(epub_cleaned)
+    if book.file_type in ("epub", "kepub"):
+        text = remove_html(convert_epub_to_str(book.file))
+    else:
+        with book.file.open("rb") as f:
+            text = f.read().decode("utf-8")
+
+    sentences = convert_text_to_sentences(text)
 
     cache.set(f"{user_id}:{book_id}", sentences, timeout=cache_timeout)
 
-    return epub_cleaned
+    return text
 
 
 def verify_book_access(book_id: int, user_id: int) -> bool:
