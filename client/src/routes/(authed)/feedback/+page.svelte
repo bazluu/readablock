@@ -83,9 +83,9 @@
 				{/if}
 
 				<form on:submit={handleSubmit} class="space-y-5">
-					<div class="flex gap-4">
+					<div class="flex flex-wrap gap-2 sm:gap-4">
 						{#each feedbackTypes as type}
-							<label class="flex items-center gap-2 cursor-pointer">
+							<label class="flex items-center gap-1.5 sm:gap-2 cursor-pointer">
 								<input
 									type="radio"
 									name="feedback-type"
@@ -94,7 +94,7 @@
 									bind:group={feedbackType}
 									disabled={isLoading}
 								/>
-								<span class="label-text text-lg leading-none">{type.label}</span>
+								<span class="label-text text-md sm:text-lg leading-none">{type.label}</span>
 							</label>
 						{/each}
 					</div>
