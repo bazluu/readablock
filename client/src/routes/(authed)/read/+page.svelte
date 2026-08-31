@@ -254,13 +254,23 @@
 		};
 	});
 
+	const handleStopSpeaking = () => {
+		if (currentAudio) {
+			currentAudio.pause();
+			currentAudio = null;
+		}
+		speakingIndex = null;
+	};
+
 	const handleNextPage = async () => {
+		handleStopSpeaking();
 		translations = {}; // Clear translations when changing pages
 		closeWordDropdown();
 		await getSentences('next');
 	};
 
 	const handlePreviousPage = async () => {
+		handleStopSpeaking();
 		translations = {}; // Clear translations when changing pages
 		closeWordDropdown();
 		await getSentences('previous');
@@ -303,14 +313,6 @@
 			speakingIndex = null;
 			currentAudio = null;
 		}
-	};
-
-	const handleStopSpeaking = () => {
-		if (currentAudio) {
-			currentAudio.pause();
-			currentAudio = null;
-		}
-		speakingIndex = null;
 	};
 </script>
 
