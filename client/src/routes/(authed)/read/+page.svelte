@@ -210,6 +210,7 @@
 				translation: translated,
 				loading: false
 			};
+			handleSpeak(cleanWord, 'word');
 		} catch (err) {
 			console.error('Word translation error:', err);
 			wordDropdown = {
@@ -465,9 +466,21 @@
 					<span class="text-xs">Translating...</span>
 				</div>
 			{:else}
-				<div class="space-y-1">
-					<div class="text-xs font-semibold opacity-70">{wordDropdown.word}</div>
-					<div class="text-sm font-bold">{wordDropdown.translation}</div>
+				<div class="flex items-center gap-2">
+					<div class="space-y-1 flex-1">
+						<div class="text-xs font-semibold opacity-70">{wordDropdown.word}</div>
+						<div class="text-sm font-bold">{wordDropdown.translation}</div>
+					</div>
+					<button
+						class="btn btn-ghost btn-xs"
+						on:click={(e) => { e.stopPropagation(); handleSpeak(wordDropdown.word, 'word'); }}
+					>
+						{#if speakingIndex === 'word'}
+							<X size={14} />
+						{:else}
+							<Volume2 size={14} />
+						{/if}
+					</button>
 				</div>
 			{/if}
 		</div>
