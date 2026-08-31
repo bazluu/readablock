@@ -9,7 +9,8 @@
 		ArrowLeft,
 		Volume2,
 		Minus,
-		Plus
+		Plus,
+		X
 	} from 'lucide-svelte';
 
 	let sentences = [];
@@ -31,6 +32,7 @@
 
 	// TTS state
 	let speakingIndex = null;
+	let currentAudio = null;
 
 	function increaseTtsSpeed() {
 		ttsSpeed.value = Math.min(1.5, Math.round((ttsSpeed.value + 0.1) * 10) / 10);
@@ -285,14 +287,30 @@
 			if (!response.ok) throw new Error('TTS request failed');
 			const data = await response.json();
 			const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+			currentAudio = audio;
 			audio.playbackRate = ttsSpeed.value;
-			audio.onended = () => (speakingIndex = null);
-			audio.onerror = () => (speakingIndex = null);
-			audio.play();
+			audio.onended = () => {
+				speakingIndex = null;
+				currentAudio = null;
+			};
+			audio.onerror = () => {
+				speakingIndex = null;
+				currentAudio = null;
+			};
+			audio.play().catch(() => {});
 		} catch (err) {
 			console.error('TTS error:', err);
 			speakingIndex = null;
+			currentAudio = null;
 		}
+	};
+
+	const handleStopSpeaking = () => {
+		if (currentAudio) {
+			currentAudio.pause();
+			currentAudio = null;
+		}
+		speakingIndex = null;
 	};
 </script>
 
@@ -386,11 +404,11 @@
 						<div class="join join-vertical my-auto border border-base-300 rounded-lg">
 							<button
 								class="join-item btn btn-sm shrink-0"
-								on:click={() => handleSpeak(sentence, index)}
-								disabled={speakingIndex === index}
+								on:click={() =>
+									speakingIndex === index ? handleStopSpeaking() : handleSpeak(sentence, index)}
 							>
 								{#if speakingIndex === index}
-									<span class="loading loading-spinner loading-xs"></span>
+									<X />
 								{:else}
 									<Volume2 />
 								{/if}
