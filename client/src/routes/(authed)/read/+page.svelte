@@ -335,120 +335,131 @@
 	{:else if sentences.length === 0}
 		<p class="text-center">No sentences found.</p>
 	{:else}
-		<div class="max-w-4xl mx-auto">
-			<div class="flex flex-row w-full justify-between items-end mb-4">
-				<button class="btn gap-2" on:click={() => goto('/dashboard')}>
-					<ArrowLeft size={20} />
-					Dashboard
-				</button>
-				<!-- <div class="flex flex-col items-start gap-1">
-					<span class="text-xs text-base-content/50">Blocks</span>
-					<select class="select select-neutral" value={sentencesPerPage} on:change={(e) => updateSentencesPerPage(Number(e.target.value))}>
-						<option value={4}>4</option>
-						<option value={6}>6</option>
-						<option value={8}>8</option>
-						<option value={10}>10</option>
-					</select>
-				</div> -->
-				<div class="flex flex-col items-start gap-1">
-					<span class="text-xs text-base-content/50">TTS Speed</span>
-					<div class="join">
-						<button
-							class="join-item btn"
-							on:click={decreaseTtsSpeed}
-							disabled={ttsSpeed.value <= 0.4}><Minus size={16} /></button
-						>
-						<button class="join-item btn pointer-events-none">{ttsSpeed.value.toFixed(1)}</button>
-						<button
-							class="join-item btn"
-							on:click={increaseTtsSpeed}
-							disabled={ttsSpeed.value >= 1.5}><Plus size={16} /></button
-						>
+		<div class="max-w-4xl mx-auto pb-20">
+			<div class="fixed top-0 left-0 right-0 bg-base-100 border-b border-base-300 py-3 px-4 z-40">
+				<div class="max-w-4xl mx-auto">
+					<div class="flex flex-row w-full justify-between items-end mb-4">
+						<button class="btn gap-2" on:click={() => goto('/dashboard')}>
+							<ArrowLeft size={20} />
+							Dashboard
+						</button>
+						<!-- <div class="flex flex-col items-start gap-1">
+							<span class="text-xs text-base-content/50">Blocks</span>
+							<select class="select select-neutral" value={sentencesPerPage} on:change={(e) => updateSentencesPerPage(Number(e.target.value))}>
+								<option value={4}>4</option>
+								<option value={6}>6</option>
+								<option value={8}>8</option>
+								<option value={10}>10</option>
+							</select>
+						</div> -->
+						<div class="flex flex-col items-start">
+							<span class="text-xs text-base-content/50">TTS Speed</span>
+							<div class="join">
+								<button
+									class="join-item btn"
+									on:click={decreaseTtsSpeed}
+									disabled={ttsSpeed.value <= 0.4}><Minus size={16} /></button
+								>
+								<button class="join-item btn pointer-events-none"
+									>{ttsSpeed.value.toFixed(1)}</button
+								>
+								<button
+									class="join-item btn"
+									on:click={increaseTtsSpeed}
+									disabled={ttsSpeed.value >= 1.5}><Plus size={16} /></button
+								>
+							</div>
+						</div>
 					</div>
+					<progress
+						class="progress progress-primary w-full mb-1"
+						value={sentenceLastRead}
+						max={sentenceCount}
+					></progress>
 				</div>
 			</div>
-			<progress
-				class="progress progress-primary w-full mb-4"
-				value={sentenceLastRead}
-				max={sentenceCount}
-			></progress>
-
-			<!-- Sentences -->
-			<div class="flex flex-col gap-2">
-				{#each sentences as sentence, index}
-					<div class="rounded-lg flex gap-2">
-						<div class="flex-1 border border-base-300 rounded-lg bg-base-200">
-							<div class="px-2 pt-1">
-								{#each splitWords(sentence) as part}
-									{#if part.trim().length > 0}
-										<button
-											class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300 text-lg text-white font-serif"
-											on:click={(e) => handleWordClick(e, part, sentence)}
-										>
+			<div class="pt-28">
+				<!-- Sentences -->
+				<div class="flex flex-col gap-2">
+					{#each sentences as sentence, index}
+						<div class="rounded-lg flex gap-2">
+							<div class="flex-1 border border-base-300 rounded-lg bg-base-200">
+								<div class="px-2 pt-1">
+									{#each splitWords(sentence) as part}
+										{#if part.trim().length > 0}
+											<button
+												class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300 text-lg text-white font-serif"
+												on:click={(e) => handleWordClick(e, part, sentence)}
+											>
+												{part}
+											</button>
+										{:else}
 											{part}
-										</button>
-									{:else}
-										{part}
-									{/if}
-								{/each}
-							</div>
+										{/if}
+									{/each}
+								</div>
 
-							{#if translations[index]}
-								<div class="px-4 border-1 bg-primary rounded-b-lg text-black">
-									<div class="flex items-start justify-between">
-										<div class="flex-1">
-											<p class="text-md">{translations[index].translated}</p>
+								{#if translations[index]}
+									<div class="px-4 border-1 bg-primary rounded-b-lg text-black">
+										<div class="flex items-start justify-between">
+											<div class="flex-1">
+												<p class="text-md">{translations[index].translated}</p>
+											</div>
 										</div>
 									</div>
-								</div>
-							{/if}
-						</div>
+								{/if}
+							</div>
 
-						<div class="join join-vertical my-auto border border-base-300 rounded-lg">
-							<button
-								class="join-item btn btn-sm shrink-0"
-								on:click={() =>
-									speakingIndex === index ? handleStopSpeaking() : handleSpeak(sentence, index)}
-							>
-								{#if speakingIndex === index}
-									<X />
-								{:else}
-									<Volume2 />
-								{/if}
-							</button>
-							<button
-								class="join-item btn btn-sm shrink-0 {translations[index]
-									? 'btn-primary'
-									: 'btn-ghost'}"
-								on:click={() => handleTranslate(sentence, index)}
-								disabled={translatingIndex === index}
-							>
-								{#if translatingIndex === index}
-									<span class="loading loading-spinner loading-xs"></span>
-								{:else}
-									<Languages />
-								{/if}
-							</button>
+							<div class="join join-vertical my-auto border border-base-300 rounded-lg">
+								<button
+									class="join-item btn btn-sm shrink-0"
+									on:click={() =>
+										speakingIndex === index ? handleStopSpeaking() : handleSpeak(sentence, index)}
+								>
+									{#if speakingIndex === index}
+										<X />
+									{:else}
+										<Volume2 />
+									{/if}
+								</button>
+								<button
+									class="join-item btn btn-sm shrink-0 {translations[index]
+										? 'btn-primary'
+										: 'btn-ghost'}"
+									on:click={() => handleTranslate(sentence, index)}
+									disabled={translatingIndex === index}
+								>
+									{#if translatingIndex === index}
+										<span class="loading loading-spinner loading-xs"></span>
+									{:else}
+										<Languages />
+									{/if}
+								</button>
+							</div>
 						</div>
-					</div>
-				{/each}
+					{/each}
+				</div>
 			</div>
 
 			<!-- Pagination Controls -->
-			<div class="flex justify-between items-center mt-4">
-				<button
-					class="btn btn-neutral"
-					on:click={handlePreviousPage}
-					disabled={!hasPrevious || isLoading}
-				>
-					<ChevronLeft />
-					<p class="mr-2">PREV</p>
-				</button>
-				<span class="text-sm">Sentence {sentenceFirst + 1}</span>
-				<button class="btn btn-neutral" on:click={handleNextPage} disabled={isLoading}>
-					<p class="ml-2">NEXT</p>
-					<ChevronRight />
-				</button>
+			<div
+				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-3 pt-4 px-4 z-40"
+			>
+				<div class="max-w-4xl mx-auto flex justify-between items-center">
+					<button
+						class="btn btn-neutral"
+						on:click={handlePreviousPage}
+						disabled={!hasPrevious || isLoading}
+					>
+						<ChevronLeft />
+						<p class="mr-2">PREV</p>
+					</button>
+					<span class="text-sm">Sentence {sentenceFirst + 1}</span>
+					<button class="btn btn-neutral" on:click={handleNextPage} disabled={isLoading}>
+						<p class="ml-2">NEXT</p>
+						<ChevronRight />
+					</button>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -473,7 +484,10 @@
 					</div>
 					<button
 						class="btn btn-ghost btn-xs"
-						on:click={(e) => { e.stopPropagation(); handleSpeak(wordDropdown.word, 'word'); }}
+						on:click={(e) => {
+							e.stopPropagation();
+							handleSpeak(wordDropdown.word, 'word');
+						}}
 					>
 						{#if speakingIndex === 'word'}
 							<X size={14} />
@@ -488,7 +502,6 @@
 </div>
 
 <style>
-	/* Optional: Add smooth transition for dropdown */
 	.fixed {
 		animation: fadeIn 0.15s ease-out;
 	}
