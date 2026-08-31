@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { baseURL } from '$lib/state.svelte.js';
+	import { baseURL, selectedLanguage } from '$lib/state.svelte.js';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 
 	const ALLOWED_EXTENSIONS = '.epub';
@@ -25,6 +25,10 @@
 	let isLoading = false;
 
 	onMount(async () => {
+		if (!language && selectedLanguage.value) {
+			language = selectedLanguage.value;
+		}
+
 		try {
 			const response = await fetch(`${baseURL}/app/supported-languages`, {
 				credentials: 'include'
@@ -172,7 +176,7 @@
 				successMessage = data.message;
 				title = '';
 				author = '';
-				language = 'it';
+				language = selectedLanguage.value || '';
 				isPublic = false;
 				description = '';
 				readingEaseScore = '';
