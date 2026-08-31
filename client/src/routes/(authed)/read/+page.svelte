@@ -7,6 +7,7 @@
 		ChevronLeft,
 		ChevronRight,
 		ArrowLeft,
+		Volume,
 		Volume2,
 		Minus,
 		Plus,
@@ -353,15 +354,14 @@
 							</select>
 						</div> -->
 						<div class="flex flex-col items-start">
-							<span class="text-xs text-base-content/50">TTS Speed</span>
 							<div class="join">
 								<button
 									class="join-item btn"
 									on:click={decreaseTtsSpeed}
 									disabled={ttsSpeed.value <= 0.4}><Minus size={16} /></button
 								>
-								<button class="join-item btn pointer-events-none"
-									>{ttsSpeed.value.toFixed(1)}</button
+								<button class="join-item btn pointer-events-none p-0"
+									><Volume class="-mr-3"></Volume>{ttsSpeed.value.toFixed(1)}</button
 								>
 								<button
 									class="join-item btn"
