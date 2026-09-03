@@ -344,15 +344,6 @@
 							<ArrowLeft size={20} />
 							Dashboard
 						</button>
-						<!-- <div class="flex flex-col items-start gap-1">
-							<span class="text-xs text-base-content/50">Blocks</span>
-							<select class="select select-neutral" value={sentencesPerPage} on:change={(e) => updateSentencesPerPage(Number(e.target.value))}>
-								<option value={4}>4</option>
-								<option value={6}>6</option>
-								<option value={8}>8</option>
-								<option value={10}>10</option>
-							</select>
-						</div> -->
 						<div class="flex flex-col items-start">
 							<div class="join">
 								<button
