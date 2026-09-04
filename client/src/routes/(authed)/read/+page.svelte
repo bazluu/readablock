@@ -348,7 +348,7 @@
 									disabled={ttsSpeed.value <= 0.4}><Minus size={16} /></button
 								>
 								<button class="join-item btn pointer-events-none p-0"
-									><Volume class="-mr-3"></Volume>{ttsSpeed.value.toFixed(1)}</button
+									><Volume class="-mr-3"></Volume>{ttsSpeed.value.toFixed(1)}x</button
 								>
 								<button
 									class="join-item btn"
@@ -406,8 +406,7 @@
 				<div class="join join-horizontal my-auto border border-base-300 rounded-lg">
 					<button
 						class="join-item btn btn-sm shrink-0"
-						on:click={() =>
-							speaking ? handleStopSpeaking() : handleSpeak(sentence)}
+						on:click={() => (speaking ? handleStopSpeaking() : handleSpeak(sentence))}
 					>
 						{#if speaking}
 							<X />
