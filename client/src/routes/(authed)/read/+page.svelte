@@ -14,25 +14,22 @@
 		X
 	} from 'lucide-svelte';
 
-	let sentences = [];
-	let sentenceLastRead = 0;
+	let sentence = null;
+	let translated = null; // Translation of the current sentence
 	let sentenceCount = 0;
 	let sentenceFirst = 0;
 	let hasPrevious = false;
-	let sentencesPerPage = 6;
-	const characterLimit = 1200;
 	let bookId = null;
 	let isLoading = true;
 	let error = null;
 
 	// Translation state
-	let translations = {}; // Store translations by sentence index
-	let translatingIndex = null;
+	let translating = false;
 	let targetLang = 'EN-GB';
 	let sourceLang = 'IT';
 
 	// TTS state
-	let speakingIndex = null;
+	let speaking = false;
 	let currentAudio = null;
 
 	function increaseTtsSpeed() {
@@ -96,21 +93,19 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					book_id: bookId,
-					character_limit: characterLimit,
-					sentence_last_read: sentenceLastRead,
-					sentences_per_page: sentencesPerPage,
+					sentence_last_read: sentenceFirst,
 					page_turn: pageTurn
 				})
 			});
 			if (!response.ok) {
-				throw new Error('Failed to fetch sentences');
+				throw new Error('Failed to fetch sentence');
 			}
 			const data = await response.json();
-			sentences = data.sentences;
-			sentenceLastRead = data.sentence_last_read;
+			sentence = data.sentence;
 			sentenceCount = data.sentence_count;
 			sentenceFirst = data.sentence_first;
 			hasPrevious = data.has_previous;
+			translated = null;
 			lastReadBookId.value = bookId;
 		} catch (err) {
 			error = err.message;
@@ -155,33 +150,24 @@
 		}
 	}
 
-	async function translateSentence(sentence, index) {
+	async function translateCurrentSentence() {
 		// Close translation if it's already open for this sentence
-		if (translations[index]) {
-			translations = {};
+		if (translated) {
+			translated = null;
 			return;
 		}
-		translations = {};
-		translatingIndex = index;
+
+		translating = true;
+
 		try {
-			const translated = await translateText(sentence);
-			translations = {
-				[index]: {
-					original: sentence,
-					translated: translated
-				}
-			};
+			const result = await translateText(sentence);
+			translated = result;
 		} catch (err) {
 			console.error('Translation error:', err);
 			alert(`Translation error: ${err.message}`);
 		} finally {
-			translatingIndex = null;
+			translating = false;
 		}
-	}
-
-	function updateSentencesPerPage(sentencesAmount) {
-		sentencesPerPage = sentencesAmount;
-		getSentences();
 	}
 
 	async function handleWordClick(event, word, sentenceContext) {
@@ -261,58 +247,68 @@
 			currentAudio.pause();
 			currentAudio = null;
 		}
-		speakingIndex = null;
+		speaking = false;
 	};
 
 	const handleNextPage = async () => {
 		handleStopSpeaking();
-		translations = {}; // Clear translations when changing pages
+		translated = null; // Clear translation when changing sentences
 		closeWordDropdown();
 		await getSentences('next');
 	};
 
 	const handlePreviousPage = async () => {
 		handleStopSpeaking();
-		translations = {}; // Clear translations when changing pages
+		translated = null; // Clear translation when changing sentences
 		closeWordDropdown();
 		await getSentences('previous');
 	};
 
-	const splitWords = (sentence) => {
-		return sentence.split(/(\s+)/);
+	const splitWords = (text) => {
+		return text.split(/(\s+)/);
 	};
 
-	const handleTranslate = async (sentence, index) => {
-		await translateSentence(sentence, index);
-	};
+	const handleSpeak = async (text) => {
+		if (speaking) return;
+		speaking = true;
 
-	const handleSpeak = async (sentence, index) => {
-		if (speakingIndex === index) return;
-		speakingIndex = index;
 		try {
 			const response = await fetch(`${baseURL}/app/tts/`, {
 				method: 'POST',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text: sentence, language: sourceLang })
+				body: JSON.stringify({ text: text, language: sourceLang })
 			});
-			if (!response.ok) throw new Error('TTS request failed');
+
+			if (!response.ok) {
+				let message = `TTS request failed (HTTP ${response.status})`;
+				try {
+					const errData = await response.json();
+					if (errData.error) message = errData.error;
+				} catch {}
+				throw new Error(message);
+			}
+
 			const data = await response.json();
 			const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+
 			currentAudio = audio;
 			audio.playbackRate = ttsSpeed.value;
 			audio.onended = () => {
-				speakingIndex = null;
+				speaking = false;
 				currentAudio = null;
 			};
+
 			audio.onerror = () => {
-				speakingIndex = null;
+				speaking = false;
 				currentAudio = null;
 			};
+
 			audio.play().catch(() => {});
 		} catch (err) {
 			console.error('TTS error:', err);
-			speakingIndex = null;
+			alert(`Text-to-speech failed: ${err.message}`);
+			speaking = false;
 			currentAudio = null;
 		}
 	};
@@ -333,7 +329,7 @@
 		</div>
 	{:else if error}
 		<p class="text-error text-center">Error: {error}</p>
-	{:else if sentences.length === 0}
+	{:else if sentence === null}
 		<p class="text-center">No sentences found.</p>
 	{:else}
 		<div class="max-w-4xl mx-auto pb-20">
@@ -364,71 +360,42 @@
 					</div>
 					<progress
 						class="progress progress-primary w-full mb-1"
-						value={sentenceLastRead}
+						value={sentenceFirst + 1}
 						max={sentenceCount}
 					></progress>
 				</div>
 			</div>
 			<div class="pt-28">
-				<!-- Sentences -->
+				<!-- Sentence -->
 				<div class="flex flex-col gap-2">
-					{#each sentences as sentence, index}
-						<div class="rounded-lg flex gap-2">
-							<div class="flex-1 border border-base-300 rounded-lg bg-base-200">
-								<div class="px-2 pt-1">
-									{#each splitWords(sentence) as part}
-										{#if part.trim().length > 0}
-											<button
-												class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300 text-lg text-white font-serif"
-												on:click={(e) => handleWordClick(e, part, sentence)}
-											>
-												{part}
-											</button>
-										{:else}
+					<div class="rounded-lg flex gap-2">
+						<div class="flex-1 border border-base-300 rounded-lg bg-base-200">
+							<div class="px-2 pt-1">
+								{#each splitWords(sentence) as part}
+									{#if part.trim().length > 0}
+										<button
+											class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300 text-lg text-white font-serif"
+											on:click={(e) => handleWordClick(e, part, sentence)}
+										>
 											{part}
-										{/if}
-									{/each}
-								</div>
+										</button>
+									{:else}
+										{part}
+									{/if}
+								{/each}
+							</div>
 
-								{#if translations[index]}
-									<div class="px-4 border-1 bg-primary rounded-b-lg text-black">
-										<div class="flex items-start justify-between">
-											<div class="flex-1">
-												<p class="text-md">{translations[index].translated}</p>
-											</div>
+							{#if translated}
+								<div class="px-4 border-1 bg-primary rounded-b-lg text-black">
+									<div class="flex items-start justify-between">
+										<div class="flex-1">
+											<p class="text-md">{translated}</p>
 										</div>
 									</div>
-								{/if}
-							</div>
-
-							<div class="join join-vertical my-auto border border-base-300 rounded-lg">
-								<button
-									class="join-item btn btn-sm shrink-0"
-									on:click={() =>
-										speakingIndex === index ? handleStopSpeaking() : handleSpeak(sentence, index)}
-								>
-									{#if speakingIndex === index}
-										<X />
-									{:else}
-										<Volume2 />
-									{/if}
-								</button>
-								<button
-									class="join-item btn btn-sm shrink-0 {translations[index]
-										? 'btn-primary'
-										: 'btn-ghost'}"
-									on:click={() => handleTranslate(sentence, index)}
-									disabled={translatingIndex === index}
-								>
-									{#if translatingIndex === index}
-										<span class="loading loading-spinner loading-xs"></span>
-									{:else}
-										<Languages />
-									{/if}
-								</button>
-							</div>
+								</div>
+							{/if}
 						</div>
-					{/each}
+					</div>
 				</div>
 			</div>
 
@@ -436,6 +403,31 @@
 			<div
 				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-3 pt-4 px-4 z-40"
 			>
+				<div class="join join-horizontal my-auto border border-base-300 rounded-lg">
+					<button
+						class="join-item btn btn-sm shrink-0"
+						on:click={() =>
+							speaking ? handleStopSpeaking() : handleSpeak(sentence)}
+					>
+						{#if speaking}
+							<X />
+						{:else}
+							<Volume2 />
+						{/if}
+					</button>
+					<button
+						class="join-item btn btn-sm shrink-0 {translated ? 'btn-primary' : 'btn-ghost'}"
+						on:click={translateCurrentSentence}
+						disabled={translating}
+					>
+						{#if translating}
+							<span class="loading loading-spinner loading-xs"></span>
+						{:else}
+							<Languages />
+						{/if}
+					</button>
+				</div>
+
 				<div class="max-w-4xl mx-auto flex justify-between items-center">
 					<button
 						class="btn btn-neutral"
@@ -480,7 +472,7 @@
 							handleSpeak(wordDropdown.word, 'word');
 						}}
 					>
-						{#if speakingIndex === 'word'}
+						{#if speaking}
 							<X size={14} />
 						{:else}
 							<Volume2 size={14} />

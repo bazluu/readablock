@@ -176,32 +176,32 @@ def read(request, data: schema.BookSchema):
 
     sentence_last_read = selectors.get_sentence_last_read(user_id, data.book_id) or 0
 
-    # Pagination
-    # sentence_last_read stores sentence_first of the last viewed page
     if data.page_turn == "next":
-        sentence_first = sentence_last_read + 1
+        sentence_current = sentence_last_read + 1
     elif data.page_turn == "previous":
-        sentence_first = max(0, sentence_last_read - 1)
+        sentence_current = max(0, sentence_last_read - 1)
     else:
-        sentence_first = sentence_last_read
+        sentence_current = sentence_last_read
 
-    sentence_last = sentence_first + 1
+    # Return only one sentence at a time
+    if sentence_current >= len(all_sentences):
+        sentence_current = len(all_sentences) - 1
 
-    sentences = all_sentences[sentence_first:sentence_last]
+    sentence = all_sentences[sentence_current]
 
     models.BookProgress.objects.update_or_create(
-        book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_first}
+        book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_current}
     )
 
     return Response(
         {
-            "sentences": sentences,
+            "sentence": sentence,
             "sentence_count": len(all_sentences),
-            "sentence_last_read": sentence_last,
-            "sentence_first": sentence_first,
-            "has_previous": sentence_first > 0,
+            "sentence_last_read": sentence_current,
+            "sentence_first": sentence_current,
+            "has_previous": sentence_current > 0,
         },
-        status=200,
+        status=200
     )
 
 
@@ -339,10 +339,13 @@ def create_feedback(request, data: schema.FeedbackSchema):
 def tts(request, data: schema.TTSSchema):
     language_code = DEEPL_TO_GOOGLE.get(data.language.upper())
 
+    if language_code is None:
+        return Response({"error": f"TTS not supported for language: {data.language}"}, status=400)
+
     try:
         audio_content = services.text_to_speech(data.text, language_code, data.speed)
         return Response({"audio": audio_content}, status=200)
     except ValueError as error:
-        return Response({"error": str(error)}, status=500)
+        return Response({"error": str(error)}, status=400)
     except requests.RequestException as error:
         return Response({"error": f"TTS error: {str(error)}"}, status=500)
