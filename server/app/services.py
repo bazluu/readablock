@@ -138,6 +138,9 @@ def text_to_speech(text, language_code, speed=0.9, tier="Standard", variant="A")
     if not settings.GOOGLE_TTS_API_KEY:
         raise ValueError("TTS not configured")
 
+    if not text or not text.strip():
+        raise ValueError("Text is empty")
+
     payload = {
         "input": {"text": text},
         "voice": {
@@ -153,6 +156,11 @@ def text_to_speech(text, language_code, speed=0.9, tier="Standard", variant="A")
         json=payload,
         timeout=10,
     )
-    response.raise_for_status()
+
+    if response.status_code != 200:
+        error_detail = response.json().get("error", {}).get("message", response.reason)
+        # Log the full error server-side; do not leak the API key (present in the URL) to clients.
+        print(f"Google TTS error ({response.status_code}): {error_detail}")
+        raise requests.HTTPError(f"Google TTS error ({response.status_code}): {error_detail}")
 
     return response.json().get("audioContent", "")
