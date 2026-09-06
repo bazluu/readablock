@@ -432,18 +432,18 @@
 
 				<div class="w-full border border-base-300 rounded-lg join join-horizontal items-stretch">
 					<button
-						class="join-item btn btn-lg flex-1 btn-neutral"
+						class="join-item btn btn-lg btn-neutral"
 						on:click={handlePreviousPage}
 						disabled={!hasPrevious || isLoading}
 					>
 						<ChevronLeft />
 						<p class="mr-2">PREV</p>
 					</button>
-					<span class="join-item flex items-center justify-center text-sm px-4 whitespace-nowrap">
+					<span class="join-item flex-1 flex items-center justify-center text-sm px-4 whitespace-nowrap">
 						Sentence {sentenceFirst + 1}
 					</span>
 					<button
-						class="join-item btn btn-lg flex-1 btn-neutral"
+						class="join-item btn btn-lg btn-neutral"
 						on:click={handleNextPage}
 						disabled={isLoading}
 					>
