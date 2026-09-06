@@ -400,7 +400,7 @@
 
 			<!-- Pagination Controls -->
 			<div
-				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-3 pt-4 px-4 z-40"
+				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-8 pt-4 px-4 z-40 flex flex-col gap-4"
 			>
 				<div class="flex justify-center">
 					<div class="join join-horizontal my-auto w-full border border-base-300 rounded-lg">
@@ -430,17 +430,23 @@
 					</div>
 				</div>
 
-				<div class="max-w-4xl mx-auto flex justify-between items-center">
+				<div class="w-full border border-base-300 rounded-lg join join-horizontal items-stretch">
 					<button
-						class="btn btn-neutral"
+						class="join-item btn btn-lg flex-1 btn-neutral"
 						on:click={handlePreviousPage}
 						disabled={!hasPrevious || isLoading}
 					>
 						<ChevronLeft />
 						<p class="mr-2">PREV</p>
 					</button>
-					<span class="text-sm">Sentence {sentenceFirst + 1}</span>
-					<button class="btn btn-neutral" on:click={handleNextPage} disabled={isLoading}>
+					<span class="join-item flex items-center justify-center text-sm px-4 whitespace-nowrap">
+						Sentence {sentenceFirst + 1}
+					</span>
+					<button
+						class="join-item btn btn-lg flex-1 btn-neutral"
+						on:click={handleNextPage}
+						disabled={isLoading}
+					>
 						<p class="ml-2">NEXT</p>
 						<ChevronRight />
 					</button>
