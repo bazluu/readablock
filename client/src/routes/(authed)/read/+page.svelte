@@ -401,8 +401,9 @@
 
 			<!-- Pagination Controls -->
 			<div
-				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-8 pt-4 px-4 z-40 flex flex-col gap-4"
-			>
+				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-8 pt-4 px-4 z-40"
+		>
+			<div class="max-w-4xl mx-auto flex flex-col gap-4">
 				<div class="flex justify-center">
 					<div class="join join-horizontal my-auto w-full border border-base-300 rounded-lg">
 						<button
@@ -453,6 +454,8 @@
 					</button>
 				</div>
 			</div>
+			</div>
+
 		</div>
 	{/if}
 
