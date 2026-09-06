@@ -412,8 +412,9 @@
 							{#if translating}
 								<span class="loading loading-spinner loading-md"></span>
 							{:else}
-								<Languages class="h-6 w-6" /> Translate
+								<Languages class="h-6 w-6" />
 							{/if}
+							<p>Translate</p>
 						</button>
 						<button
 							class="join-item btn btn-lg flex-1"
@@ -422,8 +423,9 @@
 							{#if speaking}
 								<X class="h-6 w-6" />
 							{:else}
-								<Volume2 class="h-6 w-6" /> Speech
+								<Volume2 class="h-6 w-6" />
 							{/if}
+							<p>Speech</p>
 						</button>
 					</div>
 				</div>
