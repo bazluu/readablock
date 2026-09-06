@@ -340,17 +340,18 @@
 							Dashboard
 						</button>
 						<div class="flex flex-col items-start">
-							<div class="join">
+							<div class="join border border-base-300 rounded-lg overflow-hidden">
 								<button
-									class="join-item btn"
+									class="join-item btn border-b-0 border-t-0 border-l-0 border-base-300"
 									on:click={decreaseTtsSpeed}
 									disabled={ttsSpeed.value <= 0.4}><Minus size={16} /></button
 								>
-								<button class="join-item btn pointer-events-none"
+								<button
+									class="join-item btn pointer-events-none border-b-0 border-t-0 border-base-300"
 									>{ttsSpeed.value.toFixed(1)}x</button
 								>
 								<button
-									class="join-item btn"
+									class="join-item btn border-b-0 border-t-0 border-r-0 border-base-300"
 									on:click={increaseTtsSpeed}
 									disabled={ttsSpeed.value >= 1.5}><Plus size={16} /></button
 								>
