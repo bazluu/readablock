@@ -7,7 +7,6 @@
 		ChevronLeft,
 		ChevronRight,
 		ArrowLeft,
-		Volume,
 		Volume2,
 		Minus,
 		Plus,
@@ -347,8 +346,8 @@
 									on:click={decreaseTtsSpeed}
 									disabled={ttsSpeed.value <= 0.4}><Minus size={16} /></button
 								>
-								<button class="join-item btn pointer-events-none p-0"
-									><Volume class="-mr-3"></Volume>{ttsSpeed.value.toFixed(1)}x</button
+								<button class="join-item btn pointer-events-none"
+									>{ttsSpeed.value.toFixed(1)}x</button
 								>
 								<button
 									class="join-item btn"
