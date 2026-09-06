@@ -337,7 +337,7 @@
 					<div class="flex flex-row w-full justify-between items-end mb-4">
 						<button class="btn gap-2" on:click={() => goto('/dashboard')}>
 							<ArrowLeft size={20} />
-							Dashboard
+							Books
 						</button>
 						<div class="flex flex-col items-start">
 							<div class="join border border-base-300 rounded-lg overflow-hidden">
@@ -402,60 +402,57 @@
 			<!-- Pagination Controls -->
 			<div
 				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-8 pt-4 px-4 z-40"
-		>
-			<div class="max-w-4xl mx-auto flex flex-col gap-4">
-				<div class="flex justify-center">
-					<div class="join join-horizontal my-auto w-full border border-base-300 rounded-lg">
+			>
+				<div class="max-w-4xl mx-auto flex flex-col gap-4">
+					<div class="flex justify-center">
+						<div class="join join-horizontal my-auto w-full border border-base-300 rounded-lg">
+							<button
+								class="join-item btn btn-lg flex-1 {translated ? 'btn-primary' : 'btn-ghost'}"
+								on:click={translateCurrentSentence}
+								disabled={translating}
+							>
+								{#if translating}
+									<span class="loading loading-spinner loading-md"></span>
+								{:else}
+									<Languages class="h-6 w-6" />
+								{/if}
+								<p>Translate</p>
+							</button>
+							<button
+								class="join-item btn btn-lg flex-1"
+								on:click={() => (speaking ? handleStopSpeaking() : handleSpeak(sentence))}
+							>
+								{#if speaking}
+									<X class="h-6 w-6" />
+								{:else}
+									<Volume2 class="h-6 w-6" />
+								{/if}
+								<p>Speech</p>
+							</button>
+						</div>
+					</div>
+
+					<div class="w-full border border-base-300 rounded-lg join join-horizontal items-stretch">
 						<button
-							class="join-item btn btn-lg flex-1 {translated ? 'btn-primary' : 'btn-ghost'}"
-							on:click={translateCurrentSentence}
-							disabled={translating}
+							class="join-item btn btn-lg"
+							on:click={handlePreviousPage}
+							disabled={!hasPrevious || isLoading}
 						>
-							{#if translating}
-								<span class="loading loading-spinner loading-md"></span>
-							{:else}
-								<Languages class="h-6 w-6" />
-							{/if}
-							<p>Translate</p>
+							<ChevronLeft />
+							<p class="mr-2">PREV</p>
 						</button>
-						<button
-							class="join-item btn btn-lg flex-1"
-							on:click={() => (speaking ? handleStopSpeaking() : handleSpeak(sentence))}
+						<span
+							class="join-item flex-1 flex items-center justify-center text-sm px-4 whitespace-nowrap"
 						>
-							{#if speaking}
-								<X class="h-6 w-6" />
-							{:else}
-								<Volume2 class="h-6 w-6" />
-							{/if}
-							<p>Speech</p>
+							Sentence {sentenceFirst + 1}
+						</span>
+						<button class="join-item btn btn-lg" on:click={handleNextPage} disabled={isLoading}>
+							<p class="ml-2">NEXT</p>
+							<ChevronRight />
 						</button>
 					</div>
 				</div>
-
-				<div class="w-full border border-base-300 rounded-lg join join-horizontal items-stretch">
-					<button
-						class="join-item btn btn-lg btn-neutral"
-						on:click={handlePreviousPage}
-						disabled={!hasPrevious || isLoading}
-					>
-						<ChevronLeft />
-						<p class="mr-2">PREV</p>
-					</button>
-					<span class="join-item flex-1 flex items-center justify-center text-sm px-4 whitespace-nowrap">
-						Sentence {sentenceFirst + 1}
-					</span>
-					<button
-						class="join-item btn btn-lg btn-neutral"
-						on:click={handleNextPage}
-						disabled={isLoading}
-					>
-						<p class="ml-2">NEXT</p>
-						<ChevronRight />
-					</button>
-				</div>
 			</div>
-			</div>
-
 		</div>
 	{/if}
 
