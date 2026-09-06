@@ -402,28 +402,30 @@
 			<div
 				class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 pb-3 pt-4 px-4 z-40"
 			>
-				<div class="join join-horizontal my-auto border border-base-300 rounded-lg">
-					<button
-						class="join-item btn btn-sm shrink-0"
-						on:click={() => (speaking ? handleStopSpeaking() : handleSpeak(sentence))}
-					>
-						{#if speaking}
-							<X />
-						{:else}
-							<Volume2 />
-						{/if}
-					</button>
-					<button
-						class="join-item btn btn-sm shrink-0 {translated ? 'btn-primary' : 'btn-ghost'}"
-						on:click={translateCurrentSentence}
-						disabled={translating}
-					>
-						{#if translating}
-							<span class="loading loading-spinner loading-xs"></span>
-						{:else}
-							<Languages />
-						{/if}
-					</button>
+				<div class="flex justify-center">
+					<div class="join join-horizontal my-auto w-full border border-base-300 rounded-lg">
+						<button
+							class="join-item btn btn-lg flex-1 {translated ? 'btn-primary' : 'btn-ghost'}"
+							on:click={translateCurrentSentence}
+							disabled={translating}
+						>
+							{#if translating}
+								<span class="loading loading-spinner loading-md"></span>
+							{:else}
+								<Languages class="h-6 w-6" /> Translate
+							{/if}
+						</button>
+						<button
+							class="join-item btn btn-lg flex-1"
+							on:click={() => (speaking ? handleStopSpeaking() : handleSpeak(sentence))}
+						>
+							{#if speaking}
+								<X class="h-6 w-6" />
+							{:else}
+								<Volume2 class="h-6 w-6" /> Speech
+							{/if}
+						</button>
+					</div>
 				</div>
 
 				<div class="max-w-4xl mx-auto flex justify-between items-center">
