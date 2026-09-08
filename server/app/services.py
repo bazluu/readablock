@@ -106,6 +106,11 @@ def get_book_upload_path(instance, filename):
     return f"books/{uuid.uuid4()}{ext}"
 
 
+def update_sentence_count(book: models.Book, sentences: tuple):
+    book.sentence_count = len(sentences)
+    book.save(update_fields=["sentence_count"])
+
+
 def cache_book_sentences(book_id: int, user_id: int, cache_timeout: int = 1800) -> str:
     book = models.Book.objects.get(id=book_id)
 
@@ -116,6 +121,9 @@ def cache_book_sentences(book_id: int, user_id: int, cache_timeout: int = 1800) 
             text = f.read().decode("utf-8")
 
     sentences = convert_text_to_sentences(text)
+
+    if not book.sentence_count:
+        update_sentence_count(book, sentences)
 
     cache.set(f"{user_id}:{book_id}", sentences, timeout=cache_timeout)
 
