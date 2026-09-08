@@ -114,9 +114,13 @@
 											<progress
 												class="progress progress-primary flex-1 h-1.5"
 												value={book.sentence_last_read}
-												max="100"
+												max={book.sentence_count || 1}
 											></progress>
-											<span class="text-xs font-bold text-primary">{book.sentence_last_read}%</span>
+											<span class="text-xs font-bold text-primary">
+												{book.sentence_count
+													? Math.round((book.sentence_last_read / book.sentence_count) * 100)
+													: 0}%
+											</span>
 										</div>
 										<div class="flex flex-col gap-1">
 											<p class="font-bold text-base leading-tight line-clamp-2">

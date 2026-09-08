@@ -139,7 +139,9 @@ def dashboard_books(request, language: str):
 
     books_in_progress = models.BookProgress.objects.filter(
         user_id=user_id, book__language=language
-    ).values("book_id", "book__title", "book__author", "sentence_last_read")
+    ).values(
+        "book_id", "book__title", "book__author", "sentence_last_read", "book__sentence_count"
+    )
 
     for book_progress in books_in_progress:
         if book_progress["sentence_last_read"] > 0:
@@ -149,6 +151,7 @@ def dashboard_books(request, language: str):
                     "title": book_progress["book__title"],
                     "author": book_progress["book__author"],
                     "sentence_last_read": book_progress["sentence_last_read"],
+                    "sentence_count": book_progress["book__sentence_count"],
                 }
             )
 
