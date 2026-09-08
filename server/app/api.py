@@ -271,6 +271,14 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
     )
     book.save()
 
+    # Save book sentences to cache and store sentence count on the book
+    try:
+        services.cache_book_sentences(book.id, user.id)
+        book.sentence_count = len(cache.get(f"{user.id}:{book.id}"))
+        book.save(update_fields=["sentence_count"])
+    except models.Book.DoesNotExist:
+        return Response({"error": "Book not found"}, status=404)
+
     return Response({"id": book.id, "message": "Book uploaded successfully"}, status=201)
 
 
@@ -311,6 +319,14 @@ def upload_book_content(request, data: schema.BookUploadContentSchema):
         is_public=is_public
     )
     book.save()
+
+    # Save book sentences to cache and store sentence count on the book
+    try:
+        services.cache_book_sentences(book.id, user.id)
+        book.sentence_count = len(cache.get(f"{user.id}:{book.id}"))
+        book.save(update_fields=["sentence_count"])
+    except models.Book.DoesNotExist:
+        return Response({"error": "Book not found"}, status=404)
 
     return Response({"id": book.id, "message": "Book uploaded successfully"}, status=201)
 
