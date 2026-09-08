@@ -18,6 +18,7 @@ class Book(models.Model):
     language = models.CharField(
         max_length=7, choices=[(lang, lang) for lang in constants.SUPPORTED_LANGUAGES]
     )
+    sentence_count = models.IntegerField(default=0)
     description = models.TextField(null=True)
     reading_ease_score = models.FloatField(null=True)
     tags = models.JSONField(default=list, blank=True)
@@ -32,6 +33,7 @@ class Book(models.Model):
     is_public = models.BooleanField(default=False)
 
 
+# TODO: Delete this and try to forget I ever thought this was a good idea
 class Sentence(models.Model):
     """
     Model for sentences in a book.
