@@ -22,7 +22,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_KEY: ${{ secrets.ZAI_API_KEY }}
-          OPENAI.API_BASE: "https://api.z.ai/api/paas/v4"
+          OPENAI.API_BASE: "https://api.z.ai/api/coding/paas/v4"
           config.model: "openai/glm-5.3-flash"
           config.fallback_models: '["openai/glm-5.3-flash"]'
           config.ai_timeout: "300"
