@@ -2,7 +2,7 @@ name: PR Agent
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review]
+    types: [opened, reopened, ready_for_review, synchronize]
   issue_comment:
     types: [created]
 
@@ -14,18 +14,18 @@ jobs:
       issues: write
       pull-requests: write
       contents: write
+      checks: write
     steps:
       - name: PR Agent action step
         id: pragent
         uses: the-pr-agent/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI__KEY: ${{ secrets.ZAI_API_KEY }}
-          OPENAI__API_BASE: "https://api.z.ai/api/paas/v4"
-          PR_AGENT__GIT_PROVIDER: "github"
-          CONFIG__GIT_PROVIDER: "github"
-          OPENAI__MODEL: "glm-5.3-flash"
-          PR_REVIEWER__EXTRA_INSTRUCTIONS: ""
-          GITHUB_ACTION_CONFIG__AUTO_REVIEW: "true"
-          GITHUB_ACTION_CONFIG__AUTO_DESCRIBE: "true"
-          GITHUB_ACTION_CONFIG__AUTO_IMPROVE: "false"
+          OPENAI_KEY: ${{ secrets.ZAI_API_KEY }}
+          OPENAI.API_BASE: "https://api.z.ai/api/paas/v4"
+          config.model: "glm-5.3-flash"
+          config.fallback_models: '["glm-5.3-flash"]'
+          config.ai_timeout: "300"
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "true"
+          github_action_config.auto_improve: "false"
