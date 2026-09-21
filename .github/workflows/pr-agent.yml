@@ -26,6 +26,7 @@ jobs:
           config.model: "glm-5.3-flash"
           config.fallback_models: '["glm-5.3-flash"]'
           config.ai_timeout: "300"
+          config.custom_model_max_tokens: "128000"
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
           github_action_config.auto_improve: "false"
