@@ -177,6 +177,11 @@ def read(request, data: schema.BookSchema):
 
     all_sentences = cache.get(f"{user_id}:{data.book_id}")
 
+    # A book with no parseable sentences (or none cached yet) leaves an empty
+    # tuple; indexing it at any position raises IndexError. Bail out cleanly.
+    if not all_sentences:
+        return Response({"error": "No readable sentences for this book"}, status=422)
+
     sentence_last_read = selectors.get_sentence_last_read(user_id, data.book_id) or 0
 
     if data.page_turn == "next":
