@@ -10,9 +10,12 @@ let _ttsSpeed = $state(1.0);
 
 // Guard against server-side rendering (Node has no localStorage). If we're in a browser, localStorage exists; otherwise we skip.
 if (typeof localStorage !== 'undefined') {
-	const stored = Number(localStorage.getItem('ttsSpeed'));
-	if (Number.isFinite(stored)) {
-		_ttsSpeed = Math.min(1.5, Math.max(0.4, stored));
+	const raw = localStorage.getItem('ttsSpeed');
+	if (raw !== null) {
+		const stored = Number(raw);
+		if (Number.isFinite(stored)) {
+			_ttsSpeed = Math.min(1.5, Math.max(0.4, stored));
+		}
 	}
 }
 
