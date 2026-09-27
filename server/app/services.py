@@ -109,6 +109,7 @@ def get_book_upload_path(instance, filename):
 def delete_book_by_id(book_id: int) -> None:
     book = models.Book.objects.get(id=book_id)
 
+    models.BookProgress.objects.filter(book=book).delete()
     book.file.delete(save=False)
     book.delete()
 
