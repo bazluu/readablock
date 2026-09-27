@@ -101,9 +101,9 @@
 						{#each continueReading as book}
 							<button
 								onclick={() => openBook(book.id)}
-								class="card w-full bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
+								class="card w-full h-full bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
 							>
-								<div class="flex flex-col gap-4">
+								<div class="flex flex-1 flex-col gap-4">
 									<div
 										class="aspect-[3/4] w-full bg-base-300 rounded-lg flex items-center justify-center"
 									>
@@ -124,11 +124,18 @@
 										</div>
 										<div class="flex flex-col gap-1">
 											<p class="font-bold text-base leading-tight line-clamp-2">
-												{book.title}
+												{book.title_en || book.title}
 											</p>
-											<p
-												class="-mt-0.5 text-sm font-medium text-base-content/50 leading-tight line-clamp-1"
-											>
+											{#if book.title_en && book.title}
+												<p
+													class="-mt-0.5 font-serif text-sm text-base-content/60 leading-tight line-clamp-2"
+												>
+													{book.title}
+												</p>
+											{/if}
+										</div>
+										<div class="-mb-1 mt-auto border-t border-base-300">
+											<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
 												{book.author}
 											</p>
 										</div>
@@ -154,16 +161,27 @@
 						{#each library as book}
 							<button
 								onclick={() => openBook(book.id)}
-								class="card w-full bg-base-200 border border-base-300 hover:border-secondary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
+								class="card w-full h-full bg-base-200 border border-base-300 hover:border-secondary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
 							>
-								<div class="flex flex-col gap-4">
+								<div class="flex flex-1 flex-col gap-4">
 									<div
 										class="aspect-[3/4] w-full bg-base-300 rounded-lg flex items-center justify-center"
 									>
 										<Book class="h-12 w-12 text-secondary" />
 									</div>
 									<div class="flex flex-col gap-1">
-										<p class="font-bold text-base leading-tight line-clamp-2">{book.title}</p>
+										<p class="font-bold text-base leading-tight line-clamp-2">
+											{book.title_en || book.title}
+										</p>
+										{#if book.title_en && book.title}
+											<p
+												class="-mt-0.5 font-serif text-sm text-base-content/60 leading-tight line-clamp-2"
+											>
+												{book.title}
+											</p>
+										{/if}
+									</div>
+									<div class="-mb-1 mt-auto border-t border-base-300">
 										<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
 											{book.author}
 										</p>
