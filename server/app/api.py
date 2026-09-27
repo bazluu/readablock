@@ -332,6 +332,24 @@ def upload_book_content(request, data: schema.BookUploadContentSchema):
     return Response({"id": book.id, "message": "Book uploaded successfully"}, status=201)
 
 
+@api.delete("/books/{book_id}")
+def delete_book(request, book_id: int):
+    try:
+        user = User.objects.get(id=request.session["user_id"])
+    except (KeyError, User.DoesNotExist):
+        return Response({"error": "Authentication required"}, status=401)
+
+    if not user.is_superuser:
+        return Response({"error": "Access denied"}, status=403)
+
+    try:
+        services.delete_book_by_id(book_id)
+    except models.Book.DoesNotExist:
+        return Response({"error": "Book not found"}, status=404)
+
+    return Response({"message": "Book deleted successfully"}, status=200)
+
+
 @api.post("/feedback/")
 def create_feedback(request, data: schema.FeedbackSchema):
     try:

@@ -106,6 +106,14 @@ def get_book_upload_path(instance, filename):
     return f"books/{uuid.uuid4()}{ext}"
 
 
+def delete_book_by_id(book_id: int) -> None:
+    book = models.Book.objects.get(id=book_id)
+
+    models.BookProgress.objects.filter(book=book).delete()
+    book.file.delete(save=False)
+    book.delete()
+
+
 def update_sentence_count(book: models.Book, sentences: tuple):
     book.sentence_count = len(sentences)
     book.save(update_fields=["sentence_count"])
