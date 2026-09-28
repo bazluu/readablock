@@ -46,6 +46,56 @@ class BookProgress(models.Model):
     sentence_last_read = models.IntegerField(default=0)
 
 
+class Word(models.Model):
+    """
+    Shared vocabulary table, deduped across all users and books.
+    """
+
+    text = models.CharField(max_length=255)
+    language = models.CharField(
+        max_length=7, choices=[(lang, lang) for lang in constants.SUPPORTED_LANGUAGES]
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["text", "language"], name="uniq_word_language")
+        ]
+        indexes = [models.Index(fields=["text"])]
+
+
+class ReadingLog(models.Model):
+    """
+    Materialized counter of how many words a user read on a given day.
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reading_log")
+    date = models.DateField()
+    word_count = models.PositiveSmallIntegerField(default=0)
+    word_goal = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "date"], name="uniq_user_date")
+        ]
+
+
+class WordRead(models.Model):
+    """
+    Which words a user read, on what day, and how many times.
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="word_reads")
+    word = models.ForeignKey(Word, on_delete=models.PROTECT, related_name="reads")
+    date = models.DateField()
+    count = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "word", "date"], name="uniq_user_word_date")
+        ]
+        indexes = [models.Index(fields=["user", "word"])]
+
+
 class BookUpload(models.Model):
     """
     Model for book uploads.
