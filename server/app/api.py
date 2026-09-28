@@ -11,6 +11,7 @@ import secrets
 import os
 import magic
 import requests
+from datetime import date
 
 from django.db.models import Sum
 
@@ -120,6 +121,23 @@ def update_word_goal(request, data: schema.WordGoalSchema):
     return Response({"message": "Word goal updated", "word_goal": data.word_goal}, status=200)
 
 
+@api.get("/reading-log/today")
+def reading_log_today(request):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    log = selectors.get_reading_log(user_id, date.today())
+    word_count = log.word_count if log else 0
+    word_goal = services.get_daily_word_goal(user_id) or (log.word_goal if log else 0)
+
+    return Response(
+        {"word_count": word_count, "word_goal": word_goal},
+        status=200,
+    )
+
+
 @api.get("/languages")
 def get_supported_languages(request):
     return Response({"languages": constants.SUPPORTED_LANGUAGES}, status=200)
@@ -226,6 +244,8 @@ def read(request, data: schema.BookSchema):
         book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_current}
     )
 
+    todays_log = selectors.get_reading_log(user_id, date.today())
+
     return Response(
         {
             "sentence": sentence,
@@ -233,6 +253,8 @@ def read(request, data: schema.BookSchema):
             "sentence_last_read": sentence_current,
             "sentence_first": sentence_current,
             "has_previous": sentence_current > 0,
+            "words_read_today": todays_log.word_count if todays_log else 0,
+            "word_goal_today": todays_log.word_goal if todays_log else services.get_daily_word_goal(user_id),
         },
         status=200
     )

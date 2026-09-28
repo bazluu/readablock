@@ -4,12 +4,17 @@
 	import { AlertCircle, Book, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
+	import WordGoalProgress from '$lib/components/WordGoalProgress.svelte';
+	import WordGoalModal from '$lib/components/WordGoalModal.svelte';
 
 	let continueReading = $state([]);
 	let library = $state([]);
 	let isLoading = $state(true);
 	let error = $state(null);
 	let showLanguageModal = $state(false);
+	let showGoalModal = $state(false);
+	let wordsReadToday = $state(0);
+	let wordGoalToday = $state(0);
 
 	async function fetchBooks() {
 		isLoading = true;
@@ -35,6 +40,19 @@
 			console.error('Error fetching books:', err);
 		} finally {
 			isLoading = false;
+		}
+
+		try {
+			const logResponse = await fetch(`${baseURL}/app/reading-log/today`, {
+				credentials: 'include'
+			});
+			if (logResponse.ok) {
+				const logData = await logResponse.json();
+				wordsReadToday = logData.word_count ?? 0;
+				wordGoalToday = logData.word_goal ?? 0;
+			}
+		} catch (err) {
+			console.error('Error fetching reading log:', err);
 		}
 	}
 
@@ -89,6 +107,17 @@
 				</div>
 			</div>
 		{:else}
+			<!-- Daily word goal -->
+			<section class="mb-12">
+				<div class="card bg-base-200 border border-base-300 p-4">
+					<WordGoalProgress
+						wordCount={wordsReadToday}
+						wordGoal={wordGoalToday}
+						onSetGoal={() => (showGoalModal = true)}
+					/>
+				</div>
+			</section>
+
 			<!-- Continue Reading -->
 			{#if continueReading.length > 0}
 				<section class="mb-12">
@@ -135,7 +164,9 @@
 											{/if}
 										</div>
 										<div class="-mb-1 mt-auto border-t border-base-300">
-											<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
+											<p
+												class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1"
+											>
 												{book.author}
 											</p>
 										</div>
@@ -197,3 +228,4 @@
 </div>
 
 <LanguageSelector bind:open={showLanguageModal} />
+<WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoalToday = goal)} />
