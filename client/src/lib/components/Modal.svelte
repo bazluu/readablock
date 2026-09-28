@@ -20,3 +20,10 @@
 		</form>
 	{/if}
 </dialog>
+
+<style>
+	dialog.modal[open] {
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+	}
+</style>

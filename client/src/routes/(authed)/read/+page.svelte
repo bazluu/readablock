@@ -12,6 +12,8 @@
 		Plus,
 		X
 	} from 'lucide-svelte';
+	import WordGoalProgress from '$lib/components/WordGoalProgress.svelte';
+	import WordGoalModal from '$lib/components/WordGoalModal.svelte';
 
 	let sentence = null;
 	let translated = null; // Translation of the current sentence
@@ -21,6 +23,11 @@
 	let bookId = null;
 	let isLoading = true;
 	let error = null;
+
+	// Daily word goal progress
+	let wordsReadToday = 0;
+	let wordGoalToday = 0;
+	let showGoalModal = false;
 
 	// Translation state
 	let translating = false;
@@ -105,6 +112,8 @@
 			sentenceFirst = data.sentence_first;
 			hasPrevious = data.has_previous;
 			translated = null;
+			wordsReadToday = data.words_read_today ?? 0;
+			wordGoalToday = data.word_goal_today ?? 0;
 			lastReadBookId.value = bookId;
 		} catch (err) {
 			error = err.message;
@@ -335,7 +344,10 @@
 			<div class="fixed top-0 left-0 right-0 bg-base-100 border-b border-base-300 py-3 px-4 z-40">
 				<div class="max-w-4xl mx-auto">
 					<div class="flex flex-row w-full justify-between items-end mb-4">
-						<button class="btn gap-2 border border-base-300 rounded-lg" on:click={() => goto('/dashboard')}>
+						<button
+							class="btn gap-2 border border-base-300 rounded-lg"
+							on:click={() => goto('/dashboard')}
+						>
 							<ArrowLeft size={20} />
 							Books
 						</button>
@@ -358,11 +370,13 @@
 							</div>
 						</div>
 					</div>
-					<progress
-						class="progress progress-primary w-full mb-1"
-						value={sentenceFirst + 1}
-						max={sentenceCount}
-					></progress>
+					<div class="mb-1">
+						<WordGoalProgress
+							wordCount={wordsReadToday}
+							wordGoal={wordGoalToday}
+							onSetGoal={() => (showGoalModal = true)}
+						/>
+					</div>
 				</div>
 			</div>
 			<div class="pt-28">
@@ -493,6 +507,8 @@
 		</div>
 	{/if}
 </div>
+
+<WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoalToday = goal)} />
 
 <style>
 	.fixed {
