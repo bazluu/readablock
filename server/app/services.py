@@ -3,9 +3,13 @@ import os
 import random
 import string
 import uuid
+from collections import Counter
+from datetime import date
 
 from django.conf import settings
 from django.core.cache import cache
+from django.db import transaction
+from django.db.models import F
 
 from ebooklib import epub, ITEM_DOCUMENT
 from bs4 import BeautifulSoup
@@ -15,6 +19,20 @@ import requests
 
 from app import models
 from app.constants import LANGUAGES
+from core.models import UserMeta
+
+
+def get_daily_word_goal(user_id: int) -> int:
+    key = f"daily_word_goal:{user_id}"
+
+    goal = cache.get(key)
+    if goal is None:
+        goal = UserMeta.objects.filter(user_id=user_id).values_list(
+            "daily_word_goal", flat=True
+        ).first() or 0
+        cache.set(key, goal, timeout=86400)
+
+    return goal
 
 
 def get_supported_languages():
@@ -136,6 +154,85 @@ def cache_book_sentences(book_id: int, user_id: int, cache_timeout: int = 1800) 
     cache.set(f"{user_id}:{book_id}", sentences, timeout=cache_timeout)
 
     return text
+
+
+def extract_words(sentence: str) -> list[str]:
+    return [word.lower() for word in TextBlob(sentence).words]
+
+
+def record_words_read(user_id: int, words: list[str], language: str, day: date | None = None):
+    """
+    Record words read by a user: upsert shared Word rows, then increment per-word
+    (user, word, day) counters.
+    """
+    if not words:
+        return
+
+    day = day or date.today()
+
+    counts = Counter(words)
+
+    with transaction.atomic():
+        unique_words = list(counts)
+
+        word_ids = {
+            word.text: word.id
+            for word in models.Word.objects.filter(language=language, text__in=unique_words)
+        }
+
+        missing_words = [word for word in unique_words if word not in word_ids]
+        models.Word.objects.bulk_create(
+            [models.Word(text=word, language=language) for word in missing_words],
+            ignore_conflicts=True
+        )
+
+        new_word_ids = {
+            word.text: word.id
+            for word in models.Word.objects.filter(language=language, text__in=missing_words)
+        }
+
+        unresolved_words = [
+            word for word in missing_words
+            if word not in new_word_ids
+        ]
+        if unresolved_words:
+            raise RuntimeError(f"Failed to resolve Word ids for words: {unresolved_words}")
+
+        word_ids.update(new_word_ids)
+
+        for word_text, count in counts.items():
+            word_read, created = models.WordRead.objects.get_or_create(
+                user_id=user_id,
+                word_id=word_ids[word_text],
+                date=day,
+                defaults={"count": count},
+            )
+            if not created:
+                models.WordRead.objects.filter(id=word_read.id).update(
+                    count=F("count") + count
+                )
+
+
+def update_reading_log(user_id: int, words_read: int, day: date | None = None):
+    """
+    Increment the user's daily reading total, creating the day's ReadingLog row
+    if it does not exist yet. The current word goal is written so the log row
+    always reflects the goal active at the time of reading.
+    """
+    day = day or date.today()
+    log, created = models.ReadingLog.objects.get_or_create(
+        user_id=user_id,
+        date=day,
+        defaults={
+            "word_count": words_read,
+            "word_goal": get_daily_word_goal(user_id),
+        }
+    )
+    if not created:
+        models.ReadingLog.objects.filter(id=log.id).update(
+            word_count=F("word_count") + words_read,
+            word_goal=get_daily_word_goal(user_id),
+        )
 
 
 def verify_book_access(book_id: int, user_id: int) -> bool:

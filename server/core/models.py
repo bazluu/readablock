@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.utils import timezone
 
 
@@ -12,7 +13,7 @@ class UserMeta(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.PROTECT)
     verified = models.BooleanField(default=False)
-    daily_word_goal = models.IntegerField(
+    daily_word_goal = models.PositiveIntegerField(
         choices=DailyWordGoal.choices,
         null=True
     )
@@ -23,3 +24,4 @@ class UserMeta(models.Model):
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         super(UserMeta, self).save(*args, **kwargs)
+        cache.delete(f"daily_word_goal:{self.user_id}")
