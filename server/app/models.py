@@ -70,8 +70,8 @@ class ReadingLog(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reading_log")
     date = models.DateField()
-    word_count = models.PositiveSmallIntegerField(default=0)
-    word_goal = models.PositiveSmallIntegerField(default=0)
+    word_count = models.PositiveIntegerField(default=0)
+    word_goal = models.PositiveIntegerField(default=0)
 
     class Meta:
         constraints = [
