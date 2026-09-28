@@ -12,6 +12,8 @@ import os
 import magic
 import requests
 
+from django.db.models import Sum
+
 from app import schema, services, selectors, models, constants
 from app.constants import DEEPL_TO_GOOGLE
 from core import models as core_models
@@ -96,6 +98,26 @@ def user(request):
 
     except (KeyError, User.DoesNotExist):
         return Response({"error": "Authentication required"}, status=401)
+
+
+@api.post("/update-word-goal")
+def update_word_goal(request, data: schema.WordGoalSchema):
+    try:
+        user = User.objects.get(id=request.session["user_id"])
+    except (KeyError, User.DoesNotExist):
+        return Response({"error": "Authentication required"}, status=401)
+
+    if data.word_goal not in core_models.UserMeta.DailyWordGoal.values:
+        return Response(
+            {"error": f"Invalid word goal. Allowed values: {list(core_models.UserMeta.DailyWordGoal.values)}"},
+            status=400,
+        )
+
+    meta, _ = core_models.UserMeta.objects.get_or_create(user=user)
+    meta.daily_word_goal = data.word_goal
+    meta.save()
+
+    return Response({"message": "Word goal updated", "word_goal": data.word_goal}, status=200)
 
 
 @api.get("/languages")
@@ -193,6 +215,13 @@ def read(request, data: schema.BookSchema):
 
     sentence = all_sentences[sentence_current]
 
+    # Log words read and update daily totals
+    if sentence_current > sentence_last_read:
+        book_language = models.Book.objects.get(id=data.book_id).language
+        words = services.extract_words(sentence)
+        services.record_words_read(user_id, words, book_language)
+        services.update_reading_log(user_id, len(words))
+
     models.BookProgress.objects.update_or_create(
         book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_current}
     )
@@ -207,6 +236,31 @@ def read(request, data: schema.BookSchema):
         },
         status=200
     )
+
+
+@api.post("/books/mark-unread/")
+def mark_unread(request, data: schema.MarkUnreadSchema):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    if services.verify_book_access(data.book_id, user_id) is False:
+        return Response({"error": "Access denied"}, status=403)
+
+    try:
+        models.Book.objects.get(id=data.book_id)
+    except models.Book.DoesNotExist:
+        return Response({"error": "Book not found"}, status=404)
+
+    updated = models.BookProgress.objects.filter(
+        book_id=data.book_id, user_id=user_id
+    ).update(sentence_last_read=0)
+
+    if updated:
+        return Response({"message": "Book marked as unread"}, status=200)
+
+    return Response({"error": "Book not in library"}, status=404)
 
 
 @api.post("/translate/")
