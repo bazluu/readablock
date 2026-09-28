@@ -442,9 +442,10 @@
 							<p class="mr-2">PREV</p>
 						</button>
 						<span
-							class="join-item flex-1 flex items-center justify-center text-sm px-4 whitespace-nowrap"
+							class="join-item flex-1 flex flex-col items-center justify-center text-sm px-4 whitespace-nowrap"
 						>
-							Sentence {sentenceFirst + 1}
+							<span>Sentence {sentenceFirst + 1}</span>
+							<span class="text-xs opacity-70">{sentenceFirst + 1}/{sentenceCount}</span>
 						</span>
 						<button class="join-item btn btn-lg" on:click={handleNextPage} disabled={isLoading}>
 							<p class="ml-2">NEXT</p>
