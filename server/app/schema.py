@@ -18,6 +18,10 @@ class BookSchema(Schema):
     page_turn: str | None = None  # "next" or "previous"
 
 
+class MarkUnreadSchema(Schema):
+    book_id: int
+
+
 class BookUploadSchema(Schema):
     title: str
     author: str
@@ -53,3 +57,7 @@ class BookUploadContentSchema(Schema):
 class FeedbackSchema(Schema):
     type: str
     body: str
+
+
+class WordGoalSchema(Schema):
+    word_goal: int
