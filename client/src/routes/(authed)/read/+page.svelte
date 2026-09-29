@@ -1,7 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { baseURL, selectedBookId, lastReadBookId, ttsSpeed } from '$lib/state.svelte.js';
+	import {
+		baseURL,
+		selectedBookId,
+		lastReadBookId,
+		ttsSpeed,
+		wordGoal
+	} from '$lib/state.svelte.js';
 	import {
 		Languages,
 		ChevronLeft,
@@ -26,7 +32,6 @@
 
 	// Daily word goal progress
 	let wordsReadToday = 0;
-	let wordGoalToday = 0;
 	let showGoalModal = false;
 
 	// Translation state
@@ -113,7 +118,7 @@
 			hasPrevious = data.has_previous;
 			translated = null;
 			wordsReadToday = data.words_read_today ?? 0;
-			wordGoalToday = data.word_goal_today ?? 0;
+			wordGoal.value = data.word_goal_today ?? 0;
 			lastReadBookId.value = bookId;
 		} catch (err) {
 			error = err.message;
@@ -373,7 +378,7 @@
 					<div class="mb-1">
 						<WordGoalProgress
 							wordCount={wordsReadToday}
-							wordGoal={wordGoalToday}
+							wordGoal={wordGoal.value ?? 0}
 							onSetGoal={() => (showGoalModal = true)}
 						/>
 					</div>
@@ -508,7 +513,7 @@
 	{/if}
 </div>
 
-<WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoalToday = goal)} />
+<WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoal.value = goal)} />
 
 <style>
 	.fixed {

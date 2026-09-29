@@ -2,11 +2,15 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { baseURL, selectedLanguage } from '$lib/state.svelte.js';
-	import { Library, Upload, Languages, MessageSquare, LogOut } from 'lucide-svelte';
+	import { baseURL, selectedLanguage, wordGoal } from '$lib/state.svelte.js';
+	import { Library, Upload, Languages, MessageSquare, LogOut, Goal, User } from 'lucide-svelte';
+	import WordGoalModal from '$lib/components/WordGoalModal.svelte';
 
 	let languages = $state([]);
 	let langDropdownOpen = $state(false);
+	let userDropdownOpen = $state(false);
+	let showGoalModal = $state(false);
+	let currentGoal = $state(0);
 
 	onMount(async () => {
 		const response = await fetch(`${baseURL}/app/supported-languages`, {
@@ -43,6 +47,28 @@
 			credentials: 'include'
 		});
 		goto('/login');
+	}
+
+	async function openUserMenu() {
+		userDropdownOpen = !userDropdownOpen;
+		if (userDropdownOpen) {
+			try {
+				const response = await fetch(`${baseURL}/app/reading-log/today`, {
+					credentials: 'include'
+				});
+				if (response.ok) {
+					const data = await response.json();
+					currentGoal = data.word_goal ?? 0;
+				}
+			} catch (err) {
+				console.error('Error fetching reading log:', err);
+			}
+		}
+	}
+
+	function openGoalModal() {
+		userDropdownOpen = false;
+		showGoalModal = true;
 	}
 
 	function currentLanguageName() {
@@ -128,11 +154,44 @@
 	</div>
 
 	<div class="flex items-center justify-end flex-1 gap-1 min-w-0">
-		<button
-			class="btn inline-flex items-center justify-center p-1.5 sm:p-2 transition-colors shrink-0"
-			onclick={logout}
-		>
-			<LogOut class="h-4 w-4 sm:h-5 sm:w-5" />
-		</button>
+		<div class="relative shrink-0" use:clickOutside={() => (userDropdownOpen = false)}>
+			<button
+				onclick={openUserMenu}
+				class="btn inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:py-2 rounded-lg"
+				aria-label="User menu"
+				title="User menu"
+			>
+				<User class="h-4 w-4 sm:h-5 sm:w-5" />
+			</button>
+			{#if userDropdownOpen}
+				<div
+					class="absolute top-full right-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52"
+				>
+					<button
+						class="w-full flex items-center gap-2 text-left px-4 py-2 btn justify-start"
+						onclick={openGoalModal}
+					>
+						<Goal class="h-4 w-4" />
+						Change word goal
+					</button>
+					<button
+						class="w-full flex items-center gap-2 text-left px-4 py-2 btn justify-start"
+						onclick={logout}
+					>
+						<LogOut class="h-4 w-4" />
+						Log out
+					</button>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
+
+<WordGoalModal
+	bind:open={showGoalModal}
+	currentGoal={currentGoal || null}
+	onSetGoal={(goal) => {
+		currentGoal = goal;
+		wordGoal.value = goal;
+	}}
+/>

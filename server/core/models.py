@@ -6,7 +6,7 @@ from django.utils import timezone
 
 class UserMeta(models.Model):
     class DailyWordGoal(models.IntegerChoices):
-        W140 = 140
+        W280 = 280
         W550 = 550
         W1370 = 1370
         W2740 = 2740

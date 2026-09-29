@@ -4,6 +4,8 @@ export const baseURL = import.meta.env.PROD
 
 export const user = $state({ value: null });
 
+export const wordGoal = $state({ value: null });
+
 export const selectedBookId = $state({ value: null });
 
 let _ttsSpeed = $state(1.0);
