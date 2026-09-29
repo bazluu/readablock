@@ -44,6 +44,7 @@ class BookProgress(models.Model):
     book = models.ForeignKey(Book, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     sentence_last_read = models.IntegerField(default=0)
+    sentence_furthest_read = models.IntegerField(default=0)
 
 
 class Word(models.Model):
