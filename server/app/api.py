@@ -221,7 +221,11 @@ def read(request, data: schema.BookSchema):
 
     all_sentences = cache.get(f"{user_id}:{data.book_id}")
 
-    sentence_last_read = selectors.get_sentence_last_read(user_id, data.book_id) or 0
+    progress = models.BookProgress.objects.filter(
+        book_id=data.book_id, user_id=user_id
+    ).first()
+    sentence_last_read = progress.sentence_last_read if progress else 0
+    sentence_furthest_read = progress.sentence_furthest_read if progress else 0
 
     if data.page_turn == "next":
         sentence_current = sentence_last_read + 1
@@ -236,15 +240,24 @@ def read(request, data: schema.BookSchema):
 
     sentence = all_sentences[sentence_current]
 
-    # Log words read and update daily totals
-    if sentence_current > sentence_last_read:
+    # Log words read only when the reader moves past the furthest sentence they
+    # have read before. Re-reading earlier sentences (e.g. toggling next/previous
+    # back and forth over the same two sentences) must not inflate the daily total.
+    is_new_progress = sentence_current > sentence_furthest_read
+    if is_new_progress:
         book_language = models.Book.objects.get(id=data.book_id).language
         words = services.extract_words(sentence)
         services.record_words_read(user_id, words, book_language)
         services.update_reading_log(user_id, len(words))
+        sentence_furthest_read = sentence_current
 
     models.BookProgress.objects.update_or_create(
-        book_id=data.book_id, user_id=user_id, defaults={"sentence_last_read": sentence_current}
+        book_id=data.book_id,
+        user_id=user_id,
+        defaults={
+            "sentence_last_read": sentence_current,
+            "sentence_furthest_read": sentence_furthest_read,
+        },
     )
 
     todays_log = selectors.get_reading_log(user_id, date.today())
@@ -276,7 +289,7 @@ def mark_unread(request, data: schema.MarkUnreadSchema):
 
     updated = models.BookProgress.objects.filter(
         book_id=data.book_id, user_id=user_id
-    ).update(sentence_last_read=0)
+    ).update(sentence_last_read=0, sentence_furthest_read=0)
 
     if updated:
         return Response({"message": "Book marked as unread"}, status=200)
