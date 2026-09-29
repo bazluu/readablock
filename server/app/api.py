@@ -206,15 +206,13 @@ def read(request, data: schema.BookSchema):
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
 
-    if services.verify_book_access(data.book_id, user_id) is False:
-        return Response({"error": "Access denied"}, status=403)
+    access = services.verify_book_access_and_existence(data.book_id, user_id)
+    if not access:
+        return Response({"error": "Book not found"}, status=404)
 
     # Save book sentences to cache if not already loaded
     if cache.get(f"{user_id}:{data.book_id}") is None:
-        try:
-            all_sentences = services.cache_book_sentences(data.book_id, user_id)
-        except models.Book.DoesNotExist:
-            return Response({"error": "Book not found"}, status=404)
+        all_sentences = services.cache_book_sentences(data.book_id, user_id)
 
     all_sentences = cache.get(f"{user_id}:{data.book_id}")
 
@@ -267,12 +265,8 @@ def mark_unread(request, data: schema.MarkUnreadSchema):
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
 
-    if services.verify_book_access(data.book_id, user_id) is False:
-        return Response({"error": "Access denied"}, status=403)
-
-    try:
-        models.Book.objects.get(id=data.book_id)
-    except models.Book.DoesNotExist:
+    access = services.verify_book_access_and_existence(data.book_id, user_id)
+    if not access:
         return Response({"error": "Book not found"}, status=404)
 
     updated = models.BookProgress.objects.filter(

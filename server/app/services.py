@@ -235,13 +235,16 @@ def update_reading_log(user_id: int, words_read: int, day: date | None = None):
         )
 
 
-def verify_book_access(book_id: int, user_id: int) -> bool:
-    book = models.Book.objects.get(id=book_id)
+def verify_book_access_and_existence(book_id: int, user_id: int) -> bool | None:
+    try:
+        book = models.Book.objects.values("is_public", "uploaded_by_id").get(id=book_id)
+    except models.Book.DoesNotExist:
+        return None
 
-    if book.is_public:
+    if book["is_public"]:
         return True
 
-    if book.uploaded_by_id == user_id:
+    if book["uploaded_by_id"] == user_id:
         return True
 
     return False
