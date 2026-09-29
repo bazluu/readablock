@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { baseURL, selectedBookId, selectedLanguage } from '$lib/state.svelte.js';
+	import { baseURL, selectedBookId, selectedLanguage, wordGoal } from '$lib/state.svelte.js';
 	import { AlertCircle, Book, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
@@ -14,7 +14,6 @@
 	let showLanguageModal = $state(false);
 	let showGoalModal = $state(false);
 	let wordsReadToday = $state(0);
-	let wordGoalToday = $state(0);
 
 	async function fetchBooks() {
 		isLoading = true;
@@ -49,7 +48,7 @@
 			if (logResponse.ok) {
 				const logData = await logResponse.json();
 				wordsReadToday = logData.word_count ?? 0;
-				wordGoalToday = logData.word_goal ?? 0;
+				wordGoal.value = logData.word_goal ?? 0;
 			}
 		} catch (err) {
 			console.error('Error fetching reading log:', err);
@@ -112,7 +111,7 @@
 				<div class="card bg-base-200 border border-base-300 p-4">
 					<WordGoalProgress
 						wordCount={wordsReadToday}
-						wordGoal={wordGoalToday}
+						wordGoal={wordGoal.value ?? 0}
 						onSetGoal={() => (showGoalModal = true)}
 					/>
 				</div>
@@ -228,4 +227,4 @@
 </div>
 
 <LanguageSelector bind:open={showLanguageModal} />
-<WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoalToday = goal)} />
+<WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoal.value = goal)} />

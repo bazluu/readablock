@@ -2,11 +2,11 @@
 	import { baseURL } from '$lib/state.svelte.js';
 	import Modal from './Modal.svelte';
 
-	let { open = $bindable(false), onSetGoal } = $props();
+	let { open = $bindable(false), onSetGoal, currentGoal = null } = $props();
 
 	const goals = [
 		{
-			amount: 140,
+			amount: 280,
 			title: 'A gentle start',
 			subtitle: 'Perfect for easing in — a few minutes a day'
 		},
@@ -28,6 +28,12 @@
 	];
 
 	let selected = $state(550);
+
+	$effect(() => {
+		if (open && currentGoal) {
+			selected = currentGoal;
+		}
+	});
 	let saving = $state(false);
 	let error = $state(null);
 

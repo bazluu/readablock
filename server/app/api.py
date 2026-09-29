@@ -118,6 +118,11 @@ def update_word_goal(request, data: schema.WordGoalSchema):
     meta.daily_word_goal = data.word_goal
     meta.save()
 
+    # Keep today's stats snapshot in sync with the new goal
+    models.ReadingLog.objects.filter(user_id=user.id, date=date.today()).update(
+        word_goal=data.word_goal
+    )
+
     return Response({"message": "Word goal updated", "word_goal": data.word_goal}, status=200)
 
 
@@ -130,7 +135,7 @@ def reading_log_today(request):
 
     log = selectors.get_reading_log(user_id, date.today())
     word_count = log.word_count if log else 0
-    word_goal = services.get_daily_word_goal(user_id) or (log.word_goal if log else 0)
+    word_goal = services.get_daily_word_goal(user_id)
 
     return Response(
         {"word_count": word_count, "word_goal": word_goal},
@@ -252,7 +257,7 @@ def read(request, data: schema.BookSchema):
             "sentence_first": sentence_current,
             "has_previous": sentence_current > 0,
             "words_read_today": todays_log.word_count if todays_log else 0,
-            "word_goal_today": todays_log.word_goal if todays_log else services.get_daily_word_goal(user_id),
+            "word_goal_today": services.get_daily_word_goal(user_id),
         },
         status=200
     )
