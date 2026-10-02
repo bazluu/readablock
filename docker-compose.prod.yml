@@ -13,7 +13,7 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     ports:
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     environment:
       - DEBUG=False
       - SECRET_KEY=${SECRET_KEY}
@@ -45,7 +45,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: readablock_client
     ports:
-      - "127.0.0.1:3001:3000"
+      - "3001:3000"
     networks:
       - dokploy-network
     restart: unless-stopped
