@@ -1,9 +1,9 @@
 services:
-  readablock_server:
+  server:
     build:
       context: ./server
       dockerfile: Dockerfile.prod
-    container_name: server
+    container_name: readablock_server
     command: >
       sh -c "python manage.py migrate --noinput &&
       gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4"
@@ -13,7 +13,7 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       - DEBUG=False
       - SECRET_KEY=${SECRET_KEY}
@@ -39,20 +39,18 @@ services:
       - dokploy-network
     restart: unless-stopped
 
-  readablock_client:
+  client:
     build:
       context: ./client
       dockerfile: Dockerfile.prod
-    container_name: client
+    container_name: readablock_client
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     restart: unless-stopped
 
   redis:
     image: redis:alpine
-    container_name: redis
-    ports:
-      - "6380:6379"
+    container_name: readablock_cache
     volumes:
       - redis_data:/data
     restart: unless-stopped
