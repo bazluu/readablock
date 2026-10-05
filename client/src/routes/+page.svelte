@@ -83,7 +83,7 @@
 				'Progress tracking',
 				'Priority support'
 			],
-			cta: 'Begin Your Journey',
+			cta: 'Start Reading',
 			highlighted: false
 		}
 		// {
@@ -289,10 +289,10 @@
 			</p>
 		</div>
 
-		<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+		<div class="max-w-7xl mx-auto flex flex-wrap justify-center gap-8">
 			{#each pricingPlans as plan, i}
 				<div
-					class="card bg-base-200 border-4 transition-all duration-300 hover:-translate-y-3 animate-fadeInUp {plan.highlighted
+					class="card w-full max-w-md bg-base-200 border-4 transition-all duration-300 hover:-translate-y-3 animate-fadeInUp {plan.highlighted
 						? 'border-primary scale-105'
 						: 'border-base-300'}"
 					style="animation-delay: {i * 0.15}s"
@@ -318,7 +318,10 @@
 								</li>
 							{/each}
 						</ul>
-						<button class="btn {plan.highlighted ? 'btn-primary' : 'btn-outline'} btn-lg w-full">
+						<button
+							onclick={() => goto('/dashboard')}
+							class="btn {plan.highlighted ? 'btn-primary' : 'btn-outline'} btn-lg w-full"
+						>
 							{plan.cta}
 						</button>
 					</div>
