@@ -167,7 +167,7 @@ def dashboard_books(request, language: str):
         "id", "title", "title_en", "author"
     ):
         response["library"].append(
-            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"]}
+            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "is_owner": True}
         )
 
     # Fetch public books from other users
@@ -177,13 +177,13 @@ def dashboard_books(request, language: str):
         .values("id", "title", "title_en", "author")
     ):
         response["library"].append(
-            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"]}
+            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "is_owner": False}
         )
 
     books_in_progress = models.BookProgress.objects.filter(
         user_id=user_id, book__language=language
     ).order_by("-updated_at").values(
-        "book_id", "book__title", "book__title_en", "book__author", "sentence_last_read", "book__sentence_count"
+        "book_id", "book__title", "book__title_en", "book__author", "sentence_last_read", "book__sentence_count", "book__uploaded_by_id"
     )
 
     for book_progress in books_in_progress:
@@ -196,6 +196,7 @@ def dashboard_books(request, language: str):
                     "author": book_progress["book__author"],
                     "sentence_last_read": book_progress["sentence_last_read"],
                     "sentence_count": book_progress["book__sentence_count"],
+                    "is_owner": book_progress["book__uploaded_by_id"] == user_id,
                 }
             )
 
