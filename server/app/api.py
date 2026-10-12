@@ -13,8 +13,6 @@ import magic
 import requests
 from datetime import date
 
-from django.db.models import Sum
-
 from app import schema, services, selectors, models, constants
 from app.constants import DEEPL_TO_GOOGLE
 from core import models as core_models
@@ -184,7 +182,7 @@ def dashboard_books(request, language: str):
 
     books_in_progress = models.BookProgress.objects.filter(
         user_id=user_id, book__language=language
-    ).values(
+    ).order_by("-updated_at").values(
         "book_id", "book__title", "book__title_en", "book__author", "sentence_last_read", "book__sentence_count"
     )
 
@@ -276,7 +274,7 @@ def read(request, data: schema.BookSchema):
     )
 
 
-@api.post("/books/mark-unread/")
+@api.post("/books/mark-unread")
 def mark_unread(request, data: schema.MarkUnreadSchema):
     try:
         user_id = request.session["user_id"]
@@ -287,11 +285,11 @@ def mark_unread(request, data: schema.MarkUnreadSchema):
     if not access:
         return Response({"error": "Book not found"}, status=404)
 
-    updated = models.BookProgress.objects.filter(
+    deleted, _ = models.BookProgress.objects.filter(
         book_id=data.book_id, user_id=user_id
-    ).update(sentence_last_read=0, sentence_furthest_read=0)
+    ).delete()
 
-    if updated:
+    if deleted:
         return Response({"message": "Book marked as unread"}, status=200)
 
     return Response({"error": "Book not in library"}, status=404)
