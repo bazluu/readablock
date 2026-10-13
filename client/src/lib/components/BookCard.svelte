@@ -11,16 +11,22 @@
 	let accent = $derived(
 		{
 			completed: {
-				border: 'hover:border-success',
-				icon: 'text-success'
+				border: 'border-accent',
+				icon: 'text-accent',
+				progress: 'progress-accent',
+				button: 'btn-accent'
 			},
 			'in-progress': {
 				border: 'hover:border-primary',
-				icon: 'text-primary'
+				icon: 'text-primary',
+				progress: 'progress-primary',
+				button: 'btn-primary'
 			},
 			unread: {
 				border: 'hover:border-secondary',
-				icon: 'text-secondary'
+				icon: 'text-secondary',
+				progress: 'progress-primary',
+				button: 'btn-secondary'
 			}
 		}[state]
 	);
@@ -59,7 +65,7 @@
 				{#if state !== 'unread'}
 					<div class="flex flex-row items-center gap-3">
 						<progress
-							class="progress progress-primary flex-1 h-1.5"
+							class="progress {accent.progress} flex-1 h-1.5"
 							value={book.sentence_last_read}
 							max={book.sentence_count || 1}
 						></progress>
@@ -68,7 +74,7 @@
 				{/if}
 				<div class="flex flex-row items-center gap-2">
 		<button
-			class="btn btn-sm flex-1 {state === 'unread' ? 'btn-secondary' : 'btn-primary'}"
+			class="btn btn-sm flex-1 {accent.button}"
 			onclick={() => onopen(book.id)}
 		>
 			<BookOpen class="h-4 w-4" /> Read
