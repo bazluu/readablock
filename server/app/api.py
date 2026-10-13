@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.files.base import ContentFile
+from django.http import FileResponse
 
 from ninja import NinjaAPI, File, Form
 from ninja.files import UploadedFile
@@ -436,6 +437,26 @@ def delete_book(request, book_id: int):
         return Response({"error": "Book not found"}, status=404)
 
     return Response({"message": "Book deleted successfully"}, status=200)
+
+
+@api.get("/books/{book_id}/download")
+def download_book(request, book_id: int):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    # Only the uploader can download their own book.
+    try:
+        book = models.Book.objects.get(id=book_id, uploaded_by_id=user_id)
+    except models.Book.DoesNotExist:
+        return Response({"error": "Book not found"}, status=404)
+
+    return FileResponse(
+        book.file.open("rb"),
+        as_attachment=True,
+        filename=f"{book.title}.{book.file_type}",
+    )
 
 
 @api.post("/feedback/")

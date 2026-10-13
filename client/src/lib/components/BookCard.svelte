@@ -1,7 +1,7 @@
 <script>
 	import { Book, BookCheck, BookOpen, MoreVertical } from 'lucide-svelte';
 
-	let { book, onopen, onunread } = $props();
+	let { book, onopen, onunread, ondownload } = $props();
 
 	let percent = $derived(
 		book.sentence_count ? Math.round((book.sentence_last_read / book.sentence_count) * 100) : 0
@@ -90,8 +90,8 @@
 						Mark as unread
 					</button>
 				</li>
-				<li><button class="w-full bg-transparent border-0 text-left cursor-pointer hover:bg-base-300">Download</button></li>
 				{#if book.is_owner}
+					<li><button class="w-full bg-transparent border-0 text-left cursor-pointer hover:bg-base-300" onclick={() => ondownload?.(book.id)}>Download</button></li>
 					<li>
 						<button class="w-full bg-transparent border-0 text-left cursor-pointer text-error hover:bg-base-300">
 							Delete

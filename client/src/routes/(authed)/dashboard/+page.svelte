@@ -33,6 +33,16 @@
 		}
 	}
 
+	function downloadBook(bookId) {
+		// Navigate to the endpoint so the browser follows the server's
+		// Content-Disposition header and uses the original filename.
+		const link = document.createElement('a');
+		link.href = `${baseURL}/app/books/${bookId}/download`;
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+	}
+
 	async function fetchBooks() {
 		isLoading = true;
 		error = null;
@@ -145,7 +155,7 @@
 					</div>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 						{#each continueReading as book (book.id)}
-							<BookCard {book} onopen={openBook} onunread={markUnread} />
+							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} />
 						{/each}
 					</div>
 				</section>
@@ -163,7 +173,7 @@
 					</div>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 						{#each library as book (book.id)}
-							<BookCard {book} onopen={openBook} onunread={markUnread} />
+							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} />
 						{/each}
 					</div>
 				</section>
