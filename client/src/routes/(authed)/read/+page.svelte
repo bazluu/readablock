@@ -37,7 +37,7 @@
 	// Translation state
 	let translating = false;
 	let targetLang = 'EN-GB';
-	let sourceLang = 'IT';
+	let sourceLang = null;
 
 	// TTS state
 	let speaking = false;
@@ -113,6 +113,7 @@
 			}
 			const data = await response.json();
 			sentence = data.sentence;
+			sourceLang = data.language;
 			sentenceCount = data.sentence_count;
 			sentenceFirst = data.sentence_first;
 			hasPrevious = data.has_previous;

@@ -231,6 +231,8 @@ def read(request, data: schema.BookSchema):
     if not access:
         return Response({"error": "Book not found"}, status=404)
 
+    book_language = models.Book.objects.get(id=data.book_id).language
+
     # Save book sentences to cache if not already loaded
     if cache.get(f"{user_id}:{data.book_id}") is None:
         all_sentences = services.cache_book_sentences(data.book_id, user_id)
@@ -263,7 +265,6 @@ def read(request, data: schema.BookSchema):
     # back and forth over the same two sentences) must not inflate the daily total.
     is_new_progress = sentence_current > sentence_furthest_read
     if is_new_progress:
-        book_language = models.Book.objects.get(id=data.book_id).language
         words = services.extract_words(sentence)
         services.record_words_read(user_id, words, book_language)
         services.update_reading_log(user_id, len(words))
@@ -290,6 +291,7 @@ def read(request, data: schema.BookSchema):
     return Response(
         {
             "sentence": sentence,
+            "language": book_language,
             "sentence_count": len(all_sentences),
             "sentence_last_read": sentence_current,
             "sentence_first": sentence_current,
