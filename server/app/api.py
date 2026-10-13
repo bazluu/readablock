@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import F
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.http import FileResponse
@@ -163,27 +164,42 @@ def dashboard_books(request, language: str):
 
     response = {"continue_reading": [], "library": []}
 
+    # Per-user reading progress keyed by book id, used to show read status on
+    # library cards.
+    progress_map = {
+        progress["book_id"]: progress["sentence_last_read"]
+        for progress in models.BookProgress.objects.filter(user_id=user_id).values(
+            "book_id", "sentence_last_read"
+        )
+    }
+
     # Fetch user's own books
     for book in models.Book.objects.filter(uploaded_by_id=user_id, language=language).values(
-        "id", "title", "title_en", "author"
+        "id", "title", "title_en", "author", "sentence_count"
     ):
         response["library"].append(
-            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "is_owner": True}
+            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": True}
         )
 
     # Fetch public books from other users
     for book in (
         models.Book.objects.filter(is_public=True, language=language)
         .exclude(uploaded_by_id=user_id)
-        .values("id", "title", "title_en", "author")
+        .values("id", "title", "title_en", "author", "sentence_count")
     ):
         response["library"].append(
-            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "is_owner": False}
+            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": False}
         )
 
+    # Display library books alphabetically regardless of read state, using the
+    # title the card shows (title_en falls back to title).
+    response["library"].sort(key=lambda book: (book["title_en"] or book["title"]).lower())
+
+    # Fully read books stay in the library and must not show up as
+    # continue reading.
     books_in_progress = models.BookProgress.objects.filter(
         user_id=user_id, book__language=language
-    ).order_by("-updated_at").values(
+    ).exclude(sentence_last_read__gte=F("book__sentence_count")).order_by("-updated_at").values(
         "book_id", "book__title", "book__title_en", "book__author", "sentence_last_read", "book__sentence_count", "book__uploaded_by_id"
     )
 
@@ -230,7 +246,9 @@ def read(request, data: schema.BookSchema):
     if data.page_turn == "next":
         sentence_current = sentence_last_read + 1
     elif data.page_turn == "previous":
-        sentence_current = max(0, sentence_last_read - 1)
+        # A fully read book stores sentence_last_read == sentence_count, one past
+        # the last index; treat it as standing on the last sentence.
+        sentence_current = max(0, min(sentence_last_read, len(all_sentences) - 1) - 1)
     else:
         sentence_current = sentence_last_read
 
@@ -251,11 +269,18 @@ def read(request, data: schema.BookSchema):
         services.update_reading_log(user_id, len(words))
         sentence_furthest_read = sentence_current
 
+    # Reaching the last sentence marks the book as fully read: progress is saved
+    # as sentence_count so completed books show 100% instead of stopping at 99%.
+    sentence_progress = sentence_current
+    if sentence_current == len(all_sentences) - 1:
+        sentence_progress = len(all_sentences)
+        sentence_furthest_read = max(sentence_furthest_read, sentence_progress)
+
     models.BookProgress.objects.update_or_create(
         book_id=data.book_id,
         user_id=user_id,
         defaults={
-            "sentence_last_read": sentence_current,
+            "sentence_last_read": sentence_progress,
             "sentence_furthest_read": sentence_furthest_read,
         },
     )
