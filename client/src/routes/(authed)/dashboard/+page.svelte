@@ -6,6 +6,8 @@
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 	import WordGoalProgress from '$lib/components/WordGoalProgress.svelte';
 	import WordGoalModal from '$lib/components/WordGoalModal.svelte';
+	import BookCard from '$lib/components/BookCard.svelte';
+	import DeleteBookModal from '$lib/components/DeleteBookModal.svelte';
 
 	let continueReading = $state([]);
 	let library = $state([]);
@@ -13,7 +15,41 @@
 	let error = $state(null);
 	let showLanguageModal = $state(false);
 	let showGoalModal = $state(false);
+	let showDeleteModal = $state(false);
+	let bookToDelete = $state(null);
 	let wordsReadToday = $state(0);
+
+	function requestDelete(book) {
+		bookToDelete = book;
+		showDeleteModal = true;
+	}
+
+	async function markUnread(bookId) {
+		try {
+			const response = await fetch(`${baseURL}/app/books/mark-unread`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ book_id: bookId })
+			});
+			if (!response.ok) {
+				throw new Error('Failed to mark book as unread');
+			}
+			await fetchBooks();
+		} catch (err) {
+			console.error('Error marking book as unread:', err);
+		}
+	}
+
+	function downloadBook(bookId) {
+		// Navigate to the endpoint so the browser follows the server's
+		// Content-Disposition header and uses the original filename.
+		const link = document.createElement('a');
+		link.href = `${baseURL}/app/books/${bookId}/download`;
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+	}
 
 	async function fetchBooks() {
 		isLoading = true;
@@ -125,53 +161,9 @@
 						<h2 class="text-xl font-bold text-base-content">Continue Reading</h2>
 						<div class="badge badge-primary badge-soft">{continueReading.length}</div>
 					</div>
-					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-						{#each continueReading as book}
-							<button
-								onclick={() => openBook(book.id)}
-								class="card w-full h-full bg-base-200 border border-base-300 hover:border-primary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
-							>
-								<div class="flex flex-1 flex-col gap-4">
-									<div
-										class="aspect-[3/4] w-full bg-base-300 rounded-lg flex items-center justify-center"
-									>
-										<BookOpen class="h-12 w-12 text-primary" />
-									</div>
-									<div class="flex flex-col gap-3">
-										<div class="flex flex-row items-center gap-3">
-											<progress
-												class="progress progress-primary flex-1 h-1.5"
-												value={book.sentence_last_read}
-												max={book.sentence_count || 1}
-											></progress>
-											<span class="text-xs font-bold text-primary">
-												{book.sentence_count
-													? Math.round((book.sentence_last_read / book.sentence_count) * 100)
-													: 0}%
-											</span>
-										</div>
-										<div class="flex flex-col gap-1">
-											<p class="font-bold text-base leading-tight line-clamp-2">
-												{book.title_en || book.title}
-											</p>
-											{#if book.title_en && book.title}
-												<p
-													class="-mt-0.5 font-serif text-sm text-base-content/60 leading-tight line-clamp-2"
-												>
-													{book.title}
-												</p>
-											{/if}
-										</div>
-										<div class="-mb-1 mt-auto border-t border-base-300">
-											<p
-												class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1"
-											>
-												{book.author}
-											</p>
-										</div>
-									</div>
-								</div>
-							</button>
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+						{#each continueReading as book (book.id)}
+							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} ondelete={requestDelete} />
 						{/each}
 					</div>
 				</section>
@@ -187,37 +179,9 @@
 						<h2 class="text-xl font-bold text-base-content">Your Library</h2>
 						<div class="badge badge-secondary badge-soft">{library.length}</div>
 					</div>
-					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-						{#each library as book}
-							<button
-								onclick={() => openBook(book.id)}
-								class="card w-full h-full bg-base-200 border border-base-300 hover:border-secondary hover:shadow-lg transition-all duration-200 cursor-pointer text-left p-4"
-							>
-								<div class="flex flex-1 flex-col gap-4">
-									<div
-										class="aspect-[3/4] w-full bg-base-300 rounded-lg flex items-center justify-center"
-									>
-										<Book class="h-12 w-12 text-secondary" />
-									</div>
-									<div class="flex flex-col gap-1">
-										<p class="font-bold text-base leading-tight line-clamp-2">
-											{book.title_en || book.title}
-										</p>
-										{#if book.title_en && book.title}
-											<p
-												class="-mt-0.5 font-serif text-sm text-base-content/60 leading-tight line-clamp-2"
-											>
-												{book.title}
-											</p>
-										{/if}
-									</div>
-									<div class="-mb-1 mt-auto border-t border-base-300">
-										<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
-											{book.author}
-										</p>
-									</div>
-								</div>
-							</button>
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+						{#each library as book (book.id)}
+							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} ondelete={requestDelete} />
 						{/each}
 					</div>
 				</section>
@@ -228,3 +192,4 @@
 
 <LanguageSelector bind:open={showLanguageModal} />
 <WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoal.value = goal)} />
+<DeleteBookModal bind:open={showDeleteModal} book={bookToDelete} onDeleted={fetchBooks} />

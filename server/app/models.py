@@ -46,6 +46,9 @@ class BookProgress(models.Model):
     sentence_last_read = models.IntegerField(default=0)
     sentence_furthest_read = models.IntegerField(default=0)
 
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class Word(models.Model):
     """

@@ -27,20 +27,18 @@
 		{/if}
 	{:else}
 		<div class="flex-1 flex flex-col gap-1">
-			<div class="flex items-center gap-3">
-				<progress
-					class="progress h-1.5 flex-1 {exceeded ? 'progress-success' : 'progress-primary'}"
-					value={clamped}
-					max={wordGoal}
-				></progress>
+			<progress
+				class="progress h-1.5 {exceeded ? 'progress-success' : 'progress-primary'}"
+				value={clamped}
+				max={wordGoal}
+			></progress>
+			<span class="text-xs {exceeded ? 'text-success' : 'text-base-content/60'}">
+				{wordCount.toLocaleString()} / {wordGoal.toLocaleString()} words ({percent}%)
 				{#if exceeded}
-					<span class="badge badge-success badge-soft whitespace-nowrap">
+					<span class="badge badge-success badge-soft badge-sm whitespace-nowrap">
 						+{overBy.toLocaleString()} over goal
 					</span>
 				{/if}
-			</div>
-			<span class="text-xs {exceeded ? 'text-success' : 'text-base-content/60'}">
-				{wordCount.toLocaleString()} / {wordGoal.toLocaleString()} words ({percent}%)
 			</span>
 		</div>
 	{/if}

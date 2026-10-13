@@ -37,7 +37,7 @@
 	// Translation state
 	let translating = false;
 	let targetLang = 'EN-GB';
-	let sourceLang = 'IT';
+	let sourceLang = null;
 
 	// TTS state
 	let speaking = false;
@@ -113,6 +113,7 @@
 			}
 			const data = await response.json();
 			sentence = data.sentence;
+			sourceLang = data.language;
 			sentenceCount = data.sentence_count;
 			sentenceFirst = data.sentence_first;
 			hasPrevious = data.has_previous;
@@ -330,7 +331,7 @@
 <svelte:window
 	on:keydown={(e) => {
 		if (e.key === 'Escape') closeWordDropdown();
-		if (e.key === 'ArrowRight' && !isLoading) handleNextPage();
+		if (e.key === 'ArrowRight' && !isLoading && sentenceFirst + 1 < sentenceCount) handleNextPage();
 		if (e.key === 'ArrowLeft' && !isLoading && hasPrevious) handlePreviousPage();
 	}}
 />
@@ -466,10 +467,17 @@
 							<span>Sentence {sentenceFirst + 1}</span>
 							<span class="text-xs opacity-70">{sentenceFirst + 1}/{sentenceCount}</span>
 						</span>
-						<button class="join-item btn btn-lg" on:click={handleNextPage} disabled={isLoading}>
-							<p class="ml-2">NEXT</p>
-							<ChevronRight />
-						</button>
+						{#if sentenceFirst + 1 >= sentenceCount}
+							<button class="join-item btn btn-lg" on:click={() => goto('/dashboard')}>
+								<p class="ml-2">EXIT</p>
+								<X />
+							</button>
+						{:else}
+							<button class="join-item btn btn-lg" on:click={handleNextPage} disabled={isLoading}>
+								<p class="ml-2">NEXT</p>
+								<ChevronRight />
+							</button>
+						{/if}
 					</div>
 				</div>
 			</div>
