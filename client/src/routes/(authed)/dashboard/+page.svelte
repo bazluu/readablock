@@ -7,6 +7,7 @@
 	import WordGoalProgress from '$lib/components/WordGoalProgress.svelte';
 	import WordGoalModal from '$lib/components/WordGoalModal.svelte';
 	import BookCard from '$lib/components/BookCard.svelte';
+	import DeleteBookModal from '$lib/components/DeleteBookModal.svelte';
 
 	let continueReading = $state([]);
 	let library = $state([]);
@@ -14,7 +15,14 @@
 	let error = $state(null);
 	let showLanguageModal = $state(false);
 	let showGoalModal = $state(false);
+	let showDeleteModal = $state(false);
+	let bookToDelete = $state(null);
 	let wordsReadToday = $state(0);
+
+	function requestDelete(book) {
+		bookToDelete = book;
+		showDeleteModal = true;
+	}
 
 	async function markUnread(bookId) {
 		try {
@@ -155,7 +163,7 @@
 					</div>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 						{#each continueReading as book (book.id)}
-							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} />
+							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} ondelete={requestDelete} />
 						{/each}
 					</div>
 				</section>
@@ -173,7 +181,7 @@
 					</div>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 						{#each library as book (book.id)}
-							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} />
+							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} ondelete={requestDelete} />
 						{/each}
 					</div>
 				</section>
@@ -184,3 +192,4 @@
 
 <LanguageSelector bind:open={showLanguageModal} />
 <WordGoalModal bind:open={showGoalModal} onSetGoal={(goal) => (wordGoal.value = goal)} />
+<DeleteBookModal bind:open={showDeleteModal} book={bookToDelete} onDeleted={fetchBooks} />

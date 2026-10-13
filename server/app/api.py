@@ -424,17 +424,20 @@ def upload_book_content(request, data: schema.BookUploadContentSchema):
 @api.delete("/books/{book_id}")
 def delete_book(request, book_id: int):
     try:
-        user = User.objects.get(id=request.session["user_id"])
-    except (KeyError, User.DoesNotExist):
+        user_id = request.session["user_id"]
+    except KeyError:
         return Response({"error": "Authentication required"}, status=401)
 
-    if not user.is_superuser:
-        return Response({"error": "Access denied"}, status=403)
-
     try:
-        services.delete_book_by_id(book_id)
+        book = models.Book.objects.get(id=book_id)
     except models.Book.DoesNotExist:
         return Response({"error": "Book not found"}, status=404)
+
+    # Only the owner can delete their own book.
+    if book.uploaded_by_id != user_id:
+        return Response({"error": "Access denied"}, status=403)
+
+    services.delete_book_by_id(book_id)
 
     return Response({"message": "Book deleted successfully"}, status=200)
 
@@ -455,7 +458,7 @@ def download_book(request, book_id: int):
     return FileResponse(
         book.file.open("rb"),
         as_attachment=True,
-        filename=f"{book.title}.{book.file_type}",
+        filename=f"{book.title}.{book.file_type}"
     )
 
 
