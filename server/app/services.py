@@ -13,7 +13,7 @@ from django.db.models import F
 
 from ebooklib import epub, ITEM_DOCUMENT
 from bs4 import BeautifulSoup
-from textblob import TextBlob
+import nltk
 import deepl
 import requests
 
@@ -57,20 +57,11 @@ def convert_email_to_username(email: str, length: int = 6) -> str:
 
 
 def get_total_sentence_count(text: str) -> int:
-    blob = TextBlob(text)
-    total = len(blob.sentences)
-
-    return total
+    return len(nltk.sent_tokenize(text))
 
 
 def convert_text_to_sentences(text: str) -> tuple[str]:
-    blob = TextBlob(text)
-
-    sentences = []
-    for sentence in blob.sentences:
-        sentences.append(str(sentence))
-
-    return tuple(sentences)
+    return tuple(nltk.sent_tokenize(text))
 
 
 def remove_html(text: str):
@@ -156,8 +147,11 @@ def cache_book_sentences(book_id: int, user_id: int, cache_timeout: int = 1800) 
     return text
 
 
+_word_tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
+
+
 def extract_words(sentence: str) -> list[str]:
-    return [word.lower() for word in TextBlob(sentence).words]
+    return [word.lower() for word in _word_tokenizer.tokenize(sentence)]
 
 
 def record_words_read(user_id: int, words: list[str], language: str, day: date | None = None):

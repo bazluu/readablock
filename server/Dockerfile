@@ -7,7 +7,7 @@ COPY requirements.txt .
 RUN apk add --no-cache build-base \
   file \
     && pip install --no-cache-dir -r requirements.txt \
-  && python -m textblob.download_corpora \
+  && python -m nltk.downloader punkt punkt_tab \
   && apk del build-base
 
 COPY . .
