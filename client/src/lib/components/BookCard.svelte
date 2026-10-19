@@ -60,6 +60,9 @@
 				<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
 					{book.author}
 				</p>
+				<div class="badge badge-sm badge-neutral mt-1 self-start">
+					{book.sentence_count} sentences
+				</div>
 			</div>
 			<div class="flex flex-col gap-2 mt-auto pt-3 border-t border-base-300">
 				{#if state !== 'unread'}
