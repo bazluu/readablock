@@ -6,7 +6,7 @@ COPY requirements.txt .
 
 RUN apk add --no-cache build-base cmake openssl-dev postgresql-dev libpq file \
   && pip install --no-cache-dir -r requirements.txt psycopg2==2.9.10 gunicorn \
-  && python -m textblob.download_corpora \
+  && python -m nltk.downloader punkt punkt_tab \
   && apk del build-base cmake openssl-dev postgresql-dev
 
 COPY . .
