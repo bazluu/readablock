@@ -36,8 +36,8 @@
 		};
 	}
 
-	function selectLanguage(deepl) {
-		selectedLanguage.value = deepl;
+	function selectLanguage(code) {
+		selectedLanguage.value = code;
 		langDropdownOpen = false;
 	}
 
@@ -73,7 +73,7 @@
 
 	function currentLanguageName() {
 		if (!selectedLanguage.value) return 'Language';
-		const lang = languages.find((l) => l.deepl === selectedLanguage.value);
+		const lang = languages.find((l) => l.code === selectedLanguage.value);
 		return lang ? lang.name : 'Language';
 	}
 </script>
@@ -105,10 +105,10 @@
 				>
 					{#each languages as lang}
 						<button
-							class="w-full text-left px-4 py-2 btn {selectedLanguage.value === lang.deepl
+							class="w-full text-left px-4 py-2 btn {selectedLanguage.value === lang.code
 								? 'btn-neutral'
 								: ''}"
-							onclick={() => selectLanguage(lang.deepl)}
+							onclick={() => selectLanguage(lang.code)}
 						>
 							{lang.name}
 						</button>

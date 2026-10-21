@@ -22,7 +22,7 @@ import sentry_sdk
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
+GOOGLE_TRANSLATE_API_KEY = os.getenv("GOOGLE_TRANSLATE_API_KEY")
 GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY")
 
 # SECURITY WARNING: keep the secret key used in production secret!
