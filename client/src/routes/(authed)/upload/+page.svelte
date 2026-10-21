@@ -291,8 +291,8 @@
 							disabled={isLoading}
 						>
 							{#each languages as lang}
-								<option value={lang.deepl}>
-									{lang.name} ({lang.deepl})
+								<option value={lang.code}>
+									{lang.name} ({lang.code})
 								</option>
 							{/each}
 						</select>

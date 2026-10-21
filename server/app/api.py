@@ -8,7 +8,6 @@ from django.http import FileResponse
 from ninja import NinjaAPI, File, Form
 from ninja.files import UploadedFile
 from ninja.responses import Response
-import deepl
 import secrets
 import os
 import magic
@@ -16,7 +15,7 @@ import requests
 from datetime import date
 
 from app import schema, services, selectors, models, constants
-from app.constants import DEEPL_TO_GOOGLE
+from app.constants import CODE_TO_GOOGLE_TTS
 from core import models as core_models
 
 api = NinjaAPI()
@@ -329,10 +328,16 @@ def translate(request, data: schema.TranslationSchema):
     try:
         translated = services.translate(data.text, data.source, data.target, data.context)
 
-        return Response({"translated": translated.text}, status=200)
+        return Response({"translated": translated}, status=200)
 
-    except deepl.DeepLException as error:
-        return Response({"error": f"DeepL API error: {str(error)}"}, status=400)
+    except requests.HTTPError as error:
+        return Response({"error": f"Google Translate API error: {str(error)}"}, status=400)
+
+    except requests.RequestException as error:
+        # Connection-level failure (DNS, timeout, TLS). Raw messages can embed
+        # request details, so log them server-side and return a generic error.
+        print(f"Google Translate request failed: {error}")
+        return Response({"error": "Translation service unavailable"}, status=502)
 
     except Exception as error:
         return Response({"error": f"Translation error: {str(error)}"}, status=500)
@@ -511,7 +516,7 @@ def create_feedback(request, data: schema.FeedbackSchema):
 
 @api.post("/tts/")
 def tts(request, data: schema.TTSSchema):
-    language_code = DEEPL_TO_GOOGLE.get(data.language.upper())
+    language_code = CODE_TO_GOOGLE_TTS.get(data.language.upper())
 
     if language_code is None:
         return Response({"error": f"TTS not supported for language: {data.language}"}, status=400)

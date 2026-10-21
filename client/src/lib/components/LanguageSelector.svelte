@@ -16,8 +16,8 @@
 		}
 	});
 
-	function selectLanguage(deepl) {
-		selectedLanguage.value = deepl;
+	function selectLanguage(code) {
+		selectedLanguage.value = code;
 		open = false;
 	}
 </script>
@@ -27,7 +27,7 @@
 		{#each languages as lang}
 			<div
 				class="list-row cursor-pointer hover:bg-base-300"
-				onclick={() => selectLanguage(lang.deepl)}
+				onclick={() => selectLanguage(lang.code)}
 			>
 				<span class="">{lang.name}</span>
 			</div>

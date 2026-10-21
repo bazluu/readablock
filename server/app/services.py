@@ -14,7 +14,6 @@ from django.db.models import F
 from ebooklib import epub, ITEM_DOCUMENT
 from bs4 import BeautifulSoup
 import nltk
-import deepl
 import requests
 
 from app import models
@@ -36,9 +35,9 @@ def get_daily_word_goal(user_id: int) -> int:
 
 
 def get_supported_languages():
-    supported = [{"name": "Latin", "deepl": "LA", "google_tts": None, "marc": "lat"}]
+    supported = [{"name": "Latin", "code": "LA", "google_tts": None, "marc": "lat"}]
     for lang in LANGUAGES:
-        if lang["deepl"] and lang["google_tts"]:
+        if lang["code"] and lang["google_tts"]:
             supported.append(lang)
 
     return supported
@@ -88,25 +87,67 @@ def convert_epub_to_str(file):
     return full_text
 
 
+# Google Translate uses slightly different codes than the app's language codes
+GOOGLE_TRANSLATE_CODES = {
+    "ZH": "zh-CN",
+    "ZH-HANS": "zh-CN",
+    "ZH-HANT": "zh-TW",
+    "EN-GB": "en",
+    "PT-BR": "pt",
+    "PT-PT": "pt",
+    "NB": "no",
+    "HE": "iw",
+}
+
+
+def to_google_translate_code(code: str | None) -> str | None:
+    if not code:
+        return None
+
+    return GOOGLE_TRANSLATE_CODES.get(code.upper(), code.lower())
+
+
 def translate(text: str, source: str | None, target: str, context: str | None):
     """
-    Translation using DeepL API
+    Translation using Google Cloud Translation API
 
     Parameters:
     - text: The text to translate
     - source: Source language code (optional, auto-detect if not provided)
     - target: Target language code (default: EN-GB)
-    - context: Text related to the word to be translated, in the same language (optional)
+    - context: Text related to the word to be translated, in the same language
+      (optional, ignored by Google Translate)
 
-    Returns translated text with language information
+    Returns translated text
     """
-    translator = deepl.Translator(settings.DEEPL_API_KEY)
+    if not settings.GOOGLE_TRANSLATE_API_KEY:
+        raise ValueError("Translation not configured")
 
-    translated = translator.translate_text(
-        text, source_lang=source, target_lang=target, context=context
+    payload = {
+        "q": text,
+        "target": to_google_translate_code(target),
+        "format": "text",
+    }
+
+    if source:
+        payload["source"] = to_google_translate_code(source)
+
+    response = requests.post(
+        "https://translation.googleapis.com/language/translate/v2",
+        json=payload,
+        # The key goes in a header, not the URL: query strings show up in
+        # proxy/access logs and in connection-error exception messages.
+        headers={"X-goog-api-key": settings.GOOGLE_TRANSLATE_API_KEY},
+        timeout=10,
     )
 
-    return translated
+    if response.status_code != 200:
+        error_detail = response.json().get("error", {}).get("message", response.reason)
+        # Log the full error server-side; do not leak the API key (present in the URL) to clients.
+        print(f"Google Translate error ({response.status_code}): {error_detail}")
+        raise requests.HTTPError(f"Google Translate error ({response.status_code}): {error_detail}")
+
+    return response.json()["data"]["translations"][0]["translatedText"]
 
 
 def get_book_upload_path(instance, filename):
@@ -262,7 +303,8 @@ def text_to_speech(text, language_code, speed=0.9, tier="Standard", variant="A")
     }
 
     response = requests.post(
-        f"https://texttospeech.googleapis.com/v1/text:synthesize?key={settings.GOOGLE_TTS_API_KEY}",
+        "https://texttospeech.googleapis.com/v1/text:synthesize",
+        headers={"X-goog-api-key": settings.GOOGLE_TTS_API_KEY},
         json=payload,
         timeout=10,
     )
