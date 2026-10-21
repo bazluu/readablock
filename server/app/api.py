@@ -333,6 +333,12 @@ def translate(request, data: schema.TranslationSchema):
     except requests.HTTPError as error:
         return Response({"error": f"Google Translate API error: {str(error)}"}, status=400)
 
+    except requests.RequestException as error:
+        # Connection-level failure (DNS, timeout, TLS). Raw messages can embed
+        # request details, so log them server-side and return a generic error.
+        print(f"Google Translate request failed: {error}")
+        return Response({"error": "Translation service unavailable"}, status=502)
+
     except Exception as error:
         return Response({"error": f"Translation error: {str(error)}"}, status=500)
 

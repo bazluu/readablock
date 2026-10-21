@@ -134,8 +134,10 @@ def translate(text: str, source: str | None, target: str, context: str | None):
 
     response = requests.post(
         "https://translation.googleapis.com/language/translate/v2",
-        params={"key": settings.GOOGLE_TRANSLATE_API_KEY},
         json=payload,
+        # The key goes in a header, not the URL: query strings show up in
+        # proxy/access logs and in connection-error exception messages.
+        headers={"X-goog-api-key": settings.GOOGLE_TRANSLATE_API_KEY},
         timeout=10,
     )
 
@@ -301,7 +303,8 @@ def text_to_speech(text, language_code, speed=0.9, tier="Standard", variant="A")
     }
 
     response = requests.post(
-        f"https://texttospeech.googleapis.com/v1/text:synthesize?key={settings.GOOGLE_TTS_API_KEY}",
+        "https://texttospeech.googleapis.com/v1/text:synthesize",
+        headers={"X-goog-api-key": settings.GOOGLE_TTS_API_KEY},
         json=payload,
         timeout=10,
     )
