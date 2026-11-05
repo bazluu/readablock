@@ -49,18 +49,18 @@
 		</div>
 		<div class="flex flex-col gap-3 min-w-0 flex-1">
 			<div class="flex flex-col gap-1">
-				<p class="font-bold text-base leading-tight line-clamp-2">
+				<p class="font-bold text-lg leading-tight line-clamp-2">
 					{book.title_en || book.title}
 				</p>
 				{#if book.title_en && book.title}
-					<p class="-mt-0.5 font-serif text-sm text-base-content/60 leading-tight line-clamp-2">
+					<p class="-mt-0.5 font-serif text-base text-base-content/60 leading-tight line-clamp-2">
 						{book.title}
 					</p>
 				{/if}
-				<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
+				<p class="text-base font-medium text-base-content/50 leading-tight line-clamp-1">
 					{book.author}
 				</p>
-				<div class="badge badge-sm badge-neutral mt-1 self-start">
+				<div class="badge badge-neutral mt-1 self-start">
 					{book.sentence_count} sentences
 				</div>
 			</div>
@@ -75,7 +75,7 @@
 							value={book.sentence_last_read}
 							max={book.sentence_count || 1}
 						></progress>
-						<span class="text-xs font-bold {accent.icon}">{percent}%</span>
+						<span class="text-sm font-bold {accent.icon}">{percent}%</span>
 					</div>
 				{/if}
 				<div class="flex flex-row items-center gap-2">
