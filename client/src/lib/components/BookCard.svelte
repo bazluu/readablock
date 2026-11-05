@@ -11,7 +11,7 @@
 	let accent = $derived(
 		{
 			completed: {
-				border: 'border-accent',
+				border: 'hover:border-accent',
 				icon: 'text-accent',
 				progress: 'progress-accent',
 				button: 'btn-accent'
@@ -37,7 +37,7 @@
 >
 	<div class="flex flex-1 flex-row gap-4">
 		<div
-			class="relative w-1/2 shrink-0 self-stretch bg-base-300 rounded-lg flex items-center justify-center overflow-hidden"
+			class="relative w-auto self-stretch shrink-0 bg-base-300 rounded-lg flex items-center justify-center overflow-hidden aspect-[2/3]"
 		>
 			{#if state === 'completed'}
 				<BookCheck class="h-12 w-12 {accent.icon}" />
