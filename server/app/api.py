@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db.models import F
+from django.db.models import F, Q
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.http import FileResponse
@@ -152,6 +152,75 @@ def supported_languages(request):
     languages = services.get_supported_languages()
 
     return Response({"languages": languages}, status=200)
+
+
+@api.get("/library")
+def library(request, sort: str = "alphabetical", language: str | None = None):
+    # Alphabetical is A to Z or Z to A by displayed title (title_en falls back
+    # to title); author is A to Z or Z to A by author name (books without an
+    # author sort first); date_added is oldest first or newest first by upload
+    # timestamp.
+    SORT_KEYS = {
+        "alphabetical_asc": (lambda book: (book["title_en"] or book["title"]).lower(), False),
+        "alphabetical_desc": (lambda book: (book["title_en"] or book["title"]).lower(), True),
+        "author_asc": (lambda book: (book["author"] or "").lower(), False),
+        "author_desc": (lambda book: (book["author"] or "").lower(), True),
+        "date_added_asc": (lambda book: book["uploaded_at"], False),
+        "date_added_desc": (lambda book: book["uploaded_at"], True),
+    }
+
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    if sort not in SORT_KEYS:
+        return Response(
+            {"error": f"Invalid sort. Allowed values: {sorted(SORT_KEYS)}"},
+            status=400,
+        )
+
+    # Omitting the language returns every book the user can read; providing
+    # one narrows the library to a single language.
+    if language is not None and language not in constants.SUPPORTED_LANGUAGES:
+        return Response(
+            {
+                "error": f"Invalid language. Supported languages: {', '.join(constants.SUPPORTED_LANGUAGES)}"
+            },
+            status=400,
+        )
+
+    response = {"library": []}
+
+    # Per-user reading progress keyed by book id, used to show read status on
+    # library cards.
+    progress_map = {
+        progress["book_id"]: progress["sentence_last_read"]
+        for progress in models.BookProgress.objects.filter(user_id=user_id).values(
+            "book_id", "sentence_last_read"
+        )
+    }
+
+    # Books the user has access to: their own uploads plus every public book.
+    access_filter = Q(uploaded_by_id=user_id) | Q(is_public=True)
+    if language is not None:
+        access_filter &= Q(language=language)
+
+    readable_books = models.Book.objects.filter(access_filter).values(
+        "id", "title", "title_en", "author", "language", "sentence_count", "uploaded_at", "uploaded_by_id"
+    )
+
+    for book in readable_books:
+        response["library"].append(
+            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "language": book["language"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": book["uploaded_by_id"] == user_id, "uploaded_at": str(book["uploaded_at"])}
+        )
+
+    # Each sort option carries its key function and whether the list is
+    # reversed, so one sort call covers every option.
+    key, reverse = SORT_KEYS[sort]
+    response["library"].sort(key=key, reverse=reverse)
+
+    return Response(response, status=200)
 
 
 @api.get("/dashboard/books")

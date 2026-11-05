@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { baseURL, selectedLanguage, wordGoal } from '$lib/state.svelte.js';
-	import { Library, Upload, Languages, MessageSquare, LogOut, Goal, User } from 'lucide-svelte';
+	import { ChevronDown, LayoutDashboard, Library, Upload, Languages, MessageSquare, LogOut, Goal, User } from 'lucide-svelte';
 	import WordGoalModal from '$lib/components/WordGoalModal.svelte';
 
 	let languages = $state([]);
@@ -98,6 +98,7 @@
 				<Languages class="h-4 w-4 sm:h-5 sm:w-5" />
 				<span class="sm:hidden">{selectedLanguage.value || 'Lang'}</span>
 				<span class="hidden sm:inline">{currentLanguageName()}</span>
+				<ChevronDown class="h-4 w-4 opacity-60" />
 			</button>
 			{#if langDropdownOpen}
 				<div
@@ -127,8 +128,18 @@
 					? 'btn-neutral'
 					: ''}"
 			>
-				<Library class="h-4 w-4 sm:h-5 sm:w-5" />
+				<LayoutDashboard class="h-4 w-4 sm:h-5 sm:w-5" />
 				<span class="hidden sm:inline">Dashboard</span>
+			</button>
+			<button
+				onclick={() => goto('/library')}
+				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+					.url.pathname === '/library'
+					? 'btn-neutral'
+					: ''}"
+			>
+				<Library class="h-4 w-4 sm:h-5 sm:w-5" />
+				<span class="hidden sm:inline">Library</span>
 			</button>
 			<button
 				onclick={() => goto('/upload')}
