@@ -22,6 +22,10 @@ class MarkUnreadSchema(Schema):
     book_id: int
 
 
+class BookCollectionSchema(Schema):
+    book_id: int
+
+
 class BookUploadSchema(Schema):
     title: str
     author: str

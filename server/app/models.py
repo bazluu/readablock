@@ -50,6 +50,23 @@ class BookProgress(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class BookCollection(models.Model):
+    """
+    Tracks which books are displayed in the user's dashboard.
+    The very existence of a row in this table means that the book is displayed in the dashboard.
+    """
+
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "book"], name="uniq_user_book_collection")
+        ]
+
+
 class Word(models.Model):
     """
     Shared vocabulary table, deduped across all users and books.

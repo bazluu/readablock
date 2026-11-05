@@ -1,7 +1,7 @@
 <script>
 	import { Book, BookCheck, BookOpen, MoreVertical } from 'lucide-svelte';
 
-	let { book, onopen, onunread, ondownload, ondelete } = $props();
+	let { book, onopen, onunread, ondownload, ondelete, ontogglecollection } = $props();
 
 	let percent = $derived(
 		book.sentence_count ? Math.round((book.sentence_last_read / book.sentence_count) * 100) : 0
@@ -37,7 +37,7 @@
 >
 	<div class="flex flex-1 flex-row gap-4">
 		<div
-			class="relative w-auto self-stretch shrink-0 bg-base-300 rounded-lg flex items-center justify-center overflow-hidden aspect-[2/3]"
+			class="relative w-2/5 shrink-0 self-start aspect-[2/3] bg-base-300 rounded-lg flex items-center justify-center overflow-hidden"
 		>
 			{#if state === 'completed'}
 				<BookCheck class="h-12 w-12 {accent.icon}" />
@@ -100,6 +100,14 @@
 						onclick={() => onunread?.(book.id)}
 					>
 						Mark as unread
+					</button>
+				</li>
+				<li>
+					<button
+						class="w-full bg-transparent border-0 text-left cursor-pointer hover:bg-base-300"
+						onclick={() => ontogglecollection?.(book)}
+					>
+						{book.in_collection ? 'Remove from collection' : 'Add to collection'}
 					</button>
 				</li>
 				{#if book.is_owner}

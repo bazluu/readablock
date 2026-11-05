@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { baseURL, selectedBookId, selectedLanguage, wordGoal } from '$lib/state.svelte.js';
-	import { AlertCircle, Book, BookOpen, Library, RotateCcw, Upload } from 'lucide-svelte';
+	import { AlertCircle, Book, BookOpen, Library, RotateCcw } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 	import WordGoalProgress from '$lib/components/WordGoalProgress.svelte';
@@ -39,6 +39,45 @@
 		} catch (err) {
 			console.error('Error marking book as unread:', err);
 		}
+	}
+
+	async function addToCollection(bookId) {
+		try {
+			const response = await fetch(`${baseURL}/app/books/collection`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ book_id: bookId })
+			});
+			if (!response.ok) {
+				throw new Error('Failed to add book to dashboard');
+			}
+			await fetchBooks();
+		} catch (err) {
+			console.error('Error adding book to dashboard:', err);
+		}
+	}
+
+	async function removeFromCollection(bookId) {
+		try {
+			const response = await fetch(`${baseURL}/app/books/collection/${bookId}`, {
+				method: 'DELETE',
+				credentials: 'include'
+			});
+			if (!response.ok) {
+				throw new Error('Failed to remove book from dashboard');
+			}
+			await fetchBooks();
+		} catch (err) {
+			console.error('Error removing book from dashboard:', err);
+		}
+	}
+
+	function toggleCollection(book) {
+		if (book.in_collection) {
+			return removeFromCollection(book.id);
+		}
+		return addToCollection(book.id);
 	}
 
 	function downloadBook(bookId) {
@@ -131,12 +170,12 @@
 				<div class="hero-content text-center flex-col">
 					<Library class="h-20 w-20 text-base-content/20" />
 					<div>
-						<h2 class="text-2xl font-bold">No books yet</h2>
+						<h2 class="text-2xl font-bold">No books on your dashboard yet</h2>
 						<p class="py-4 text-base-content/60 max-w-sm">
-							Start your reading journey by uploading your first book.
+							Add books to your dashboard from your library using the card menu.
 						</p>
-						<a href="/upload" class="btn btn-primary btn-lg gap-2">
-							<Upload class="h-5 w-5" /> Upload a book
+						<a href="/library" class="btn btn-primary btn-lg gap-2">
+							<Library class="h-5 w-5" /> Go to library
 						</a>
 					</div>
 				</div>
@@ -163,7 +202,14 @@
 					</div>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 						{#each continueReading as book (book.id)}
-							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} ondelete={requestDelete} />
+							<BookCard
+								{book}
+								onopen={openBook}
+								onunread={markUnread}
+								ondownload={downloadBook}
+								ondelete={requestDelete}
+								ontogglecollection={toggleCollection}
+							/>
 						{/each}
 					</div>
 				</section>
@@ -181,7 +227,14 @@
 					</div>
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 						{#each library as book (book.id)}
-							<BookCard {book} onopen={openBook} onunread={markUnread} ondownload={downloadBook} ondelete={requestDelete} />
+							<BookCard
+								{book}
+								onopen={openBook}
+								onunread={markUnread}
+								ondownload={downloadBook}
+								ondelete={requestDelete}
+								ontogglecollection={toggleCollection}
+							/>
 						{/each}
 					</div>
 				</section>

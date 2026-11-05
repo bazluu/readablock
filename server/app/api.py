@@ -201,6 +201,11 @@ def library(request, sort: str = "alphabetical", language: str | None = None):
         )
     }
 
+    # Books the user displays in the dashboard, keyed by book id.
+    collected_book_ids = set(
+        models.BookCollection.objects.filter(user_id=user_id).values_list("book_id", flat=True)
+    )
+
     # Books the user has access to: their own uploads plus every public book.
     access_filter = Q(uploaded_by_id=user_id) | Q(is_public=True)
     if language is not None:
@@ -212,7 +217,7 @@ def library(request, sort: str = "alphabetical", language: str | None = None):
 
     for book in readable_books:
         response["library"].append(
-            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "language": book["language"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": book["uploaded_by_id"] == user_id, "uploaded_at": str(book["uploaded_at"])}
+            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "language": book["language"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": book["uploaded_by_id"] == user_id, "in_collection": book["id"] in collected_book_ids, "uploaded_at": str(book["uploaded_at"])}
         )
 
     # Each sort option carries its key function and whether the list is
@@ -232,6 +237,11 @@ def dashboard_books(request, language: str):
 
     response = {"continue_reading": [], "library": []}
 
+    # Books displayed in the dashboard are the user's collection.
+    collected_book_ids = list(
+        models.BookCollection.objects.filter(user_id=user_id).values_list("book_id", flat=True)
+    )
+
     # Per-user reading progress keyed by book id, used to show read status on
     # library cards.
     progress_map = {
@@ -241,22 +251,12 @@ def dashboard_books(request, language: str):
         )
     }
 
-    # Fetch user's own books
-    for book in models.Book.objects.filter(uploaded_by_id=user_id, language=language).values(
-        "id", "title", "title_en", "author", "sentence_count"
+    # Collection books available in the selected language
+    for book in models.Book.objects.filter(id__in=collected_book_ids, language=language).values(
+        "id", "title", "title_en", "author", "sentence_count", "uploaded_by_id"
     ):
         response["library"].append(
-            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": True}
-        )
-
-    # Fetch public books from other users
-    for book in (
-        models.Book.objects.filter(is_public=True, language=language)
-        .exclude(uploaded_by_id=user_id)
-        .values("id", "title", "title_en", "author", "sentence_count")
-    ):
-        response["library"].append(
-            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": False}
+            {"id": book["id"], "title": book["title"], "title_en": book["title_en"], "author": book["author"], "sentence_count": book["sentence_count"], "sentence_last_read": progress_map.get(book["id"], 0), "is_owner": book["uploaded_by_id"] == user_id, "in_collection": True}
         )
 
     # Display library books alphabetically regardless of read state, using the
@@ -266,7 +266,7 @@ def dashboard_books(request, language: str):
     # Fully read books stay in the library and must not show up as
     # continue reading.
     books_in_progress = models.BookProgress.objects.filter(
-        user_id=user_id, book__language=language
+        user_id=user_id, book__language=language, book_id__in=collected_book_ids
     ).exclude(sentence_last_read__gte=F("book__sentence_count")).order_by("-updated_at").values(
         "book_id", "book__title", "book__title_en", "book__author", "sentence_last_read", "book__sentence_count", "book__uploaded_by_id"
     )
@@ -300,6 +300,9 @@ def read(request, data: schema.BookSchema):
         return Response({"error": "Book not found"}, status=404)
 
     book_language = models.Book.objects.get(id=data.book_id).language
+
+    # Starting the book adds it to the user's dashboard collection.
+    models.BookCollection.objects.get_or_create(user_id=user_id, book_id=data.book_id)
 
     # Save book sentences to cache if not already loaded
     if cache.get(f"{user_id}:{data.book_id}") is None:
@@ -392,6 +395,44 @@ def mark_unread(request, data: schema.MarkUnreadSchema):
     return Response({"error": "Book not in library"}, status=404)
 
 
+@api.post("/books/collection")
+def add_book_to_collection(request, data: schema.BookCollectionSchema):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    access = services.verify_book_access_and_existence(data.book_id, user_id)
+    if not access:
+        return Response({"error": "Book not found"}, status=404)
+
+    _, created = models.BookCollection.objects.get_or_create(
+        user_id=user_id, book_id=data.book_id
+    )
+
+    if created:
+        return Response({"message": "Book added to dashboard"}, status=201)
+
+    return Response({"message": "Book already in dashboard"}, status=200)
+
+
+@api.delete("/books/collection/{book_id}")
+def remove_book_from_collection(request, book_id: int):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    deleted, _ = models.BookCollection.objects.filter(
+        user_id=user_id, book_id=book_id
+    ).delete()
+
+    if deleted:
+        return Response({"message": "Book removed from dashboard"}, status=200)
+
+    return Response({"error": "Book not in dashboard"}, status=404)
+
+
 @api.post("/translate/")
 def translate(request, data: schema.TranslationSchema):
     try:
@@ -464,6 +505,9 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
     )
     book.save()
 
+    # The uploader's new book is displayed in their dashboard.
+    models.BookCollection.objects.create(user=user, book=book)
+
     # Save book sentences to cache and store sentence count on the book
     try:
         services.cache_book_sentences(book.id, user.id)
@@ -511,6 +555,9 @@ def upload_book_content(request, data: schema.BookUploadContentSchema):
         is_public=is_public
     )
     book.save()
+
+    # The uploader's new book is displayed in their dashboard.
+    models.BookCollection.objects.create(user=user, book=book)
 
     # Save book sentences to cache and store sentence count on the book
     try:

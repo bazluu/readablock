@@ -90,6 +90,45 @@
 		}
 	}
 
+	async function addToCollection(bookId) {
+		try {
+			const response = await fetch(`${baseURL}/app/books/collection`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ book_id: bookId })
+			});
+			if (!response.ok) {
+				throw new Error('Failed to add book to dashboard');
+			}
+			await fetchBooks();
+		} catch (err) {
+			console.error('Error adding book to dashboard:', err);
+		}
+	}
+
+	async function removeFromCollection(bookId) {
+		try {
+			const response = await fetch(`${baseURL}/app/books/collection/${bookId}`, {
+				method: 'DELETE',
+				credentials: 'include'
+			});
+			if (!response.ok) {
+				throw new Error('Failed to remove book from dashboard');
+			}
+			await fetchBooks();
+		} catch (err) {
+			console.error('Error removing book from dashboard:', err);
+		}
+	}
+
+	function toggleCollection(book) {
+		if (book.in_collection) {
+			return removeFromCollection(book.id);
+		}
+		return addToCollection(book.id);
+	}
+
 	function downloadBook(bookId) {
 		// Navigate to the endpoint so the browser follows the server's
 		// Content-Disposition header and uses the original filename.
@@ -233,6 +272,7 @@
 							onunread={markUnread}
 							ondownload={downloadBook}
 							ondelete={requestDelete}
+							ontogglecollection={toggleCollection}
 						/>
 						<div class="badge badge-sm badge-neutral absolute top-2 right-2 pointer-events-none">
 							{book.language}
