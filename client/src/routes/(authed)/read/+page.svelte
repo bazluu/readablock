@@ -425,9 +425,11 @@
 			>
 				<div class="max-w-4xl mx-auto flex flex-col gap-4">
 					<div class="flex justify-center">
-						<div class="join join-horizontal my-auto w-full border border-base-300 rounded-lg">
+						<div class="flex my-auto w-full gap-2">
 							<button
-								class="join-item btn btn-lg flex-1 {translated ? 'btn-primary' : 'btn-ghost'}"
+								class="btn btn-lg flex-1 border border-base-300 {translated
+									? 'btn-primary'
+									: 'btn-ghost'}"
 								on:click={translateCurrentSentence}
 								disabled={translating}
 							>
@@ -439,7 +441,7 @@
 								<p>Translate</p>
 							</button>
 							<button
-								class="join-item btn btn-lg flex-1"
+								class="btn btn-lg flex-1 border border-base-300"
 								on:click={() => (speaking ? handleStopSpeaking() : handleSpeak(sentence))}
 							>
 								{#if speaking}
