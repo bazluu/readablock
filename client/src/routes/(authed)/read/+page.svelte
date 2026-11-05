@@ -388,34 +388,26 @@
 			<div class="pt-28">
 				<!-- Sentence -->
 				<div class="flex flex-col gap-2">
-					<div class="rounded-lg flex gap-2">
-						<div class="flex-1 border border-base-300 rounded-lg bg-base-200">
-							<div class="px-2 pt-1">
-								{#each splitWords(sentence) as part}
-									{#if part.trim().length > 0}
-										<button
-											class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300 text-lg text-white font-serif"
-											on:click={(e) => handleWordClick(e, part, sentence)}
-										>
-											{part}
-										</button>
-									{:else}
-										{part}
-									{/if}
-								{/each}
-							</div>
-
-							{#if translated}
-								<div class="px-4 border-1 bg-primary rounded-b-lg text-black">
-									<div class="flex items-start justify-between">
-										<div class="flex-1">
-											<p class="text-md">{translated}</p>
-										</div>
-									</div>
-								</div>
+					<div class="px-2 pt-1">
+						{#each splitWords(sentence) as part}
+							{#if part.trim().length > 0}
+								<button
+									class="btn btn-ghost btn-xs normal-case p-0 m-0.5 hover:bg-base-300 text-lg text-white font-serif"
+									on:click={(e) => handleWordClick(e, part, sentence)}
+								>
+									{part}
+								</button>
+							{:else}
+								{part}
 							{/if}
-						</div>
+						{/each}
 					</div>
+
+					{#if translated}
+						<div class="px-4 py-1 bg-primary rounded-lg text-black">
+							<p class="text-md">{translated}</p>
+						</div>
+					{/if}
 				</div>
 			</div>
 
