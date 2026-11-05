@@ -64,6 +64,9 @@
 					{book.sentence_count} sentences
 				</div>
 			</div>
+			{#if state === 'unread'}
+				<div class="h-4"></div>
+			{/if}
 			<div class="flex flex-col gap-2 mt-auto pt-3 border-t border-base-300">
 				{#if state !== 'unread'}
 					<div class="flex flex-row items-center gap-3">
