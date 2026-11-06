@@ -139,7 +139,13 @@
 		link.remove();
 	}
 
+	// Monotonic id per fetchBooks call; responses from superseded requests are
+	// discarded so a slow earlier fetch can't overwrite the current filter's
+	// results.
+	let fetchSequence = 0;
+
 	async function fetchBooks() {
+		const requestId = ++fetchSequence;
 		isLoading = true;
 		error = null;
 		try {
@@ -155,12 +161,16 @@
 			}
 			const data = await response.json();
 
+			if (requestId !== fetchSequence) return;
 			library = data.library || [];
 		} catch (err) {
+			if (requestId !== fetchSequence) return;
 			error = err.message;
 			console.error('Error fetching books:', err);
 		} finally {
-			isLoading = false;
+			if (requestId === fetchSequence) {
+				isLoading = false;
+			}
 		}
 	}
 
