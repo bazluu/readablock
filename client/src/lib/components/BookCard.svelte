@@ -1,7 +1,7 @@
 <script>
 	import { Book, BookCheck, BookOpen, MoreVertical } from 'lucide-svelte';
 
-	let { book, onopen, onunread, ondownload, ondelete } = $props();
+	let { book, onopen, onunread, ondownload, ondelete, ontogglecollection } = $props();
 
 	let percent = $derived(
 		book.sentence_count ? Math.round((book.sentence_last_read / book.sentence_count) * 100) : 0
@@ -11,7 +11,7 @@
 	let accent = $derived(
 		{
 			completed: {
-				border: 'border-accent',
+				border: 'hover:border-accent',
 				icon: 'text-accent',
 				progress: 'progress-accent',
 				button: 'btn-accent'
@@ -37,7 +37,7 @@
 >
 	<div class="flex flex-1 flex-row gap-4">
 		<div
-			class="relative w-1/2 shrink-0 self-stretch bg-base-300 rounded-lg flex items-center justify-center overflow-hidden"
+			class="relative w-2/5 shrink-0 self-start aspect-[2/3] bg-base-300 rounded-lg flex items-center justify-center overflow-hidden"
 		>
 			{#if state === 'completed'}
 				<BookCheck class="h-12 w-12 {accent.icon}" />
@@ -49,21 +49,24 @@
 		</div>
 		<div class="flex flex-col gap-3 min-w-0 flex-1">
 			<div class="flex flex-col gap-1">
-				<p class="font-bold text-base leading-tight line-clamp-2">
+				<p class="font-bold text-lg leading-tight line-clamp-2">
 					{book.title_en || book.title}
 				</p>
 				{#if book.title_en && book.title}
-					<p class="-mt-0.5 font-serif text-sm text-base-content/60 leading-tight line-clamp-2">
+					<p class="-mt-0.5 font-serif text-base text-base-content/60 leading-tight line-clamp-2">
 						{book.title}
 					</p>
 				{/if}
-				<p class="text-sm font-medium text-base-content/50 leading-tight line-clamp-1">
+				<p class="text-base font-medium text-base-content/50 leading-tight line-clamp-1">
 					{book.author}
 				</p>
-				<div class="badge badge-sm badge-neutral mt-1 self-start">
+				<div class="badge badge-neutral mt-1 self-start">
 					{book.sentence_count} sentences
 				</div>
 			</div>
+			{#if state === 'unread'}
+				<div class="h-4"></div>
+			{/if}
 			<div class="flex flex-col gap-2 mt-auto pt-3 border-t border-base-300">
 				{#if state !== 'unread'}
 					<div class="flex flex-row items-center gap-3">
@@ -72,7 +75,7 @@
 							value={book.sentence_last_read}
 							max={book.sentence_count || 1}
 						></progress>
-						<span class="text-xs font-bold {accent.icon}">{percent}%</span>
+						<span class="text-sm font-bold {accent.icon}">{percent}%</span>
 					</div>
 				{/if}
 				<div class="flex flex-row items-center gap-2">
@@ -97,6 +100,14 @@
 						onclick={() => onunread?.(book.id)}
 					>
 						Mark as unread
+					</button>
+				</li>
+				<li>
+					<button
+						class="w-full bg-transparent border-0 text-left cursor-pointer hover:bg-base-300"
+						onclick={() => ontogglecollection?.(book)}
+					>
+						{book.in_collection ? 'Remove from collection' : 'Add to collection'}
 					</button>
 				</li>
 				{#if book.is_owner}

@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { baseURL, selectedLanguage, wordGoal } from '$lib/state.svelte.js';
-	import { Library, Upload, Languages, MessageSquare, LogOut, Goal, User } from 'lucide-svelte';
+	import { ChevronDown, LayoutDashboard, Library, Upload, Languages, MessageSquare, LogOut, Goal, User, Menu } from 'lucide-svelte';
 	import WordGoalModal from '$lib/components/WordGoalModal.svelte';
 
 	let languages = $state([]);
@@ -11,6 +11,12 @@
 	let userDropdownOpen = $state(false);
 	let showGoalModal = $state(false);
 	let currentGoal = $state(0);
+	let drawerOpen = $state(false);
+
+	$effect(() => {
+		$page.url.pathname;
+		drawerOpen = false;
+	});
 
 	onMount(async () => {
 		const response = await fetch(`${baseURL}/app/supported-languages`, {
@@ -49,6 +55,11 @@
 		goto('/login');
 	}
 
+	function navigate(path) {
+		drawerOpen = false;
+		goto(path);
+	}
+
 	async function openUserMenu() {
 		userDropdownOpen = !userDropdownOpen;
 		if (userDropdownOpen) {
@@ -78,112 +89,183 @@
 	}
 </script>
 
-<div
-	class="flex items-center py-1 sm:py-2 bg-base-200 border-b border-base-300 text-neutral-100 gap-1 sm:gap-2"
->
-	<div class="flex items-center flex-1 gap-1 sm:gap-2">
-		<button
-			onclick={() => goto('/dashboard')}
-			class="btn font-display text-base sm:text-lg md:text-2xl font-bold text-primary transition-colors"
-		>
-			<span class="hidden md:inline">Readablock</span>
-			<span class="md:hidden">R</span>
-		</button>
+<div class="drawer">
+	<input id="nav-drawer" type="checkbox" class="drawer-toggle" bind:checked={drawerOpen} />
 
-		<div class="relative shrink-0" use:clickOutside={() => (langDropdownOpen = false)}>
-			<button
-				onclick={() => (langDropdownOpen = !langDropdownOpen)}
-				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 rounded-lg"
-			>
-				<Languages class="h-4 w-4 sm:h-5 sm:w-5" />
-				<span class="sm:hidden">{selectedLanguage.value || 'Lang'}</span>
-				<span class="hidden sm:inline">{currentLanguageName()}</span>
-			</button>
-			{#if langDropdownOpen}
-				<div
-					class="absolute top-full left-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52 overflow-y-auto max-h-64"
+	<div class="drawer-content">
+		<div
+			class="flex items-center py-1 sm:py-2 bg-base-200 border-b border-base-300 text-neutral-100 gap-1 sm:gap-2"
+		>
+			<div class="flex items-center flex-1 gap-1 sm:gap-2">
+				<button
+					onclick={() => (drawerOpen = true)}
+					class="btn md:hidden px-2 rounded-lg"
+					aria-label="Open menu"
 				>
-					{#each languages as lang}
-						<button
-							class="w-full text-left px-4 py-2 btn {selectedLanguage.value === lang.code
-								? 'btn-neutral'
-								: ''}"
-							onclick={() => selectLanguage(lang.code)}
+					<Menu class="h-5 w-5" />
+				</button>
+				<button
+					onclick={() => goto('/dashboard')}
+					class="btn font-display text-base sm:text-lg md:text-2xl font-bold text-primary transition-colors"
+				>
+					Readablock
+				</button>
+
+				<div class="relative shrink-0" use:clickOutside={() => (langDropdownOpen = false)}>
+					<button
+						onclick={() => (langDropdownOpen = !langDropdownOpen)}
+						class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 rounded-lg"
+					>
+						<Languages class="h-4 w-4 sm:h-5 sm:w-5" />
+						<span class="sm:hidden">{selectedLanguage.value || 'Lang'}</span>
+						<span class="hidden sm:inline">{currentLanguageName()}</span>
+						<ChevronDown class="h-4 w-4 opacity-60" />
+					</button>
+					{#if langDropdownOpen}
+						<div
+							class="absolute top-full left-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52 overflow-y-auto max-h-64"
 						>
-							{lang.name}
-						</button>
-					{/each}
+							{#each languages as lang}
+								<button
+									class="w-full text-left px-4 py-2 btn {selectedLanguage.value === lang.code
+										? 'btn-neutral'
+										: ''}"
+									onclick={() => selectLanguage(lang.code)}
+								>
+									{lang.name}
+								</button>
+							{/each}
+						</div>
+					{/if}
 				</div>
-			{/if}
+			</div>
+
+			<div class="hidden md:flex items-center justify-center">
+				<div class="flex gap-0.5 sm:gap-1">
+					<button
+						onclick={() => goto('/dashboard')}
+						class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+							.url.pathname === '/dashboard'
+							? 'btn-neutral'
+							: ''}"
+					>
+						<LayoutDashboard class="h-4 w-4 sm:h-5 sm:w-5" />
+						<span class="hidden sm:inline">Dashboard</span>
+					</button>
+					<button
+						onclick={() => goto('/library')}
+						class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+							.url.pathname === '/library'
+							? 'btn-neutral'
+							: ''}"
+					>
+						<Library class="h-4 w-4 sm:h-5 sm:w-5" />
+						<span class="hidden sm:inline">Library</span>
+					</button>
+					<button
+						onclick={() => goto('/upload')}
+						class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+							.url.pathname === '/upload'
+							? 'btn-neutral'
+							: ''}"
+					>
+						<Upload class="h-4 w-4 sm:h-5 sm:w-5" />
+						<span class="hidden sm:inline">Upload</span>
+					</button>
+					<button
+						onclick={() => goto('/feedback')}
+						class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+							.url.pathname === '/feedback'
+							? 'btn-neutral'
+							: ''}"
+					>
+						<MessageSquare class="h-4 w-4 sm:h-5 sm:w-5" />
+						<span class="hidden sm:inline">Feedback</span>
+					</button>
+				</div>
+			</div>
+
+			<div class="flex items-center justify-end flex-1 gap-1 min-w-0">
+				<div class="relative shrink-0" use:clickOutside={() => (userDropdownOpen = false)}>
+					<button
+						onclick={openUserMenu}
+						class="btn inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:py-2 rounded-lg"
+						aria-label="User menu"
+						title="User menu"
+					>
+						<User class="h-4 w-4 sm:h-5 sm:w-5" />
+					</button>
+					{#if userDropdownOpen}
+						<div
+							class="absolute top-full right-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52"
+						>
+							<button
+								class="w-full flex items-center gap-2 text-left px-4 py-2 btn justify-start"
+								onclick={openGoalModal}
+							>
+								<Goal class="h-4 w-4" />
+								Change word goal
+							</button>
+							<button
+								class="w-full flex items-center gap-2 text-left px-4 py-2 btn justify-start"
+								onclick={logout}
+							>
+								<LogOut class="h-4 w-4" />
+								Log out
+							</button>
+						</div>
+					{/if}
+				</div>
+			</div>
 		</div>
 	</div>
 
-	<div class="flex items-center justify-center">
-		<div class="flex gap-0.5 sm:gap-1">
+	<div class="drawer-side">
+		<label for="nav-drawer" aria-label="Close menu" class="drawer-overlay"></label>
+		<nav
+			class="bg-base-200 text-neutral-100 min-h-full w-64 p-3 border-r border-base-300 flex flex-col gap-1"
+		>
 			<button
-				onclick={() => goto('/dashboard')}
-				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+				onclick={() => navigate('/dashboard')}
+				class="btn inline-flex items-center justify-start gap-2 px-4 py-2 rounded-lg {$page
 					.url.pathname === '/dashboard'
 					? 'btn-neutral'
 					: ''}"
 			>
-				<Library class="h-4 w-4 sm:h-5 sm:w-5" />
-				<span class="hidden sm:inline">Dashboard</span>
+				<LayoutDashboard class="h-5 w-5" />
+				Dashboard
 			</button>
 			<button
-				onclick={() => goto('/upload')}
-				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+				onclick={() => navigate('/library')}
+				class="btn inline-flex items-center justify-start gap-2 px-4 py-2 rounded-lg {$page
+					.url.pathname === '/library'
+					? 'btn-neutral'
+					: ''}"
+			>
+				<Library class="h-5 w-5" />
+				Library
+			</button>
+			<button
+				onclick={() => navigate('/upload')}
+				class="btn inline-flex items-center justify-start gap-2 px-4 py-2 rounded-lg {$page
 					.url.pathname === '/upload'
 					? 'btn-neutral'
 					: ''}"
 			>
-				<Upload class="h-4 w-4 sm:h-5 sm:w-5" />
-				<span class="hidden sm:inline">Upload</span>
+				<Upload class="h-5 w-5" />
+				Upload
 			</button>
 			<button
-				onclick={() => goto('/feedback')}
-				class="btn inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-4 py-1.5 sm:py-2 rounded-lg {$page
+				onclick={() => navigate('/feedback')}
+				class="btn inline-flex items-center justify-start gap-2 px-4 py-2 rounded-lg {$page
 					.url.pathname === '/feedback'
 					? 'btn-neutral'
 					: ''}"
 			>
-				<MessageSquare class="h-4 w-4 sm:h-5 sm:w-5" />
-				<span class="hidden sm:inline">Feedback</span>
+				<MessageSquare class="h-5 w-5" />
+				Feedback
 			</button>
-		</div>
-	</div>
-
-	<div class="flex items-center justify-end flex-1 gap-1 min-w-0">
-		<div class="relative shrink-0" use:clickOutside={() => (userDropdownOpen = false)}>
-			<button
-				onclick={openUserMenu}
-				class="btn inline-flex items-center justify-center gap-1 px-2 py-1.5 sm:py-2 rounded-lg"
-				aria-label="User menu"
-				title="User menu"
-			>
-				<User class="h-4 w-4 sm:h-5 sm:w-5" />
-			</button>
-			{#if userDropdownOpen}
-				<div
-					class="absolute top-full right-0 mt-1 bg-base-200 border border-base-300 rounded-lg shadow-lg z-50 w-52"
-				>
-					<button
-						class="w-full flex items-center gap-2 text-left px-4 py-2 btn justify-start"
-						onclick={openGoalModal}
-					>
-						<Goal class="h-4 w-4" />
-						Change word goal
-					</button>
-					<button
-						class="w-full flex items-center gap-2 text-left px-4 py-2 btn justify-start"
-						onclick={logout}
-					>
-						<LogOut class="h-4 w-4" />
-						Log out
-					</button>
-				</div>
-			{/if}
-		</div>
+		</nav>
 	</div>
 </div>
 
