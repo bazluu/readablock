@@ -155,7 +155,7 @@ def supported_languages(request):
 
 
 @api.get("/library")
-def library(request, sort: str = "alphabetical", language: str | None = None):
+def library(request, sort: str = "alphabetical_asc", language: str | None = None):
     # Alphabetical is A to Z or Z to A by displayed title (title_en falls back
     # to title); author is A to Z or Z to A by author name (books without an
     # author sort first); date_added is oldest first or newest first by upload
