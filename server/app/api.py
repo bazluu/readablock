@@ -16,6 +16,7 @@ from datetime import date
 
 from app import schema, services, selectors, models, constants
 from app.constants import CODE_TO_GOOGLE_TTS
+from billing import services as billing_services
 from core import models as core_models
 
 api = NinjaAPI()
@@ -107,6 +108,9 @@ def update_word_goal(request, data: schema.WordGoalSchema):
     except (KeyError, User.DoesNotExist):
         return Response({"error": "Authentication required"}, status=401)
 
+    if not billing_services.is_entitled(user.id):
+        return Response({"error": "Subscription required"}, status=402)
+
     if data.word_goal not in core_models.UserMeta.DailyWordGoal.values:
         return Response(
             {"error": f"Invalid word goal. Allowed values: {list(core_models.UserMeta.DailyWordGoal.values)}"},
@@ -131,6 +135,9 @@ def reading_log_today(request):
         user_id = request.session["user_id"]
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
 
     log = selectors.get_reading_log(user_id, date.today())
     word_count = log.word_count if log else 0
@@ -173,6 +180,9 @@ def library(request, sort: str = "alphabetical_asc", language: str | None = None
         user_id = request.session["user_id"]
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
 
     if sort not in SORT_KEYS:
         return Response(
@@ -235,6 +245,9 @@ def dashboard_books(request, language: str):
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
 
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
+
     response = {"continue_reading": [], "library": []}
 
     # Books displayed in the dashboard are the user's collection.
@@ -294,6 +307,9 @@ def read(request, data: schema.BookSchema):
         user_id = request.session["user_id"]
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
 
     access = services.verify_book_access_and_existence(data.book_id, user_id)
     if not access:
@@ -381,6 +397,9 @@ def mark_unread(request, data: schema.MarkUnreadSchema):
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
 
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
+
     access = services.verify_book_access_and_existence(data.book_id, user_id)
     if not access:
         return Response({"error": "Book not found"}, status=404)
@@ -401,6 +420,9 @@ def add_book_to_collection(request, data: schema.BookCollectionSchema):
         user_id = request.session["user_id"]
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
 
     access = services.verify_book_access_and_existence(data.book_id, user_id)
     if not access:
@@ -423,6 +445,9 @@ def remove_book_from_collection(request, book_id: int):
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
 
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
+
     deleted, _ = models.BookCollection.objects.filter(
         user_id=user_id, book_id=book_id
     ).delete()
@@ -435,6 +460,14 @@ def remove_book_from_collection(request, book_id: int):
 
 @api.post("/translate/")
 def translate(request, data: schema.TranslationSchema):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
+
     try:
         translated = services.translate(data.text, data.source, data.target, data.context)
 
@@ -459,6 +492,9 @@ def upload_book(request, data: Form[schema.BookUploadSchema], file: UploadedFile
         user = User.objects.get(id=request.session["user_id"])
     except (KeyError, User.DoesNotExist):
         return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user.id):
+        return Response({"error": "Subscription required"}, status=402)
 
     if file.size > MAX_FILE_SIZE:
         return Response({"error": "File exceeds the 50 MB size limit"}, status=400)
@@ -525,6 +561,9 @@ def upload_book_content(request, data: schema.BookUploadContentSchema):
     except (KeyError, User.DoesNotExist):
         return Response({"error": "Authentication required"}, status=401)
 
+    if not billing_services.is_entitled(user.id):
+        return Response({"error": "Subscription required"}, status=402)
+
     if data.language not in constants.SUPPORTED_LANGUAGES:
         return Response(
             {
@@ -576,6 +615,9 @@ def delete_book(request, book_id: int):
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
 
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
+
     try:
         book = models.Book.objects.get(id=book_id)
     except models.Book.DoesNotExist:
@@ -596,6 +638,9 @@ def download_book(request, book_id: int):
         user_id = request.session["user_id"]
     except KeyError:
         return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
 
     # Only the uploader can download their own book.
     try:
@@ -632,6 +677,14 @@ def create_feedback(request, data: schema.FeedbackSchema):
 
 @api.post("/tts/")
 def tts(request, data: schema.TTSSchema):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    if not billing_services.is_entitled(user_id):
+        return Response({"error": "Subscription required"}, status=402)
+
     language_code = CODE_TO_GOOGLE_TTS.get(data.language.upper())
 
     if language_code is None:

@@ -3,10 +3,21 @@ import json
 from django.http import HttpResponse
 
 from ninja import NinjaAPI
+from ninja.responses import Response
 
 from billing import services
 
 api = NinjaAPI(urls_namespace="billing")
+
+
+@api.get("/status/")
+def billing_status(request):
+    try:
+        user_id = request.session["user_id"]
+    except KeyError:
+        return Response({"error": "Authentication required"}, status=401)
+
+    return Response({"entitled": services.is_entitled(user_id)}, status=200)
 
 
 @api.post("/webhook/")

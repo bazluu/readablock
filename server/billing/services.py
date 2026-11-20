@@ -9,8 +9,23 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from billing import models
+from core.models import UserMeta
 
 VALID_SUBSCRIPTION_STATUSES = {choice for choice, _ in models.Subscription.STATUS_CHOICES}
+
+
+def is_entitled(user_id) -> bool:
+    """
+    Using the app requires an active subscription. Superusers and users
+    granted free access in the admin are exempt.
+    """
+    if User.objects.filter(id=user_id, is_superuser=True).exists():
+        return True
+
+    if UserMeta.objects.filter(user_id=user_id, free_access=True).exists():
+        return True
+
+    return models.Subscription.objects.filter(user_id=user_id, status="active").exists()
 
 
 def is_valid_signature(raw_body: bytes, signature: str | None) -> bool:

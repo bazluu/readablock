@@ -13,6 +13,10 @@ class UserMeta(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.PROTECT)
     verified = models.BooleanField(default=False)
+    free_access = models.BooleanField(
+        default=False,
+        help_text="Grants full app access without a subscription."
+    )
     daily_word_goal = models.PositiveIntegerField(
         choices=DailyWordGoal.choices,
         null=True
