@@ -24,6 +24,7 @@ import sentry_sdk
 
 GOOGLE_TRANSLATE_API_KEY = os.getenv("GOOGLE_TRANSLATE_API_KEY")
 GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY")
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "storages",
     "app.apps.AppConfig",
+    "billing.apps.AppConfig",
     "core",
 ]
 

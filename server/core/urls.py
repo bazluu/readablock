@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from app.api import api as app_api
+from billing.api import api as billing_api
 
 
 def trigger_error(request):
@@ -30,6 +31,7 @@ def trigger_error(request):
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("app/", app_api.urls),
+    path("billing/", billing_api.urls),
     path("sentry-debug/", trigger_error),
 ]
 
