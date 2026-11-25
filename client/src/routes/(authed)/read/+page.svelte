@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import {
 		baseURL,
@@ -30,6 +30,9 @@
 	let isLoading = true;
 	let error = null;
 
+	// Bottom pagination controls; content keeps clear of it via padding-bottom
+	const CONTROLS_RESERVE = '13rem';
+
 	// Daily word goal progress
 	let wordsReadToday = 0;
 	let showGoalModal = false;
@@ -42,6 +45,9 @@
 	// TTS state
 	let speaking = false;
 	let currentAudio = null;
+
+	// Scroll offset of the reading pane when a new sentence loads
+	let contentAnchor;
 
 	function increaseTtsSpeed() {
 		ttsSpeed.value = Math.min(1.5, Math.round((ttsSpeed.value + 0.1) * 10) / 10);
@@ -129,6 +135,16 @@
 		}
 	}
 
+	function scrollToSentence() {
+		// Re-anchor the reading pane to the freshly loaded sentence without
+		// fighting the browser's scroll anchoring. Runs after the DOM update.
+		tick().then(() => {
+			if (contentAnchor) {
+				window.scrollTo({ top: contentAnchor.offsetTop - 16, behavior: 'instant' });
+			}
+		});
+	}
+
 	async function translateText(text, context = null) {
 		try {
 			const requestBody = {
@@ -176,6 +192,8 @@
 		try {
 			const result = await translateText(sentence);
 			translated = result;
+			// Keep the sentence text in view; the translation flows below it
+			scrollToSentence();
 		} catch (err) {
 			console.error('Translation error:', err);
 			alert(`Translation error: ${err.message}`);
@@ -200,7 +218,7 @@
 			translation: '',
 			loading: true,
 			x: rect.left,
-			y: rect.bottom + window.scrollY + 4
+			y: rect.bottom + 4
 		};
 
 		try {
@@ -269,6 +287,7 @@
 		translated = null; // Clear translation when changing sentences
 		closeWordDropdown();
 		await getSentences('next');
+		scrollToSentence();
 	};
 
 	const handlePreviousPage = async () => {
@@ -276,6 +295,7 @@
 		translated = null; // Clear translation when changing sentences
 		closeWordDropdown();
 		await getSentences('previous');
+		scrollToSentence();
 	};
 
 	const splitWords = (text) => {
@@ -346,7 +366,7 @@
 	{:else if sentence === null}
 		<p class="text-center">No sentences found.</p>
 	{:else}
-		<div class="max-w-4xl mx-auto pb-20">
+		<div class="max-w-4xl mx-auto" style="padding-bottom: {CONTROLS_RESERVE};">
 			<div class="fixed top-0 left-0 right-0 bg-base-100 border-b border-base-300 py-3 px-4 z-40">
 				<div class="max-w-4xl mx-auto">
 					<div class="flex flex-row w-full justify-between items-end mb-4">
@@ -385,7 +405,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="pt-28">
+			<div bind:this={contentAnchor} style="padding-top: 7rem;">
 				<!-- Sentence -->
 				<div class="flex flex-col gap-2">
 					<div class="px-2 pt-1">
